@@ -1,0 +1,22 @@
+body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+.contenedor-principal { display: flex; gap: 20px; max-width: 1200px; margin: auto; }
+
+/* Paneles */
+.panel-datos, .panel-chat { flex: 1; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.oculto { display: none; }
+
+/* Botón Transnumeración */
+.btn-transnumeracion { background: #1a3a5a; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; }
+
+/* Tabla */
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+th { background: #f8f9fa; }
+
+/* Chat */
+.historial-chat { height: 350px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
+.mensaje { padding: 8px 12px; border-radius: 10px; max-width: 80%; }
+.tutor { background: #e3f2fd; align-self: flex-start; }
+.estudiante { background: #1a3a5a; color: white; align-self: flex-end; }
+.zona-input { display: flex; gap: 5px; }
+input { flex: 1; padding: 8px; }
