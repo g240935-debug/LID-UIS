@@ -10,25 +10,21 @@ CORS(app)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Datos de la matriz para enviar al frontend
+# Datos de la matriz y gráfico (mantenidos constantes para la experiencia)
 matriz_data = [
     ["Hombres", 30, 5, 15, 50],
     ["Mujeres", 10, 25, 15, 50],
     ["Total Marginal", 40, 30, 30, 100]
 ]
 headers = ["Género \ Actividad", "Deportes", "Danza", "Música", "Total Marginal"]
-
-# Datos para el gráfico (basados en la columna de Danza, por ejemplo)
-# Representa: [Hombres Danza, Mujeres Danza, Total Danza]
 grafico_valores = [5, 25, 30]
 
-# Tu sistema de prompt (mantenido intacto)
+# Prompt del sistema (sin cambios)
 system_prompt = """Eres un mediador pedagógico (estudiante senior de la UIS). 
 Tu objetivo es guiar al usuario a través de la TSD (Brousseau) situacion a-didactica y el análisis bivariado (Niveles de Curcio)y por medio de la interacciòn hacerle ver al estudiante la importancia, a apartir de problemas reales.
 adicional a lo anterior tener en cuenta que se busca en espacio adecuado para el aprendizaje, por tanto si por algun motivo el estudiante responde o pregunta cosas que lo hagan ver que esta disperso o pensando en otras coasas, dile que retome e incitalo a concentrase. no responda a cosas que trunquen el proceso de aprendizaje, pero si a todo lo que el estuiante pregunte referente a analisis estadistico 
 DATOS DEL PROBLEMA:
 - Contexto: Preferencias de actividades extracurriculares según el género en jóvenes de Bucaramanga.
-- Matriz cruzada: Hombres (Deportes:30, Danza:5, Música:15). Mujeres (Deportes:10, Danza:25, Música:15). Total N={total_n}.
 
 PROTOCOLO SECUENCIAL (NO te saltes pasos):
 
@@ -60,18 +56,21 @@ REGLAS DE ORO:
 - Asume el rol de compañero universitario, sé amigable pero riguroso, no permitas que el estudiante se vaya con la falsa idea de dominar el tema si aùn no es suficiente, para ello cuestionalo con preguntas y analiza si las preguntas son respondidas con claridad, en caso de no serlo explicale o guialo con preguuntas mas sencillas.
 - Escribe los términos matemáticos en cursiva (ejemplo: *Frecuencia Conjunta*)."""
 
-# Diccionario para mantener sesiones de diferentes usuarios
+# Diccionario para mantener sesiones de diferentes usuarios en memoria
 chats = {}
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
+    # Recibimos el ID enviado por el frontend. Si no existe, usamos 'default'
     session_id = data.get("session_id", "default_user")
     user_message = data.get("message")
 
+    # Inicializar historial de sesión si es nueva
     if session_id not in chats:
         chats[session_id] = [{"role": "system", "content": system_prompt}]
 
+    # Agregar mensaje del usuario al historial de SU sesión
     chats[session_id].append({"role": "user", "content": user_message})
 
     try:
@@ -82,20 +81,24 @@ def chat():
         )
         
         reply = completion.choices[0].message.content
+        
+        # Guardar respuesta del asistente en el historial de SU sesión
         chats[session_id].append({"role": "assistant", "content": reply})
 
-        # Verificamos si la sesión terminó según tu lógica
+        # Lógica de detección de fin de sesión
         session_completed = "Frecuencia Condicionada" in reply and "¡Muy bien!" in reply
 
         return jsonify({
             "reply": reply,
             "table": matriz_data,
             "headers": headers,
-            "grafico_data": grafico_valores, # <-- Recomendación integrada aquí
+            "grafico_data": grafico_valores,
             "completed": session_completed
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run()
+    # En desarrollo, asegúrate de no usar debug=True si usas hilos, 
+    # o gestiona bien la memoria.
+    app.run(port=5000)
