@@ -3,65 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LID - Estadística UIS</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>LID - Tutor Estadístico UIS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>📊 Tutor LID: Análisis Bivariado</h1>
+            <p>Compañero, analicemos juntos estos datos de la UIS.</p>
+        </header>
 
-    <h1>Libro Interactivo Digital</h1>
+        <div id="tabla-container"></div>
 
-    <div class="contenedor-principal">
-        
-        <div class="panel-datos">
-            <button id="btnToggle" class="btn-transnumeracion" onclick="cambiarRepresentacion()">
-                📊 Cambiar a Representación Gráfica
-            </button>
-
-            <div id="vista-tabla">
-                <table>
-                    <tr>
-                        <th>Género \ Actividad</th>
-                        <th>Deportes</th>
-                        <th>Danza</th>
-                        <th>Música</th>
-                        <th>Total</th>
-                    </tr>
-                    <tr>
-                        <td><strong>Hombres</strong></td>
-                        <td>30</td>
-                        <td>5</td>
-                        <td>15</td>
-                        <td>50</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Mujeres</strong></td>
-                        <td>10</td>
-                        <td>25</td>
-                        <td>15</td>
-                        <td>50</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div id="vista-grafico" class="oculto">
-                <canvas id="miGrafico"></canvas>
-            </div>
-        </div>
-
-        <div class="panel-chat">
-            <div class="cabecera-chat">🤖 Tutor Virtual</div>
-            <div class="historial-chat" id="chat-box">
-                <div class="mensaje tutor">¡Hola! Analicemos la tabla. ¿Cuántas mujeres prefieren Danza?</div>
-            </div>
-            <div class="zona-input">
-                <input type="text" id="input-estudiante" placeholder="Escribe tu respuesta...">
+        <main id="chat-container">
+            <div id="chat-box"></div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Escribe tu respuesta...">
                 <button onclick="enviarMensaje()">Enviar</button>
             </div>
-        </div>
-
+            <button id="btn-cambio-rep" onclick="solicitarCambioRepresentacion()">Cambiar a Proporciones 📈</button>
+        </main>
     </div>
-
     <script src="script.js"></script>
+</body>
+</html>pt.js"></script>
 </body>
 </html>
