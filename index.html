@@ -3,35 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LID - Tutor Estadístico UIS</title>
-    
+    <title>LID — Tablas de Contingencia · UIS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📊 Tutor LID: Análisis Bivariado</h1>
-            <p>Compañero, analicemos juntos estos datos de la UIS.</p>
-        </header>
 
-        <div id="visualizer-container">
-            <div id="tabla-container"></div>
-            <canvas id="miGrafico" style="display:none; max-width: 100%; margin: 20px 0;"></canvas>
+<div class="book-shell">
+
+  <!-- Lomo del libro -->
+  <div class="book-spine">
+    <span class="spine-text">LID · Tablas de Contingencia · UIS · 2026</span>
+  </div>
+
+  <!-- Páginas -->
+  <div class="book-pages" id="bookPages">
+
+    <!-- ══════════ PÁGINA 0: PORTADA ══════════ -->
+    <div class="page active" id="page-0">
+      <div class="cover-page">
+        <!-- Decoración de fondo: cuadrícula tipo tabla -->
+        <div class="cover-grid-bg">
+          <div class="cgb-row">
+            <div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell header-cell"></div>
+          </div>
+          <div class="cgb-row">
+            <div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell data-cell lit"></div>
+            <div class="cgb-cell data-cell"></div>
+            <div class="cgb-cell data-cell marg-cell"></div>
+          </div>
+          <div class="cgb-row">
+            <div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell data-cell"></div>
+            <div class="cgb-cell data-cell lit accent"></div>
+            <div class="cgb-cell data-cell marg-cell"></div>
+          </div>
+          <div class="cgb-row">
+            <div class="cgb-cell marg-cell"></div>
+            <div class="cgb-cell marg-cell"></div>
+            <div class="cgb-cell marg-cell"></div>
+            <div class="cgb-cell grand-cell"></div>
+          </div>
         </div>
 
-        <main id="chat-container">
-            <div id="chat-box"></div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Escribe tu respuesta...">
-                <button onclick="enviarMensaje()">Enviar</button>
-            </div>
-            
-            <button id="btn-toggle" onclick="toggleVisualizacion()" style="display:none; width: 100%; margin-top: 10px; background: #6c757d;">Ver Gráfico / Tabla</button>
-            <button id="btn-cambio-rep" onclick="solicitarCambioRepresentacion()" style="display:none; width: 100%; margin-top: 10px; background: #28a745;">Cambiar a Proporciones 📈</button>
-        </main>
+        <div class="cover-content">
+          <div class="cover-eyebrow">Libro Interactivo Digital · Capítulo II</div>
+          <h1 class="cover-title">Tablas de<br>Contingencia</h1>
+          <div class="cover-rule"></div>
+          <p class="cover-authors">Andrés Felipe Gómez Acevedo &amp; Juan Camilo Rojas Velasco</p>
+          <p class="cover-director">Dirección: Mg. Tulia Esther Rivera Florez</p>
+          <div class="cover-meta-row">
+            <span>Universidad Industrial de Santander</span>
+            <span class="meta-sep">·</span>
+            <span>Escuela de Matemáticas</span>
+            <span class="meta-sep">·</span>
+            <span>2026</span>
+          </div>
+          <button class="btn-start" onclick="irAPagina(1)">
+            Abrir capítulo <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
     </div>
-    
-    <script src="script.js"></script>
+
+    <!-- ══════════ PÁGINA 1: PRESENTACIÓN DEL CAPÍTULO ══════════ -->
+    <div class="page" id="page-1">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo II · Presentación</span>
+          <span class="page-num">01</span>
+        </div>
+
+        <h2 class="page-title">Tablas de Contingencia</h2>
+
+        <div class="intro-layout">
+          <div class="intro-main">
+            <p class="lead-text">Una <strong>tabla de contingencia</strong> organiza simultáneamente dos variables categóricas, permitiendo analizar cómo se relacionan entre sí. A diferencia de una tabla de frecuencias simple, aquí cada celda recoge información de <em>dos categorías a la vez</em>.</p>
+
+            <p class="body-text">En este capítulo explorarás la estructura de una tabla cruzada, sus elementos clave y distintas formas de representar la misma información. El recorrido está organizado en tres momentos:</p>
+
+            <div class="moment-list">
+              <div class="moment-item">
+                <div class="moment-num">1</div>
+                <div class="moment-body">
+                  <strong>Exploración</strong> — Interactúas con una situación real y descubres los elementos de la tabla por ti mismo, con la guía del tutor virtual.
+                </div>
+              </div>
+              <div class="moment-item">
+                <div class="moment-num">2</div>
+                <div class="moment-body">
+                  <strong>Transnumeración</strong> — Cambias la forma de representar los mismos datos (tabla ↔ diagrama de barras) para ver qué revela cada representación.
+                </div>
+              </div>
+              <div class="moment-item">
+                <div class="moment-num">3</div>
+                <div class="moment-body">
+                  <strong>Institucionalización</strong> — El tutor formaliza los conceptos que construiste durante la exploración.
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini tabla estructural -->
+            <div class="struct-box">
+              <div class="struct-label">Estructura de una tabla de contingencia r × c</div>
+              <div class="struct-table">
+                <div class="st-row">
+                  <div class="st-cell corner"></div>
+                  <div class="st-cell col-hdr">B₁</div>
+                  <div class="st-cell col-hdr">B₂</div>
+                  <div class="st-cell col-hdr dots">···</div>
+                  <div class="st-cell col-hdr marg-hdr">Total</div>
+                </div>
+                <div class="st-row">
+                  <div class="st-cell row-hdr">A₁</div>
+                  <div class="st-cell joint">f₁₁</div>
+                  <div class="st-cell joint">f₁₂</div>
+                  <div class="st-cell joint dots">···</div>
+                  <div class="st-cell marg">f₁·</div>
+                </div>
+                <div class="st-row">
+                  <div class="st-cell row-hdr">A₂</div>
+                  <div class="st-cell joint">f₂₁</div>
+                  <div class="st-cell joint">f₂₂</div>
+                  <div class="st-cell joint dots">···</div>
+                  <div class="st-cell marg">f₂·</div>
+                </div>
+                <div class="st-row">
+                  <div class="st-cell row-hdr marg-hdr">Total</div>
+                  <div class="st-cell marg">f·₁</div>
+                  <div class="st-cell marg">f·₂</div>
+                  <div class="st-cell marg dots">···</div>
+                  <div class="st-cell grand">N</div>
+                </div>
+              </div>
+              <div class="legend-row">
+                <span class="leg-item"><span class="leg-dot joint-dot"></span>Frecuencia conjunta f<sub>ij</sub></span>
+                <span class="leg-item"><span class="leg-dot marg-dot"></span>Frecuencia marginal f<sub>i·</sub> / f<sub>·j</sub></span>
+                <span class="leg-item"><span class="leg-dot grand-dot"></span>Total general N</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta lateral de objetivo -->
+          <div class="intro-aside">
+            <div class="obj-card">
+              <div class="obj-icon">🎯</div>
+              <div class="obj-title">Objetivo del capítulo</div>
+              <p class="obj-text">Fortalecer la lectura de tablas de contingencia mediante la exploración activa y el cambio de representación, desarrollando el sentido estadístico a través de situaciones contextualizadas.</p>
+            </div>
+            <div class="note-card">
+              <div class="note-title">📌 Antes de continuar</div>
+              <p class="note-text">En la siguiente página encontrarás la situación de aprendizaje. <strong>Lee con atención</strong> el contexto y responde las preguntas del tutor con tus propias palabras. No hay respuestas incorrectas si explicas tu razonamiento.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(0)">← Portada</button>
+          <button class="btn-nav next" onclick="irAPagina(2)">Situación →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 2: SITUACIÓN A-DIDÁCTICA + TUTOR ══════════ -->
+    <div class="page" id="page-2">
+      <div class="page-inner page-activity">
+
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo II · Actividad</span>
+          <span class="phase-indicator" id="phaseIndicator">
+            <span class="phase-dot phase-a"></span>
+            <span class="phase-label" id="phaseLabel">Exploración</span>
+          </span>
+          <span class="page-num">02</span>
+        </div>
+
+        <div class="activity-layout">
+
+          <!-- Panel izquierdo: visualización -->
+          <div class="vis-panel">
+
+            <div class="situation-header">
+              <span class="sit-badge">Situación · Bucaramanga</span>
+              <h3 class="sit-title">Actividades Extracurriculares en jóvenes</h3>
+              <p class="sit-desc">Se encuestaron <strong>100 jóvenes</strong> de Bucaramanga sobre su actividad extracurricular preferida. Los datos se cruzaron con el género para construir la siguiente tabla.</p>
+            </div>
+
+            <!-- Contenedor de visualización -->
+            <div id="vis-wrapper">
+              <div id="tabla-container" class="tabla-animada"></div>
+              <div id="grafico-container" class="grafico-animado" style="display:none;">
+                <canvas id="miGrafico"></canvas>
+              </div>
+            </div>
+
+            <!-- Botón transnumeración — inicia oculto, aparece en Fase C -->
+            <div class="transnum-zone" id="transnum-zone" style="display:none;">
+              <div class="transnum-hint">
+                <span class="hint-icon">💡</span>
+                <span class="hint-text">¿Cómo cambia lo que ves al cambiar la representación?</span>
+              </div>
+              <button id="btn-transnum" class="btn-transnum" onclick="toggleVisualizacion()">
+                <span class="transnum-icon" id="transnum-icon">⇄</span>
+                <span id="btn-transnum-label">Ver como Diagrama de Barras</span>
+              </button>
+              <div class="rep-label">
+                <span class="rep-dot" id="rep-dot"></span>
+                <span id="rep-text">Representación tabular</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Panel derecho: tutor -->
+          <div class="tutor-panel">
+            <div class="tutor-header">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status">
+                  <span class="status-dot"></span>
+                  <span id="tutor-status-text">Conectando…</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="chat-box" class="chat-box"></div>
+
+            <div class="chat-input-area">
+              <input type="text" id="user-input" class="chat-input"
+                     placeholder="Escribe tu respuesta aquí…"
+                     onkeydown="if(event.key==='Enter') enviarMensaje()">
+              <button class="btn-send" onclick="enviarMensaje()">
+                Enviar <span class="send-icon">↑</span>
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /activity-layout -->
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(1)">← Presentación</button>
+          <button class="btn-nav next" onclick="irAPagina(3)">Síntesis →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 3: SÍNTESIS / INSTITUCIONALIZACIÓN ══════════ -->
+    <div class="page" id="page-3">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo II · Síntesis</span>
+          <span class="page-num">03</span>
+        </div>
+
+        <h2 class="page-title">Lo que construiste en esta sesión</h2>
+        <p class="synthesis-intro">A través de la exploración con el tutor, llegaste a los siguientes conceptos de manera autónoma. Aquí quedan formalizados:</p>
+
+        <div class="synthesis-grid">
+          <div class="syn-card">
+            <div class="syn-tag">Fase A</div>
+            <div class="syn-num">f<sub>ij</sub></div>
+            <h4>Frecuencia Conjunta</h4>
+            <p>El valor en la intersección de la fila <em>i</em> y la columna <em>j</em>. Indica cuántos individuos pertenecen simultáneamente a dos categorías.</p>
+            <div class="syn-example">Ej: 25 mujeres prefieren danza → f<sub>Muj,Dan</sub> = 25</div>
+          </div>
+
+          <div class="syn-card">
+            <div class="syn-tag">Fase B</div>
+            <div class="syn-num">f<sub>i·</sub></div>
+            <h4>Frecuencia Marginal</h4>
+            <p>Los totales ubicados en el borde (margen) de la tabla, por fila (f<sub>i·</sub>) o por columna (f<sub>·j</sub>). Dan el contexto de cada grupo.</p>
+            <div class="syn-example">Ej: Total de mujeres = 50 → f<sub>Muj·</sub> = 50</div>
+          </div>
+
+          <div class="syn-card">
+            <div class="syn-tag">Fase C</div>
+            <div class="syn-num">h<sub>i|j</sub></div>
+            <h4>Frecuencia Condicionada</h4>
+            <p>Analiza un subgrupo dado el total marginal elegido como base. Su valor cambia según la pregunta que se quiera responder.</p>
+            <div class="syn-example">Ej: 25/50 = 50% de mujeres bailan · 25/30 = 83% de bailarines son mujeres</div>
+          </div>
+
+          <div class="syn-card accent-syn">
+            <div class="syn-tag">Transversal</div>
+            <div class="syn-num">⇄</div>
+            <h4>Transnumeración</h4>
+            <p>Cambiar el sistema de representación (tabla → gráfico → proporción) no cambia el dato, cambia lo que el dato <em>comunica</em>. La elección depende de la pregunta.</p>
+            <div class="syn-example">Mismo dato, historias diferentes según el total marginal de referencia.</div>
+          </div>
+        </div>
+
+        <!-- Progresión de niveles de lectura -->
+        <div class="reading-strip">
+          <div class="rs-title">Niveles de lectura que ejercitaste en esta sesión</div>
+          <div class="rs-levels">
+            <div class="rs-level done">
+              <div class="rs-badge">N1</div>
+              <div class="rs-label">Leer <strong>los datos</strong></div>
+              <div class="rs-desc">Identificar el 25 en la celda</div>
+            </div>
+            <div class="rs-arrow">→</div>
+            <div class="rs-level done">
+              <div class="rs-badge">N2</div>
+              <div class="rs-label">Leer <strong>entre</strong> los datos</div>
+              <div class="rs-desc">Cruzar filas y columnas</div>
+            </div>
+            <div class="rs-arrow">→</div>
+            <div class="rs-level done">
+              <div class="rs-badge">N3</div>
+              <div class="rs-label">Leer <strong>más allá</strong></div>
+              <div class="rs-desc">Interpretar proporciones y comparar grupos</div>
+            </div>
+            <div class="rs-arrow">→</div>
+            <div class="rs-level next-chapter">
+              <div class="rs-badge muted">N4</div>
+              <div class="rs-label">Leer <strong>detrás</strong></div>
+              <div class="rs-desc">Validación estadística · Próximo capítulo</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(2)">← Actividad</button>
+          <span class="footer-note">Fin del Capítulo II · El Capítulo III abordará la prueba Chi-cuadrado</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /book-pages -->
+
+  <!-- Indicadores de página -->
+  <div class="page-indicators">
+    <span class="pi-dot active" onclick="irAPagina(0)" title="Portada"></span>
+    <span class="pi-dot" onclick="irAPagina(1)" title="Presentación"></span>
+    <span class="pi-dot" onclick="irAPagina(2)" title="Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(3)" title="Síntesis"></span>
+  </div>
+
+</div><!-- /book-shell -->
+
+<!-- Overlay de carga inicial -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <p>Iniciando LID…</p>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
