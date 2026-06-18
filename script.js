@@ -41,3 +41,29 @@ function solicitarCambioRepresentacion() {
     document.getElementById('btn-cambio-rep').style.display = 'none';
     enviarMensaje();
 }
+// Función para inicializar la interfaz
+async function inicializarChat() {
+    try {
+        // Hacemos una petición vacía o de inicio para que el tutor salude
+        const response = await fetch(URL_BACKEND, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: "Hola, estoy listo para aprender." })
+        });
+        const data = await response.json();
+
+        // Mostrar saludo del tutor y cargar tabla inicial
+        if (data.reply) {
+            agregarAlChat('Tutor: ' + data.reply, false);
+        }
+        if (data.table) {
+            actualizarTabla(data.table, data.headers);
+        }
+    } catch (error) {
+        console.error('Error al inicializar:', error);
+        agregarAlChat('Tutor: Hola, bienvenido. Por favor escribe un mensaje para comenzar.', false);
+    }
+}
+
+// Ejecutar al cargar la página
+window.onload = inicializarChat;
