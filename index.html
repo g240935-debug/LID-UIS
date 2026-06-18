@@ -192,7 +192,7 @@
             <div class="situation-header">
               <span class="sit-badge">Situación · Bucaramanga</span>
               <h3 class="sit-title">Actividades Extracurriculares en jóvenes</h3>
-              <p class="sit-desc">Se encuestaron <strong>100 estudiantes</strong> de la Universidad Indsutrial de Santander (UIS) sobre su actividad extracurricular preferida. Los datos se cruzaron con el género para construir la siguiente tabla.</p>
+              <p class="sit-desc">Se encuestaron <strong>100 jóvenes</strong> de Bucaramanga sobre su actividad extracurricular preferida. Los datos se cruzaron con el género para construir la siguiente tabla.</p>
             </div>
 
             <!-- Contenedor de visualización -->
@@ -332,19 +332,227 @@
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(2)">← Actividad</button>
-          <span class="footer-note">Fin del Capítulo II · El Capítulo III abordará la prueba Chi-cuadrado</span>
+          <button class="btn-nav next" onclick="irAPagina(4)">Cap. III: Formas Parciales →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 4: CAP III — FORMAS PARCIALES (expositivo + interactivo) ══════════
+         DÓNDE VA: Cuadrado 2 del esquema. Contenido estático — no llama al backend.
+         El JS de esta página está en la sección "CAP 2 — TABLA INTERACTIVA" de script.js.
+    ══════════ -->
+    <div class="page" id="page-4">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Formas Parciales</span>
+          <span class="page-num">04</span>
+        </div>
+
+        <h2 class="page-title">Formas de leer una tabla de contingencia</h2>
+
+        <div class="fp-layout">
+          <!-- Columna izquierda: contexto + tabla base + selector -->
+          <div class="fp-left">
+            <div class="fp-context-box">
+              <span class="sit-badge">Situación · UIS Bucaramanga</span>
+              <p class="fp-context-text">Se encuestaron <strong>120 estudiantes</strong> de la UIS. Se cruzó su <strong>rendimiento académico</strong> (Bajo / Medio / Alto) con las <strong>horas de estudio individual</strong> semanales (Menos de 5h / Entre 5 y 10h / Más de 10h).</p>
+            </div>
+
+            <!-- Selector de tipo de tabla -->
+            <div class="fp-selector">
+              <div class="fp-sel-label">Selecciona el tipo de representación:</div>
+              <div class="fp-tabs">
+                <button class="fp-tab active" onclick="cambiarTipoTabla('absoluta')" id="tab-absoluta">
+                  Frecuencias absolutas
+                </button>
+                <button class="fp-tab" onclick="cambiarTipoTabla('total')" id="tab-total">
+                  % sobre el total
+                </button>
+                <button class="fp-tab" onclick="cambiarTipoTabla('fila')" id="tab-fila">
+                  % por fila
+                </button>
+                <button class="fp-tab" onclick="cambiarTipoTabla('columna')" id="tab-columna">
+                  % por columna
+                </button>
+              </div>
+            </div>
+
+            <!-- Tabla dinámica -->
+            <div id="fp-tabla-wrapper" class="fp-tabla-wrapper"></div>
+
+            <!-- Pregunta interpretativa que cambia con la tabla -->
+            <div class="fp-question-box" id="fp-question-box">
+              <span class="fq-icon">🔍</span>
+              <span id="fp-question-text">¿Cuántos estudiantes con rendimiento Alto estudian más de 10h semanales?</span>
+            </div>
+          </div>
+
+          <!-- Columna derecha: explicación del tipo activo -->
+          <div class="fp-right">
+            <div class="fp-explain-card" id="fp-explain-card">
+
+              <!-- Contenido ABSOLUTA (visible por defecto) -->
+              <div class="fpe-content" id="fpe-absoluta">
+                <div class="fpe-tag">Tipo 1 de 3</div>
+                <h4 class="fpe-title">Frecuencias absolutas</h4>
+                <p class="fpe-text">Es la forma base de la tabla. Cada celda muestra el <strong>conteo directo</strong> de individuos que pertenecen a las dos categorías simultáneamente.</p>
+                <p class="fpe-text">Útil para saber cuántos hay, pero <em>no permite comparar grupos de distinto tamaño</em>. ¿Cómo sabes si 18 es mucho o poco sin saber el total de cada grupo?</p>
+                <div class="fpe-formula">
+                  <span class="fpe-f-label">Notación</span>
+                  <span class="fpe-f-expr">f<sub>ij</sub> = conteo de la celda (i, j)</span>
+                </div>
+                <div class="fpe-hint">👉 Cambia al tipo <strong>% sobre el total</strong> para ver la primera transformación.</div>
+              </div>
+
+              <!-- Contenido TOTAL -->
+              <div class="fpe-content hidden" id="fpe-total">
+                <div class="fpe-tag">Tipo 2 de 3 · Primera transnumeración</div>
+                <h4 class="fpe-title">Porcentaje sobre el total (distribución conjunta)</h4>
+                <p class="fpe-text">Cada celda se divide entre <strong>N = 120</strong> (el total general). El resultado indica qué proporción del total representa esa combinación.</p>
+                <p class="fpe-text">Permite responder: <em>¿Qué fracción de toda la muestra tiene rendimiento Alto y estudia más de 10h?</em></p>
+                <div class="fpe-formula">
+                  <span class="fpe-f-label">Fórmula</span>
+                  <span class="fpe-f-expr">h<sub>ij</sub> = f<sub>ij</sub> / N × 100</span>
+                </div>
+                <div class="fpe-alert">⚠️ La suma de todas las celdas da <strong>100%</strong>. Los márgenes dan los porcentajes marginales.</div>
+              </div>
+
+              <!-- Contenido FILA -->
+              <div class="fpe-content hidden" id="fpe-fila">
+                <div class="fpe-tag">Tipo 3a de 3 · Segunda transnumeración</div>
+                <h4 class="fpe-title">Porcentaje por fila (distribución condicional por rendimiento)</h4>
+                <p class="fpe-text">Cada celda se divide entre el <strong>total de su fila</strong>. Muestra cómo se distribuyen las horas de estudio <em>dentro de cada grupo de rendimiento</em>.</p>
+                <p class="fpe-text">Responde: <em>De los estudiantes con rendimiento Alto, ¿qué porcentaje estudia más de 10h?</em></p>
+                <div class="fpe-formula">
+                  <span class="fpe-f-label">Fórmula</span>
+                  <span class="fpe-f-expr">h<sub>i|·</sub> = f<sub>ij</sub> / f<sub>i·</sub> × 100</span>
+                </div>
+                <div class="fpe-alert">⚠️ Cada <strong>fila</strong> suma 100%. Las filas se pueden comparar entre sí.</div>
+              </div>
+
+              <!-- Contenido COLUMNA -->
+              <div class="fpe-content hidden" id="fpe-columna">
+                <div class="fpe-tag">Tipo 3b de 3 · Tercera transnumeración</div>
+                <h4 class="fpe-title">Porcentaje por columna (distribución condicional por horas)</h4>
+                <p class="fpe-text">Cada celda se divide entre el <strong>total de su columna</strong>. Muestra cómo se distribuye el rendimiento <em>dentro de cada grupo de horas de estudio</em>.</p>
+                <p class="fpe-text">Responde: <em>De quienes estudian más de 10h, ¿qué porcentaje tiene rendimiento Alto?</em></p>
+                <div class="fpe-formula">
+                  <span class="fpe-f-label">Fórmula</span>
+                  <span class="fpe-f-expr">h<sub>·|j</sub> = f<sub>ij</sub> / f<sub>·j</sub> × 100</span>
+                </div>
+                <div class="fpe-alert">⚠️ Cada <strong>columna</strong> suma 100%. Las columnas se pueden comparar entre sí.</div>
+              </div>
+
+            </div><!-- /fp-explain-card -->
+
+            <!-- Nota pedagógica fija -->
+            <div class="fp-note">
+              <div class="fp-note-title">💡 La clave de la transnumeración</div>
+              <p class="fp-note-text">Los datos no cambian — cambia la <em>pregunta que responden</em>. Elegir entre % fila, % columna o % total depende de lo que quieras comunicar, no del dato en sí.</p>
+            </div>
+          </div>
+        </div><!-- /fp-layout -->
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(3)">← Síntesis Cap. II</button>
+          <button class="btn-nav next" onclick="irAPagina(5)">Actividad →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 5: CAP III — MINI-ACTIVIDAD CON IA ══════════
+         DÓNDE VA: Segunda parte del Cuadrado 2. Usa el backend con session_id="cap2_user"
+         para no mezclar la sesión con el Cap 1. El JS está en "CAP 2 — TUTOR" en script.js.
+    ══════════ -->
+    <div class="page" id="page-5">
+      <div class="page-inner page-activity">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Actividad</span>
+          <span class="phase-indicator" id="phaseIndicator2">
+            <span class="phase-dot phase-a" id="phaseDot2"></span>
+            <span class="phase-label" id="phaseLabel2">Exploración</span>
+          </span>
+          <span class="page-num">05</span>
+        </div>
+
+        <div class="activity-layout">
+
+          <!-- Panel izquierdo: tabla de referencia fija + recordatorio -->
+          <div class="vis-panel">
+            <div class="situation-header">
+              <span class="sit-badge">Actividad · UIS Bucaramanga</span>
+              <h3 class="sit-title">Rendimiento × Horas de estudio</h3>
+              <p class="sit-desc">Usa la tabla que exploraste en la página anterior. El tutor te hará preguntas sobre las distintas formas de calcular proporciones.</p>
+            </div>
+
+            <!-- Tabla fija de referencia (absoluta, siempre visible) -->
+            <div class="fp-ref-table-wrapper">
+              <div class="fp-ref-label">Tabla de referencia — frecuencias absolutas</div>
+              <div id="fp-ref-table"></div>
+            </div>
+
+            <!-- Mini recordatorio de fórmulas -->
+            <div class="fp-formulas-strip">
+              <div class="fps-title">Fórmulas clave</div>
+              <div class="fps-row">
+                <div class="fps-item">
+                  <span class="fps-label">% total</span>
+                  <span class="fps-expr">f<sub>ij</sub> / N</span>
+                </div>
+                <div class="fps-item">
+                  <span class="fps-label">% fila</span>
+                  <span class="fps-expr">f<sub>ij</sub> / f<sub>i·</sub></span>
+                </div>
+                <div class="fps-item">
+                  <span class="fps-label">% columna</span>
+                  <span class="fps-expr">f<sub>ij</sub> / f<sub>·j</sub></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel derecho: tutor Cap 2 -->
+          <div class="tutor-panel">
+            <div class="tutor-header">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status">
+                  <span class="status-dot"></span>
+                  <span id="tutor-status-text2">Conectando…</span>
+                </div>
+              </div>
+            </div>
+            <div id="chat-box2" class="chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="user-input2" class="chat-input"
+                     placeholder="Escribe tu respuesta aquí…"
+                     onkeydown="if(event.key==='Enter') enviarMensaje2()">
+              <button class="btn-send" onclick="enviarMensaje2()">
+                Enviar <span class="send-icon">↑</span>
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /activity-layout -->
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(4)">← Formas parciales</button>
+          <span class="footer-note">Más capítulos próximamente · Cuadrados 3–7 del esquema</span>
         </div>
       </div>
     </div>
 
   </div><!-- /book-pages -->
 
-  <!-- Indicadores de página -->
+  <!-- Indicadores de página — ahora son 6 puntos (0–5) -->
   <div class="page-indicators">
     <span class="pi-dot active" onclick="irAPagina(0)" title="Portada"></span>
     <span class="pi-dot" onclick="irAPagina(1)" title="Presentación"></span>
-    <span class="pi-dot" onclick="irAPagina(2)" title="Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(3)" title="Síntesis"></span>
+    <span class="pi-dot" onclick="irAPagina(2)" title="Cap II · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(3)" title="Cap II · Síntesis"></span>
+    <span class="pi-dot" onclick="irAPagina(4)" title="Cap III · Formas Parciales"></span>
+    <span class="pi-dot" onclick="irAPagina(5)" title="Cap III · Actividad"></span>
   </div>
 
 </div><!-- /book-shell -->
