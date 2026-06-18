@@ -2,16 +2,23 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
-# CORS permite que tu página (GitHub Pages) le hable a tu servidor (Render)
 CORS(app)
 
-# Configuración del cliente OpenAI
-# Render leerá la variable de entorno OPENAI_API_KEY que configuraste en su panel
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Definición del System Prompt (El mediador pedagógico)
+# Datos de la matriz para enviar al frontend
+matriz_data = [
+    ["Hombres", 30, 5, 15, 50],
+    ["Mujeres", 10, 25, 15, 50],
+    ["Total Marginal", 40, 30, 30, 100]
+]
+headers = ["Género \ Actividad", "Deportes", "Danza", "Música", "Total Marginal"]
+
+# Tu sistema de prompt (mantenlo exactamente como lo definiste)
 system_prompt = """Eres un mediador pedagógico (estudiante senior de la UIS). 
 Tu objetivo es guiar al usuario a través de la TSD (Brousseau) situacion a-didactica y el análisis bivariado (Niveles de Curcio)y por medio de la interacciòn hacerle ver al estudiante la importancia, a apartir de problemas reales.
 adicional a lo anterior tener en cuenta que se busca en espacio adecuado para el aprendizaje, por tanto si por algun motivo el estudiante responde o pregunta cosas que lo hagan ver que esta disperso o pensando en otras coasas, dile que retome e incitalo a concentrase. no responda a cosas que trunquen el proceso de aprendizaje, pero si a todo lo que el estuiante pregunte referente a analisis estadistico 
@@ -47,37 +54,43 @@ REGLAS DE ORO:
 - Usa párrafos cortos. Deja un espacio en blanco (doble Enter) entre párrafos.
 - NUNCA des la respuesta directa ni le digas qué operación matemática hacer. Usa la mayéutica
 - Asume el rol de compañero universitario, sé amigable pero riguroso, no permitas que el estudiante se vaya con la falsa idea de dominar el tema si aùn no es suficiente, para ello cuestionalo con preguntas y analiza si las preguntas son respondidas con claridad, en caso de no serlo explicale o guialo con preguuntas mas sencillas.
-- Escribe los términos matemáticos en cursiva (ejemplo: *Frecuencia Conjunta*).
-"""
-# Historial de chat (En memoria - se reinicia si el servidor se reinicia)
-historial = [{"role": "system", "content": system_prompt}]
+- Escribe los términos matemáticos en cursiva (ejemplo: *Frecuencia Conjunta*)."""
+
+# Diccionario para mantener sesiones de diferentes usuarios
+chats = {}
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
+    data = request.json
+    session_id = data.get("session_id", "default_user")
+    user_message = data.get("message")
+
+    if session_id not in chats:
+        chats[session_id] = [{"role": "system", "content": system_prompt}]
+
+    chats[session_id].append({"role": "user", "content": user_message})
+
     try:
-        data = request.json
-        usuario_msg = data.get("mensaje")
-        
-        # Guardar mensaje del estudiante
-        historial.append({"role": "user", "content": usuario_msg})
-        
-        # Llamada a la IA
         completion = client.chat.completions.create(
             model="gpt-4o",
-            messages=historial,
+            messages=chats[session_id],
             temperature=0.5
         )
         
-        respuesta_ia = completion.choices[0].message.content
-        
-        # Guardar respuesta de la IA
-        historial.append({"role": "assistant", "content": respuesta_ia})
-        
-        return jsonify({"respuesta": respuesta_ia})
-    
+        reply = completion.choices[0].message.content
+        chats[session_id].append({"role": "assistant", "content": reply})
+
+        # Verificamos si la sesión terminó según tu lógica
+        session_completed = "Frecuencia Condicionada" in reply and "¡Muy bien!" in reply
+
+        return jsonify({
+            "reply": reply,
+            "table": matriz_data,
+            "headers": headers,
+            "completed": session_completed
+        })
     except Exception as e:
-        return jsonify({"respuesta": "Hubo un error al conectar con el tutor virtual: " + str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Render usa esta configuración
-    app.run(host='0.0.0.0', port=5000)
+    app.run()
