@@ -29,7 +29,7 @@ async function enviarMensaje() {
     input.value = '';
 
     // URL PROPORCIONADA POR RENDER
-    const URL_BACKEND = 'https://TU_URL_AQUI.onrender.com/api/chat';
+    const URL_BACKEND = 'https://lid-uis.onrender.com/api/chat';
 
     try {
         const res = await fetch(URL_BACKEND, {
