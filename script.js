@@ -60,10 +60,16 @@ function irAPagina(n) {
   paginaActual = n;
   actualizarIndicadores();
 
-  // Iniciar chat solo al llegar a la página de actividad
+  // Iniciar tutor Cap 2 al llegar a página 2
   if (n === 2 && !chatIniciado) {
     chatIniciado = true;
     inicializarChat();
+  }
+
+  // Iniciar tutor Cap 3 al llegar a página 5
+  if (n === 5 && !cap3Iniciado) {
+    cap3Iniciado = true;
+    setTimeout(inicializarChat2, 400);
   }
 }
 
@@ -652,13 +658,3 @@ document.addEventListener('DOMContentLoaded', () => {
   // Renderizar tabla de referencia fija de la página 5
   renderizarFPRefTable();
 });
-
-// Al navegar a página 5, iniciar el tutor del Cap 3 la primera vez
-const _irAPaginaBase = irAPagina;
-function irAPagina(n) {
-  _irAPaginaBase(n);
-  if (n === 5 && !cap3Iniciado) {
-    cap3Iniciado = true;
-    setTimeout(inicializarChat2, 400);
-  }
-}
