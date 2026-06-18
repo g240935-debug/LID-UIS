@@ -1,4 +1,5 @@
 const URL_BACKEND = 'https://lid-uis.onrender.com/api/chat';
+let graficoActual = null; // Variable para gestionar el gráfico
 
 async function enviarMensaje() {
     const input = document.getElementById('user-input');
@@ -17,12 +18,49 @@ async function enviarMensaje() {
 
     if (data.reply) {
         agregarAlChat('Tutor: ' + data.reply, false);
+        // Lógica de los botones
         if (data.reply.includes("titular impactante") || data.reply.includes("cambiar la forma")) {
             document.getElementById('btn-cambio-rep').style.display = 'block';
         }
     }
-    if (data.table) actualizarTabla(data.table, data.headers);
+    if (data.table) {
+        actualizarTabla(data.table, data.headers);
+        document.getElementById('btn-toggle').style.display = 'block'; // Mostrar botón de gráfico
+    }
 }
+
+// --- NUEVA LÓGICA DE VISUALIZACIÓN ---
+
+function toggleVisualizacion() {
+    const tabla = document.getElementById('tabla-container');
+    const canvas = document.getElementById('miGrafico');
+    
+    if (tabla.style.display === 'none') {
+        tabla.style.display = 'block';
+        canvas.style.display = 'none';
+    } else {
+        tabla.style.display = 'none';
+        canvas.style.display = 'block';
+        renderizarGrafico(); // Dibuja el gráfico al cambiar
+    }
+}
+
+function renderizarGrafico() {
+    const ctx = document.getElementById('miGrafico').getContext('2d');
+    if (graficoActual) graficoActual.destroy();
+    
+    // Aquí usamos datos de ejemplo. En una mejora futura, 
+    // podrías hacer que el servidor envíe los datos listos para el gráfico.
+    graficoActual = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Deportes', 'Danza', 'Música'],
+            datasets: [{ label: 'Preferencia', data: [15, 25, 20], backgroundColor: '#007bff' }]
+        }
+    });
+}
+
+// --- FUNCIONES EXISTENTES ---
 
 function agregarAlChat(txt, esUser) {
     const box = document.getElementById('chat-box');
@@ -41,29 +79,25 @@ function solicitarCambioRepresentacion() {
     document.getElementById('btn-cambio-rep').style.display = 'none';
     enviarMensaje();
 }
-// Función para inicializar la interfaz
+
 async function inicializarChat() {
     try {
-        // Hacemos una petición vacía o de inicio para que el tutor salude
         const response = await fetch(URL_BACKEND, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: "Hola, estoy listo para aprender." })
         });
         const data = await response.json();
-
-        // Mostrar saludo del tutor y cargar tabla inicial
-        if (data.reply) {
-            agregarAlChat('Tutor: ' + data.reply, false);
-        }
+        if (data.reply) agregarAlChat('Tutor: ' + data.reply, false);
         if (data.table) {
             actualizarTabla(data.table, data.headers);
+            document.getElementById('btn-toggle').style.display = 'block';
         }
     } catch (error) {
         console.error('Error al inicializar:', error);
-        agregarAlChat('Tutor: Hola, bienvenido. Por favor escribe un mensaje para comenzar.', false);
     }
 }
 
+window.onload = inicializarChat;
 // Ejecutar al cargar la página
 window.onload = inicializarChat;
