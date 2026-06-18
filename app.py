@@ -18,7 +18,11 @@ matriz_data = [
 ]
 headers = ["Género \ Actividad", "Deportes", "Danza", "Música", "Total Marginal"]
 
-# Tu sistema de prompt (mantenlo exactamente como lo definiste)
+# Datos para el gráfico (basados en la columna de Danza, por ejemplo)
+# Representa: [Hombres Danza, Mujeres Danza, Total Danza]
+grafico_valores = [5, 25, 30]
+
+# Tu sistema de prompt (mantenido intacto)
 system_prompt = """Eres un mediador pedagógico (estudiante senior de la UIS). 
 Tu objetivo es guiar al usuario a través de la TSD (Brousseau) situacion a-didactica y el análisis bivariado (Niveles de Curcio)y por medio de la interacciòn hacerle ver al estudiante la importancia, a apartir de problemas reales.
 adicional a lo anterior tener en cuenta que se busca en espacio adecuado para el aprendizaje, por tanto si por algun motivo el estudiante responde o pregunta cosas que lo hagan ver que esta disperso o pensando en otras coasas, dile que retome e incitalo a concentrase. no responda a cosas que trunquen el proceso de aprendizaje, pero si a todo lo que el estuiante pregunte referente a analisis estadistico 
@@ -87,6 +91,7 @@ def chat():
             "reply": reply,
             "table": matriz_data,
             "headers": headers,
+            "grafico_data": grafico_valores, # <-- Recomendación integrada aquí
             "completed": session_completed
         })
     except Exception as e:
