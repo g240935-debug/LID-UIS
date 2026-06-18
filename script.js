@@ -1,5 +1,32 @@
 const URL_BACKEND = 'https://lid-uis.onrender.com/api/chat';
-let graficoActual = null; // Variable para gestionar el gráfico
+let graficoActual = null;
+let datosParaGraficar = [5, 25, 15]; // Valores iniciales por defecto
+
+// Inicialización: Carga el chat y la tabla apenas abre la página
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(inicializarChat, 1000);
+});
+
+async function inicializarChat() {
+    try {
+        const response = await fetch(URL_BACKEND, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: "Hola, estoy listo para aprender." })
+        });
+        const data = await response.json();
+        
+        if (data.reply) agregarAlChat('Tutor: ' + data.reply, false);
+        if (data.table) {
+            actualizarTabla(data.table, data.headers);
+            // Mostramos el botón de transnumeración si ya hay datos
+            document.getElementById('btn-toggle').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error al inicializar:', error);
+        agregarAlChat('Tutor: Hola, bienvenido. Escribe un mensaje para comenzar.', false);
+    }
+}
 
 async function enviarMensaje() {
     const input = document.getElementById('user-input');
@@ -18,30 +45,34 @@ async function enviarMensaje() {
 
     if (data.reply) {
         agregarAlChat('Tutor: ' + data.reply, false);
-        // Lógica de los botones
+        // Lógica de aparición del botón de Proporciones (Fase C)
         if (data.reply.includes("titular impactante") || data.reply.includes("cambiar la forma")) {
             document.getElementById('btn-cambio-rep').style.display = 'block';
         }
     }
+    
+    // Actualizamos datos si el servidor envía nuevos
+    if (data.grafico_data) datosParaGraficar = data.grafico_data;
     if (data.table) {
         actualizarTabla(data.table, data.headers);
-        document.getElementById('btn-toggle').style.display = 'block'; // Mostrar botón de gráfico
+        document.getElementById('btn-toggle').style.display = 'block';
     }
 }
-
-// --- NUEVA LÓGICA DE VISUALIZACIÓN ---
 
 function toggleVisualizacion() {
     const tabla = document.getElementById('tabla-container');
     const canvas = document.getElementById('miGrafico');
+    const btn = document.getElementById('btn-toggle');
     
     if (tabla.style.display === 'none') {
         tabla.style.display = 'block';
         canvas.style.display = 'none';
+        btn.textContent = "Cambiar a Representación Gráfica (Transnumerar)";
     } else {
         tabla.style.display = 'none';
         canvas.style.display = 'block';
-        renderizarGrafico(); // Dibuja el gráfico al cambiar
+        renderizarGrafico();
+        btn.textContent = "Cambiar a Representación Tabular (Transnumerar)";
     }
 }
 
@@ -49,18 +80,19 @@ function renderizarGrafico() {
     const ctx = document.getElementById('miGrafico').getContext('2d');
     if (graficoActual) graficoActual.destroy();
     
-    // Aquí usamos datos de ejemplo. En una mejora futura, 
-    // podrías hacer que el servidor envíe los datos listos para el gráfico.
     graficoActual = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Deportes', 'Danza', 'Música'],
-            datasets: [{ label: 'Preferencia', data: [15, 25, 20], backgroundColor: '#007bff' }]
-        }
+            datasets: [{
+                label: 'Frecuencia de Actividades',
+                data: datosParaGraficar,
+                backgroundColor: ['#1a3a5a', '#28a745', '#ffc107']
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
 }
-
-// --- FUNCIONES EXISTENTES ---
 
 function agregarAlChat(txt, esUser) {
     const box = document.getElementById('chat-box');
@@ -79,25 +111,4 @@ function solicitarCambioRepresentacion() {
     document.getElementById('btn-cambio-rep').style.display = 'none';
     enviarMensaje();
 }
-
-async function inicializarChat() {
-    try {
-        const response = await fetch(URL_BACKEND, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Hola, estoy listo para aprender." })
-        });
-        const data = await response.json();
-        if (data.reply) agregarAlChat('Tutor: ' + data.reply, false);
-        if (data.table) {
-            actualizarTabla(data.table, data.headers);
-            document.getElementById('btn-toggle').style.display = 'block';
-        }
-    } catch (error) {
-        console.error('Error al inicializar:', error);
-    }
-}
-
-window.onload = inicializarChat;
-// Ejecutar al cargar la página
 window.onload = inicializarChat;
