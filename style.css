@@ -667,6 +667,178 @@ html, body {
 .fade-out { opacity: 0; transform: translateY(-6px); transition: opacity .25s, transform .25s; }
 .fade-in  { animation: fadeInUp .35s ease; }
 
+/* ══════════════════════════════════════════════
+   CAP III — FORMAS PARCIALES (página 4)
+   Estos estilos son exclusivos de la página 4.
+   No afectan ninguna otra página.
+══════════════════════════════════════════════ */
+
+/* Layout dos columnas de la página 4 */
+.fp-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 22px;
+  flex: 1;
+  min-height: 0;
+}
+.fp-left  { display: flex; flex-direction: column; gap: 12px; }
+.fp-right { display: flex; flex-direction: column; gap: 12px; }
+
+/* Caja de contexto situacional */
+.fp-context-box {
+  background: #FEF9EC;
+  border: 1px solid #E8CE6A;
+  border-radius: 3px;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.fp-context-text { font-size: .83rem; line-height: 1.55; color: #445; }
+
+/* Selector de tipo (tabs) */
+.fp-selector { display: flex; flex-direction: column; gap: 7px; }
+.fp-sel-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .63rem; text-transform: uppercase; letter-spacing: .12em; color: var(--slate);
+}
+.fp-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.fp-tab {
+  background: var(--cream); border: 1px solid var(--rule);
+  color: var(--slate); border-radius: 2px;
+  padding: 7px 12px; font-size: .78rem; font-weight: 500;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.fp-tab:hover  { background: #EBF2F9; border-color: var(--sky); color: var(--navy); }
+.fp-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* Wrapper tabla dinámica */
+.fp-tabla-wrapper {
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--cream); overflow: hidden;
+  animation: fadeInUp .3s ease;
+}
+.fp-tabla-wrapper table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.fp-tabla-wrapper th {
+  background: var(--navy); color: white;
+  padding: 8px 10px; font-size: .75rem; text-align: center;
+}
+.fp-tabla-wrapper th:first-child { text-align: left; }
+.fp-tabla-wrapper td {
+  padding: 8px 10px; text-align: center;
+  border-bottom: 1px solid var(--rule); color: var(--ink);
+}
+.fp-tabla-wrapper td:first-child { font-weight: 600; text-align: left; }
+/* Celdas de margen (última col y última fila) */
+.fp-tabla-wrapper td.td-marg {
+  background: #E8F5ED; font-weight: 700; color: var(--moss);
+}
+.fp-tabla-wrapper tr:last-child td { background: #E8F5ED; font-weight: 700; color: var(--moss); }
+.fp-tabla-wrapper tr:last-child td:last-child { background: var(--gold); color: var(--ink); }
+/* Celda destacada (la que responde la pregunta del recuadro) */
+.fp-tabla-wrapper td.td-highlight {
+  background: rgba(200,168,75,.25);
+  font-weight: 700; color: var(--ink);
+  outline: 2px solid var(--gold);
+}
+
+/* Caja de pregunta interpretativa */
+.fp-question-box {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--cream); border: 1px solid var(--rule);
+  border-left: 3px solid var(--navy);
+  border-radius: 3px; padding: 10px 13px;
+  font-size: .82rem; color: var(--ink); line-height: 1.5;
+  transition: border-color .3s;
+}
+.fq-icon { font-size: 1rem; flex-shrink: 0; }
+
+/* Tarjeta de explicación derecha */
+.fp-explain-card {
+  background: white; border: 1px solid var(--rule);
+  border-radius: 3px; padding: 18px;
+  flex: 1;
+}
+.fpe-content { display: flex; flex-direction: column; gap: 10px; }
+.fpe-content.hidden { display: none; }
+.fpe-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; text-transform: uppercase; letter-spacing: .12em; color: var(--gold);
+}
+.fpe-title { font-size: .95rem; font-weight: 700; color: var(--navy); }
+.fpe-text  { font-size: .8rem; line-height: 1.55; color: #445; }
+.fpe-formula {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 2px; padding: 8px 12px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.fpe-f-label { font-size: .65rem; color: #889; font-family: 'JetBrains Mono', monospace; }
+.fpe-f-expr  { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--navy); font-weight: 600; }
+.fpe-alert {
+  background: #FEF9EC; border: 1px solid #E8CE6A;
+  border-radius: 2px; padding: 7px 10px;
+  font-size: .78rem; color: #7a5c00; line-height: 1.4;
+}
+.fpe-hint {
+  font-size: .78rem; color: var(--slate); font-style: italic;
+}
+
+/* Nota pedagógica */
+.fp-note {
+  background: var(--navy); border-radius: 3px;
+  padding: 14px 16px; color: white;
+}
+.fp-note-title { font-weight: 600; font-size: .82rem; margin-bottom: 6px; color: var(--gold); }
+.fp-note-text  { font-size: .78rem; line-height: 1.5; color: rgba(255,255,255,.8); }
+
+/* ══════════════════════════════════════════════
+   CAP III — ACTIVIDAD CON IA (página 5)
+   Reutiliza .activity-layout, .tutor-panel, etc.
+   Solo estilos nuevos aquí.
+══════════════════════════════════════════════ */
+
+/* Tabla de referencia fija (página 5) */
+.fp-ref-table-wrapper {
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--cream); overflow: hidden;
+}
+.fp-ref-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; text-transform: uppercase; letter-spacing: .11em;
+  color: var(--slate); background: #EBF2F9;
+  padding: 6px 12px; border-bottom: 1px solid var(--rule);
+}
+#fp-ref-table table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+#fp-ref-table th {
+  background: var(--navy); color: white;
+  padding: 7px 9px; font-size: .72rem; text-align: center;
+}
+#fp-ref-table th:first-child { text-align: left; }
+#fp-ref-table td {
+  padding: 7px 9px; text-align: center;
+  border-bottom: 1px solid var(--rule);
+}
+#fp-ref-table td:first-child { font-weight: 600; text-align: left; }
+#fp-ref-table tr:last-child td { background: #E8F5ED; font-weight: 700; color: var(--moss); }
+
+/* Tira de fórmulas */
+.fp-formulas-strip {
+  background: #0d2034; border-radius: 3px;
+  padding: 10px 14px;
+}
+.fps-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; text-transform: uppercase; letter-spacing: .13em;
+  color: rgba(255,255,255,.4); margin-bottom: 8px;
+}
+.fps-row { display: flex; gap: 8px; }
+.fps-item {
+  flex: 1; background: rgba(255,255,255,.07);
+  border-radius: 2px; padding: 7px 10px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.fps-label { font-size: .65rem; color: rgba(255,255,255,.5); font-family: 'JetBrains Mono', monospace; }
+.fps-expr  { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--gold); font-weight: 600; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
   .book-spine { display: none; }
