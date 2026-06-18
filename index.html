@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LID - Tutor Estadístico UIS</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,7 +15,10 @@
             <p>Compañero, analicemos juntos estos datos de la UIS.</p>
         </header>
 
-        <div id="tabla-container"></div>
+        <div id="visualizer-container">
+            <div id="tabla-container"></div>
+            <canvas id="miGrafico" style="display:none; max-width: 100%; margin: 20px 0;"></canvas>
+        </div>
 
         <main id="chat-container">
             <div id="chat-box"></div>
@@ -21,11 +26,12 @@
                 <input type="text" id="user-input" placeholder="Escribe tu respuesta...">
                 <button onclick="enviarMensaje()">Enviar</button>
             </div>
-            <button id="btn-cambio-rep" onclick="solicitarCambioRepresentacion()">Cambiar a Proporciones 📈</button>
+            
+            <button id="btn-toggle" onclick="toggleVisualizacion()" style="display:none; width: 100%; margin-top: 10px; background: #6c757d;">Ver Gráfico / Tabla</button>
+            <button id="btn-cambio-rep" onclick="solicitarCambioRepresentacion()" style="display:none; width: 100%; margin-top: 10px; background: #28a745;">Cambiar a Proporciones 📈</button>
         </main>
     </div>
+    
     <script src="script.js"></script>
-</body>
-</html>pt.js"></script>
 </body>
 </html>
