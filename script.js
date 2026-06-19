@@ -541,31 +541,6 @@ function renderizarFPRefTable() {
    para que el historial no se mezcle.
 ════════════════════════════════════════════════ */
 
-const SYSTEM_PROMPT_CAP3 = `Eres un mediador pedagógico (estudiante senior de la UIS).
-Tu objetivo es guiar al estudiante para que comprenda las tres formas de calcular proporciones en una tabla de contingencia: porcentaje sobre el total, porcentaje por fila y porcentaje por columna. Usa siempre el dataset de rendimiento académico × horas de estudio.
-
-DATOS:
-Tabla de 120 estudiantes UIS:
-             <5h   5-10h  >10h   Total
-Bajo:         22     10     3      35
-Medio:        12     28    10      50
-Alto:          4     17    14      35
-Total:        38     55    27     120
-
-PROTOCOLO (no saltes pasos):
-1. Pregunta al estudiante: "Si quiero saber qué fracción del TOTAL de la muestra tiene rendimiento Alto y estudia más de 10h, ¿qué operación haría?" Espera su respuesta. Si dice 14/120 ≈ 11.7% está correcto. Guíalo con preguntas si se equivoca.
-2. Una vez lo logre, INSTITUCIONALIZA: explica que esto se llama distribución conjunta o porcentaje sobre el total. Notación: h_ij = f_ij / N.
-3. Luego pregunta: "Ahora quiero saber, del grupo con rendimiento Alto, ¿qué porcentaje estudia más de 10h? ¿Cambiaría el denominador?" Espera. La respuesta correcta es 14/35 ≈ 40%.
-4. Una vez lo logre, INSTITUCIONALIZA: distribución condicional por fila. Notación: h_i|· = f_ij / f_i·.
-5. Finalmente: "¿Y si quiero saber, de quienes estudian más de 10h, qué porcentaje tiene rendimiento Alto?" La respuesta es 14/27 ≈ 51.9%.
-6. INSTITUCIONALIZACIÓN FINAL: explica la diferencia entre los tres tipos y cuándo usar cada uno.
-
-REGLAS:
-- Nunca des la respuesta directamente. Usa preguntas guía.
-- Párrafos cortos. Doble salto entre párrafos.
-- Términos estadísticos en *cursiva*.
-- Si el estudiante pregunta algo fuera del tema, invítalo a retomar.`;
-
 let cap3Iniciado = false;
 let cap3Historia = [];
 
@@ -575,11 +550,8 @@ async function inicializarChat2() {
     const res  = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Hola, ya exploré las formas de la tabla. Estoy listo para la actividad.',
-        session_id: 'cap3_user'
-      })
-    });
+      body: JSON.stringify({ message: 'Hola, inicio Cap 3.', session_id: 'cap3_user' })
+});
     const data = await res.json();
     if (data.reply) agregarMensaje2(data.reply, 'tutor');
     setStatus2('En línea');
@@ -605,7 +577,7 @@ async function enviarMensaje2() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: texto, session_id: 'cap3_user' })
-    });
+});
     const data = await res.json();
     quitarTyping2(typingId);
     setStatus2('En línea');
