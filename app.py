@@ -127,7 +127,6 @@ def chat():
     session_id = data.get("session_id", "default_user")
     user_message = data.get("message")
 
-    # Inicializar sesión si no existe
     if session_id not in chats:
         chats[session_id] = [{"role": "system", "content": obtener_prompt(session_id)}]
 
@@ -143,26 +142,38 @@ def chat():
         reply = completion.choices[0].message.content
         chats[session_id].append({"role": "assistant", "content": reply})
 
-        # Detección de finalización
-        session_completed = "Frecuencia Condicionada" in reply and "¡Muy bien!" in reply
+        # Detección dinámica de fin de sesión
+        if session_id == "cap3_user":
+            session_completed = "Felicidades, sesión terminada" in reply
+        else:
+            session_completed = "Frecuencia Condicionada" in reply and "¡Muy bien!" in reply
 
-        return jsonify({
+        # Retornar datos (solo enviar tablas si es Cap 2)
+        response_data = {
             "reply": reply,
-            "table": matriz_data,
-            "headers": headers,
-            "grafico_data": grafico_valores,
             "completed": session_completed
-        })
+        }
+        
+        if session_id != "cap3_user":
+            response_data["table"] = matriz_data
+            response_data["headers"] = headers
+            response_data["grafico_data"] = grafico_valores
+            
+        return jsonify(response_data)
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── NUEVA RUTA: Recuperación de Historial ──
 @app.route('/api/chat/historial', methods=['POST'])
 def obtener_historial():
     data = request.json
     session_id = data.get("session_id", "default_user")
-    # Retornamos el historial guardado en memoria
-    return jsonify({"history": chats.get(session_id, [])})
+    
+    # Obtener historial y filtrar solo mensajes de usuario y asistente
+    historial_completo = chats.get(session_id, [])
+    historial_filtrado = [msg for msg in historial_completo if msg["role"] in ["user", "assistant"]]
+    
+    return jsonify({"history": historial_filtrado})
 
 if __name__ == '__main__':
     app.run(port=5000)
