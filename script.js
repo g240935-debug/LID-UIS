@@ -619,6 +619,7 @@ function setStatus2(txt) {
   if (el) el.textContent = txt;
 }
 
+// Función: recibe el ID de sesión y a qué "chat-box" debe enviar los mensajes
 async function cargarHistorial(idSesion, contenedorId) {
     try {
         const res = await fetch(URL_BACKEND.replace('/api/chat', '/api/chat/historial'), {
@@ -632,9 +633,9 @@ async function cargarHistorial(idSesion, contenedorId) {
             const box = document.getElementById(contenedorId);
             if (!box) return;
             
-            box.innerHTML = ''; 
+            box.innerHTML = ''; // Limpiar antes de cargar
             data.history.forEach(msg => {
-                // Si es el chat del Cap 2, usa agregarMensaje, si es Cap 3 usa agregarMensaje2
+                // Si es el chat principal, usa agregarMensaje; si es el chat2, usa agregarMensaje2
                 if (contenedorId === 'chat-box') {
                     if (msg.role === 'user') agregarMensaje(msg.content, 'user');
                     else if (msg.role === 'assistant') agregarMensaje(msg.content, 'tutor');
@@ -643,8 +644,9 @@ async function cargarHistorial(idSesion, contenedorId) {
                     else if (msg.role === 'assistant') agregarMensaje2(msg.content, 'tutor');
                 }
             });
-            // Solo actualizamos fases si es el chat principal (Cap 2)
-            if (contenedorId === 'chat-box') {
+            
+            // Actualizar fase solo si es el Cap 2
+            if (contenedorId === 'chat-box' && data.history.length > 0) {
                 actualizarFase(data.history[data.history.length - 1].content);
             }
         }
@@ -657,15 +659,13 @@ async function cargarHistorial(idSesion, contenedorId) {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(ocultarLoading, 800);
 
-    // Rep-dot inicial del Cap 2
     const repDot = document.getElementById('rep-dot');
     if (repDot) repDot.className = 'rep-dot is-tabla';
 
-    // --- CARGAR AMBOS HISTORIALES ---
-    cargarHistorial(sessionId, 'chat-box');       // Carga Cap 2
-    cargarHistorial('cap3_user', 'chat-box2');    // Carga Cap 3
+    // --- CARGA AMBOS HISTORIALES ---
+    cargarHistorial(sessionId, 'chat-box');       // Historial Cap 2
+    cargarHistorial('cap3_user', 'chat-box2');    // Historial Cap 3
     
-    // Renderizar tablas
     renderizarFPTabla('absoluta');
     renderizarFPRefTable();
 });
