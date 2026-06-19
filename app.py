@@ -111,14 +111,12 @@ REGLAS DE ORO:
 - Escribe los términos estadísticos en cursiva (ejemplo: *distribución conjunta*)."""
 
 # ════════════════════════════════
-# FUNCIÓN QUE ASIGNA EL PROMPT CORRECTO SEGÚN session_id
+# FUNCIÓN QUE ASIGNA EL PROMPT CORRECTO SEGÚN session_id, si se necesitan agregar mas prompt alli se hace
 # ════════════════════════════════
 def obtener_prompt(session_id):
     if session_id == "cap3_user":
         return system_prompt_cap3
-    else:
-        # "default_user" y cualquier otro → Cap 2
-        return system_prompt_cap2
+    return system_prompt_cap2
 
 # Diccionario de sesiones en memoria
 chats = {}
@@ -129,9 +127,7 @@ def chat():
     session_id = data.get("session_id", "default_user")
     user_message = data.get("message")
 
-    # ── ÚNICA LÍNEA QUE CAMBIÓ AQUÍ ──
-    # Antes: chats[session_id] = [{"role": "system", "content": system_prompt}]
-    # Ahora: usa obtener_prompt() para asignar el prompt correcto según la sesión
+    # Inicializar sesión si no existe
     if session_id not in chats:
         chats[session_id] = [{"role": "system", "content": obtener_prompt(session_id)}]
 
@@ -143,10 +139,11 @@ def chat():
             messages=chats[session_id],
             temperature=0.5
         )
-
+        
         reply = completion.choices[0].message.content
         chats[session_id].append({"role": "assistant", "content": reply})
 
+        # Detección de finalización
         session_completed = "Frecuencia Condicionada" in reply and "¡Muy bien!" in reply
 
         return jsonify({
@@ -158,6 +155,14 @@ def chat():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ── NUEVA RUTA: Recuperación de Historial ──
+@app.route('/api/chat/historial', methods=['POST'])
+def obtener_historial():
+    data = request.json
+    session_id = data.get("session_id", "default_user")
+    # Retornamos el historial guardado en memoria
+    return jsonify({"history": chats.get(session_id, [])})
 
 if __name__ == '__main__':
     app.run(port=5000)
