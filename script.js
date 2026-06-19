@@ -619,42 +619,53 @@ function setStatus2(txt) {
   if (el) el.textContent = txt;
 }
 
-async function cargarHistorial() {
+async function cargarHistorial(idSesion, contenedorId) {
     try {
         const res = await fetch(URL_BACKEND.replace('/api/chat', '/api/chat/historial'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId })
+            body: JSON.stringify({ session_id: idSesion })
         });
         const data = await res.json();
         
-        if (data.history && data.history.length > 1) {
-            const box = document.getElementById('chat-box');
-            box.innerHTML = ''; // Limpiar chat antes de cargar
+        if (data.history && data.history.length > 0) {
+            const box = document.getElementById(contenedorId);
+            if (!box) return;
+            
+            box.innerHTML = ''; 
             data.history.forEach(msg => {
-                if (msg.role === 'user') agregarMensaje(msg.content, 'user');
-                else if (msg.role === 'assistant') agregarMensaje(msg.content, 'tutor');
+                // Si es el chat del Cap 2, usa agregarMensaje, si es Cap 3 usa agregarMensaje2
+                if (contenedorId === 'chat-box') {
+                    if (msg.role === 'user') agregarMensaje(msg.content, 'user');
+                    else if (msg.role === 'assistant') agregarMensaje(msg.content, 'tutor');
+                } else if (contenedorId === 'chat-box2') {
+                    if (msg.role === 'user') agregarMensaje2(msg.content, 'user');
+                    else if (msg.role === 'assistant') agregarMensaje2(msg.content, 'tutor');
+                }
             });
-            actualizarFase(data.history[data.history.length - 1].content);
+            // Solo actualizamos fases si es el chat principal (Cap 2)
+            if (contenedorId === 'chat-box') {
+                actualizarFase(data.history[data.history.length - 1].content);
+            }
         }
-    } catch (err) { console.error("Error al recuperar historial:", err); }
+    } catch (err) { console.error(`Error al recuperar historial ${idSesion}:`, err); }
 }
 
 /* ════════════════════════════════
    INIT
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(ocultarLoading, 800);
+    setTimeout(ocultarLoading, 800);
 
-  // Rep-dot inicial del Cap 2
-  const repDot = document.getElementById('rep-dot');
-  if (repDot) repDot.className = 'rep-dot is-tabla';
+    // Rep-dot inicial del Cap 2
+    const repDot = document.getElementById('rep-dot');
+    if (repDot) repDot.className = 'rep-dot is-tabla';
 
-   cargarHistorial();
-   
-  // Renderizar tabla interactiva de la página 4 (tipo inicial: absoluta)
-  renderizarFPTabla('absoluta');
-
-  // Renderizar tabla de referencia fija de la página 5
-  renderizarFPRefTable();
+    // --- CARGAR AMBOS HISTORIALES ---
+    cargarHistorial(sessionId, 'chat-box');       // Carga Cap 2
+    cargarHistorial('cap3_user', 'chat-box2');    // Carga Cap 3
+    
+    // Renderizar tablas
+    renderizarFPTabla('absoluta');
+    renderizarFPRefTable();
 });
