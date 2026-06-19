@@ -5,6 +5,11 @@
 ═══════════════════════════════════════════════════════ */
 
 const URL_BACKEND = 'https://lid-uis.onrender.com/api/chat';
+let sessionId = localStorage.getItem('lid_uid');
+if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem('lid_uid', sessionId);
+}
 
 // ── Estado global ──
 let graficoActual  = null;
@@ -254,8 +259,8 @@ async function inicializarChat() {
     const res  = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Hola, estoy listo para aprender.' })
-    });
+      body: JSON.stringify({ message: 'Hola, estoy listo para aprender.', session_id: sessionId })
+});
     const data = await res.json();
 
     if (data.reply) {
@@ -290,8 +295,8 @@ async function enviarMensaje() {
     const res  = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: texto })
-    });
+      body: JSON.stringify({ message: texto, session_id: sessionId })
+});
     const data = await res.json();
 
     quitarTyping(typingId);
@@ -642,6 +647,27 @@ function setStatus2(txt) {
   if (el) el.textContent = txt;
 }
 
+async function cargarHistorial() {
+    try {
+        const res = await fetch(URL_BACKEND.replace('/api/chat', '/api/chat/historial'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        const data = await res.json();
+        
+        if (data.history && data.history.length > 1) {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = ''; // Limpiar chat antes de cargar
+            data.history.forEach(msg => {
+                if (msg.role === 'user') agregarMensaje(msg.content, 'user');
+                else if (msg.role === 'assistant') agregarMensaje(msg.content, 'tutor');
+            });
+            actualizarFase(data.history[data.history.length - 1].content);
+        }
+    } catch (err) { console.error("Error al recuperar historial:", err); }
+}
+
 /* ════════════════════════════════
    INIT
 ════════════════════════════════ */
@@ -652,6 +678,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const repDot = document.getElementById('rep-dot');
   if (repDot) repDot.className = 'rep-dot is-tabla';
 
+   cargarHistorial();
+   
   // Renderizar tabla interactiva de la página 4 (tipo inicial: absoluta)
   renderizarFPTabla('absoluta');
 
