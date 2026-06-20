@@ -815,26 +815,45 @@ const PROBLEMAS_A = [
   }
 ];
 
-let probAActual = 0;
-let repAActual = 'absoluta';
+let probAActual  = 0;
+let tipoEscogidoA = null;  // tipo que el estudiante seleccionó
+let probAIniciado = false;
+
+/* ── Escogencia del tipo en pág 7 ── */
+function escogerTipoA(tipo) {
+  tipoEscogidoA = tipo;
+  // Marcar botón seleccionado
+  document.querySelectorAll('#page-7 .pts-btn').forEach(b => {
+    b.classList.remove('selected','correcto','incorrecto');
+    if (b.dataset.tipo === tipo) b.classList.add('selected');
+  });
+  // Ocultar feedback de tipo anterior
+  const fb = document.getElementById('probA-tipo-feedback');
+  if (fb) fb.style.display = 'none';
+  // Re-renderizar la tabla con el tipo escogido
+  renderizarProbA();
+}
 
 function renderizarProbA() {
   const p = PROBLEMAS_A[probAActual];
-  document.getElementById('probA-enunciado').innerHTML = p.enunciado;
-  document.getElementById('probA-pregunta').innerHTML  = p.pregunta;
-  document.getElementById('probA-counter').textContent = `${probAActual+1} / ${PROBLEMAS_A.length}`;
-  // Actualizar badge (nueva estructura)
-  const badge = document.getElementById('probA-num-badge');
-  if (badge) badge.textContent = probAActual + 1;
-  document.getElementById('probA-feedback').style.display = 'none';
-  repAActual = 'absoluta';
-  document.getElementById('btn-rep-A-label').textContent = 'Ver como % por fila';
-  document.getElementById('btn-rep-A')?.classList.remove('is-chart');
-  const repDot = document.getElementById('repA-dot');
-  const repTxt = document.getElementById('repA-text');
-  if (repDot) repDot.className = 'rep-dot is-tabla';
-  if (repTxt) repTxt.textContent = 'Frecuencias absolutas';
+  const el_en = document.getElementById('probA-enunciado');
+  const el_pq = document.getElementById('probA-pregunta');
+  const el_ct = document.getElementById('probA-counter');
+  const el_bg = document.getElementById('probA-num-badge');
+  const el_fb = document.getElementById('probA-feedback');
+  if (el_en) el_en.innerHTML = p.enunciado;
+  if (el_pq) el_pq.innerHTML = p.pregunta;
+  if (el_ct) el_ct.textContent = `${probAActual+1} / ${PROBLEMAS_A.length}`;
+  if (el_bg) el_bg.textContent = probAActual + 1;
+  if (el_fb) el_fb.style.display = 'none';
 
+  // Resetear tipo al cambiar problema
+  tipoEscogidoA = null;
+  document.querySelectorAll('#page-7 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
+  const fbTipo = document.getElementById('probA-tipo-feedback');
+  if (fbTipo) fbTipo.style.display = 'none';
+
+  const tipo = tipoEscogidoA || 'absoluta';
   const { filas, columnas, matriz, ocultas, N } = p;
   const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
   const totalesFila = matriz.map(r => r.reduce((s, v) => s + v, 0));
@@ -847,101 +866,146 @@ function renderizarProbA() {
     html += `<tr><td>${filas[i]}</td>`;
     fila.forEach((val, j) => {
       const esOculta = ocultas.some(([oi,oj]) => oi===i && oj===j);
-      const celda = calcularCelda(repAActual, val, totalesFila[i], totalesCol[j], N);
+      // El valor correcto cambia según el tipo escogido
+      const valorCorrecto = calcularCeldaNum(tipo, val, totalesFila[i], totalesCol[j], N);
+      const celdaDisplay  = calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N);
       if (esOculta) {
-        html += `<td><input type="number" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${val}" placeholder="?"></td>`;
+        html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${valorCorrecto}" placeholder="?"></td>`;
       } else {
-        html += `<td>${celda}</td>`;
+        html += `<td>${celdaDisplay}</td>`;
       }
     });
-    html += `<td class="td-marg">${totalesFila[i]}</td></tr>`;
+    const margVal = calcularMarginalFila(tipo, totalesFila[i], N);
+    html += `<td class="td-marg">${margVal}</td></tr>`;
   });
 
   html += '<tr><td>Total</td>';
-  totalesCol.forEach(tc => { html += `<td>${tc}</td>`; });
-  html += `<td>${N}</td></tr></tbody></table>`;
+  totalesCol.forEach(tc => { html += `<td class="td-marg">${calcularMarginalCol(tipo, tc, N)}</td>`; });
+  html += `<td class="td-marg">${tipo === 'absoluta' ? N : '100%'}</td></tr></tbody></table>`;
 
-  document.getElementById('probA-tabla-wrapper').innerHTML = html;
+  const w = document.getElementById('probA-tabla-wrapper');
+  if (w) w.innerHTML = html;
 }
 
-function toggleRepA() {
-  const tipos = ['absoluta','total','fila','columna'];
-  const idx = tipos.indexOf(repAActual);
-  repAActual = tipos[(idx+1) % tipos.length];
-  const nextIdx = (tipos.indexOf(repAActual) + 1) % tipos.length;
-  const labels = { absoluta:'Ver como % total', total:'Ver como % fila', fila:'Ver como % columna', columna:'Ver como frecuencias' };
-  const repNames = { absoluta:'Frecuencias absolutas', total:'% sobre el total', fila:'% por fila', columna:'% por columna' };
-  document.getElementById('btn-rep-A-label').textContent = labels[repAActual];
-  const repDot = document.getElementById('repA-dot');
-  const repTxt = document.getElementById('repA-text');
-  if (repDot) repDot.className = repAActual === 'absoluta' ? 'rep-dot is-tabla' : 'rep-dot is-grafico';
-  if (repTxt) repTxt.textContent = repNames[repAActual];
-  // Re-renderizar manteniendo los valores ingresados
-  const inputs = document.querySelectorAll('#probA-tabla-wrapper .cell-input');
-  const valores = {};
-  inputs.forEach(inp => { valores[`${inp.dataset.fila}_${inp.dataset.col}`] = inp.value; });
-  renderizarProbA();
-  setTimeout(() => {
-    document.querySelectorAll('#probA-tabla-wrapper .cell-input').forEach(inp => {
-      const key = `${inp.dataset.fila}_${inp.dataset.col}`;
-      if (valores[key]) inp.value = valores[key];
-    });
-  }, 50);
+// Retorna el número puro para comparar (sin el %)
+function calcularCeldaNum(tipo, val, totalFila, totalCol, N) {
+  if (tipo === 'absoluta') return val;
+  if (tipo === 'total')    return parseFloat((val / N * 100).toFixed(1));
+  if (tipo === 'fila')     return parseFloat((val / totalFila * 100).toFixed(1));
+  if (tipo === 'columna')  return parseFloat((val / totalCol * 100).toFixed(1));
+  return val;
 }
 
 function verificarProblemaA() {
+  const p = PROBLEMAS_A[probAActual];
+
+  // 1. Evaluar escogencia del tipo
+  const fbTipo = document.getElementById('probA-tipo-feedback');
+  if (!tipoEscogidoA) {
+    if (fbTipo) { fbTipo.style.display='block'; fbTipo.className='pts-feedback error'; fbTipo.textContent='⚠️ Primero selecciona el sistema de representación adecuado.'; }
+    return;
+  }
+  const tipoOk = tipoEscogidoA === p.respuestaCorrecta;
+  document.querySelectorAll('#page-7 .pts-btn').forEach(b => {
+    b.classList.remove('correcto','incorrecto');
+    if (b.dataset.tipo === tipoEscogidoA) b.classList.add(tipoOk ? 'correcto' : 'incorrecto');
+  });
+  if (fbTipo) {
+    fbTipo.style.display = 'block';
+    if (tipoOk) {
+      fbTipo.className = 'pts-feedback ok';
+      fbTipo.innerHTML = `✅ ¡Correcto! El <strong>% por ${p.respuestaCorrecta}</strong> es el sistema adecuado para responder esta pregunta.`;
+    } else {
+      fbTipo.className = 'pts-feedback error';
+      fbTipo.innerHTML = `❌ El sistema <strong>${tipoEscogidoA}</strong> no es el más adecuado. Piensa: ¿qué grupo es el "universo" de la pregunta?`;
+    }
+  }
+
+  // 2. Evaluar celdas
   const inputs = document.querySelectorAll('#probA-tabla-wrapper .cell-input');
   let correctas = 0; let total = inputs.length;
   inputs.forEach(inp => {
-    const val = parseFloat(inp.value);
+    const val      = parseFloat(inp.value);
     const correcto = parseFloat(inp.dataset.correcto);
     inp.classList.remove('correcto','incorrecto');
-    if (!isNaN(val) && val === correcto) { inp.classList.add('correcto'); correctas++; }
+    if (!isNaN(val) && Math.abs(val - correcto) < 0.2) { inp.classList.add('correcto'); correctas++; }
     else if (inp.value !== '') inp.classList.add('incorrecto');
   });
 
   const fb = document.getElementById('probA-feedback');
-  fb.style.display = 'block';
-  const p = PROBLEMAS_A[probAActual];
-
-  if (correctas === total) {
-    fb.className = 'prob-feedback ok';
-    fb.innerHTML = `✅ ¡Correcto! Todas las celdas son correctas. El sistema de representación adecuado para esta pregunta es <strong>% ${p.respuestaCorrecta}</strong>.`;
-    enviarContextoProbA(`El estudiante completó correctamente todas las celdas del Problema ${probAActual+1}. Confirma y explica por qué el % ${p.respuestaCorrecta} es el sistema adecuado para responder la pregunta planteada.`);
-  } else if (correctas === 0) {
-    fb.className = 'prob-feedback error';
-    fb.innerHTML = `❌ Ninguna celda es correcta todavía. Revisa los datos del enunciado y vuelve a intentarlo.`;
-    enviarContextoProbA(`El estudiante no pudo completar ninguna celda del Problema ${probAActual+1}. La pregunta es: "${p.pregunta}". Guíalo con una pista sin dar la respuesta directa.`);
-  } else {
-    fb.className = 'prob-feedback parcial';
-    fb.innerHTML = `⚠️ ${correctas} de ${total} celdas correctas. Revisa las marcadas en rojo.`;
-    enviarContextoProbA(`El estudiante completó ${correctas} de ${total} celdas del Problema ${probAActual+1}. Tiene errores. Guíalo para que encuentre dónde se equivocó sin decirle la respuesta.`);
+  if (fb) {
+    fb.style.display = 'block';
+    if (correctas === total && tipoOk) {
+      fb.className='prob-feedback ok';
+      fb.innerHTML=`✅ ¡Perfecto! Escogiste el sistema correcto y completaste todas las celdas. `;
+    } else if (correctas === total && !tipoOk) {
+      fb.className='prob-feedback parcial';
+      fb.innerHTML=`⚠️ Las celdas son correctas para el tipo que escogiste, pero el sistema no es el más adecuado para responder la pregunta.`;
+    } else {
+      fb.className='prob-feedback parcial';
+      fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas. Las incorrectas están en rojo.`;
+    }
   }
+
+  // 3. Enviar contexto al tutor
+  const contexto = `Problema ${probAActual+1} — Pregunta: "${p.pregunta}". 
+Sistema correcto: % por ${p.respuestaCorrecta}. 
+El estudiante escogió: ${tipoEscogidoA} (${tipoOk ? 'CORRECTO' : 'INCORRECTO'}).
+Celdas correctas: ${correctas} de ${total}.
+${correctas === total && tipoOk ? 'Todo bien. Felicítalo y explica brevemente por qué ese sistema responde la pregunta.' :
+  !tipoOk ? 'El sistema de representación no es el adecuado. Guíalo con una pregunta sobre cuál es el "universo" de la pregunta sin revelar la respuesta.' :
+  'Las celdas tienen errores. Haz una pregunta guía para que revise sus cálculos.'}`;
+  enviarContextoProbA(contexto);
 }
 
 function cambiarProbA(dir) {
   const nuevo = probAActual + dir;
   if (nuevo < 0 || nuevo >= PROBLEMAS_A.length) return;
   probAActual = nuevo;
+  tipoEscogidoA = null;
   renderizarProbA();
 }
 
-/* ── Tutor Tipo A ── */
-let probAIniciado = false;
-
-async function enviarContextoProbA(contexto) {
-  setStatusProbA('Analizando…');
-  const msg = `[CONTEXTO AUTOMÁTICO]: ${contexto}`;
+/* ── Tutor Pág 7 ── */
+async function inicializarTutorProbA() {
+  setStatusProbA('Conectando…');
   try {
     const res = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, session_id: `probA_${sessionId}` })
+      body: JSON.stringify({
+        message: 'Hola, estoy en la sección de formulación. Estoy listo para resolver los problemas.',
+        session_id: `probA_${sessionId}`
+      })
     });
     const data = await res.json();
     if (data.reply) agregarMensajeProbA(data.reply, 'tutor');
     setStatusProbA('En línea');
-  } catch { setStatusProbA('En línea'); }
+  } catch(e) {
+    console.error('Error tutor probA:', e);
+    agregarMensajeProbA('¡Hola! Estoy aquí para guiarte. Escoge el tipo de tabla, completa las celdas y presiona Verificar cuando estés listo.', 'tutor');
+    setStatusProbA('En línea');
+  }
+}
+
+async function enviarContextoProbA(contexto) {
+  setStatusProbA('Analizando…');
+  const tid = agregarTypingGen('chat-probA');
+  try {
+    const res = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `[CONTEXTO]: ${contexto}`, session_id: `probA_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    if (data.reply) agregarMensajeProbA(data.reply, 'tutor');
+    setStatusProbA('En línea');
+  } catch(e) {
+    quitarTypingGen(tid);
+    console.error('Error contexto probA:', e);
+    setStatusProbA('En línea');
+  }
 }
 
 async function enviarMensajeProbA() {
@@ -961,7 +1025,11 @@ async function enviarMensajeProbA() {
     quitarTypingGen(tid);
     if (data.reply) agregarMensajeProbA(data.reply, 'tutor');
     setStatusProbA('En línea');
-  } catch { quitarTypingGen(tid); setStatusProbA('En línea'); }
+  } catch(e) {
+    quitarTypingGen(tid);
+    console.error('Error mensaje probA:', e);
+    setStatusProbA('En línea');
+  }
 }
 
 function agregarMensajeProbA(texto, tipo) {
@@ -977,35 +1045,30 @@ function agregarMensajeProbA(texto, tipo) {
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
-
-function setStatusProbA(txt) {
-  const el = document.getElementById('tutor-status-probA');
-  if (el) el.textContent = txt;
-}
+function setStatusProbA(txt) { const el=document.getElementById('tutor-status-probA'); if(el) el.textContent=txt; }
 
 /* ════════════════════════════════════════════════
-   PÁG 7 — PROBLEMAS TIPO B (construir tabla)
-   3 problemas: se da N y frases; el estudiante
-   debe llenar TODA la tabla para que responda.
+   PÁG 8 — PROBLEMAS TIPO B (construir tabla)
 ════════════════════════════════════════════════ */
 const PROBLEMAS_B = [
   {
     enunciado: 'Se encuestaron <strong>90 estudiantes</strong> de la UIS sobre su <strong>medio de transporte</strong> (Bus / Bicicleta / A pie) y su <strong>puntualidad</strong> (Siempre / A veces / Nunca).',
     frases: [
       '30 estudiantes usan Bus.',
-      '24 estudiantes llegan Siempre a tiempo.',
-      'De quienes usan Bicicleta, el 50% llega Siempre.',
+      'De quienes usan Bicicleta, la mitad llega Siempre.',
       '10 estudiantes van A pie y llegan A veces.',
-      'Solo 3 estudiantes van A pie y Nunca llegan.'
+      'Solo 3 estudiantes van A pie y Nunca llegan.',
+      'En total, 24 estudiantes llegan Siempre a tiempo.'
     ],
-    pregunta: 'Construye la tabla en frecuencias absolutas que permita responder: ¿qué medio de transporte tiene mejor puntualidad?',
+    pregunta: '¿Qué medio de transporte se asocia con mejor puntualidad?',
     filas: ['Bus', 'Bicicleta', 'A pie'],
     columnas: ['Siempre', 'A veces', 'Nunca'],
     solucion: [[10,14,6],[12,8,5],[2,10,3]],
+    respuestaCorrecta: 'absoluta',
     N: 90
   },
   {
-    enunciado: 'Se encuestaron <strong>60 estudiantes</strong> sobre su <strong>programa académico</strong> (Matemáticas / Física / Estadística) y su <strong>uso de software estadístico</strong> (R / Python / SPSS).',
+    enunciado: 'Se encuestaron <strong>60 estudiantes</strong> sobre su <strong>programa</strong> (Matemáticas / Física / Estadística) y el <strong>software estadístico</strong> que más usan (R / Python / SPSS).',
     frases: [
       '25 estudiantes son de Matemáticas.',
       'El 40% de los estudiantes de Física usa R.',
@@ -1013,119 +1076,197 @@ const PROBLEMAS_B = [
       'Solo 2 estudiantes de Matemáticas usan SPSS.',
       'En total, 22 estudiantes usan Python.'
     ],
-    pregunta: 'Construye la tabla en % por fila que responda: dentro de cada programa, ¿cuál es el software más usado?',
+    pregunta: 'Dentro de cada programa, ¿cuál es el software más usado?',
     filas: ['Matemáticas', 'Física', 'Estadística'],
     columnas: ['R', 'Python', 'SPSS'],
     solucion: [[12,11,2],[6,6,3],[4,8,8]],
+    respuestaCorrecta: 'fila',
     N: 60
   },
   {
     enunciado: 'Se encuestaron <strong>75 estudiantes</strong> sobre su <strong>nivel de inglés</strong> (Básico / Intermedio / Avanzado) y su <strong>participación en intercambios</strong> (Sí / No).',
     frases: [
-      'El 60% de los estudiantes de nivel Avanzado participó en intercambio.',
       '30 estudiantes tienen nivel Básico.',
-      'Solo 3 estudiantes de nivel Básico participaron.',
       '20 estudiantes tienen nivel Avanzado.',
+      'El 60% de los de nivel Avanzado participó en intercambio.',
+      'Solo 3 estudiantes de nivel Básico participaron.',
       'En total, 22 estudiantes participaron en intercambio.'
     ],
-    pregunta: 'Construye la tabla en % por columna que responda: de quienes participaron en intercambio, ¿de qué nivel son?',
+    pregunta: 'De quienes participaron en intercambio, ¿de qué nivel son?',
     filas: ['Básico', 'Intermedio', 'Avanzado'],
     columnas: ['Sí', 'No'],
     solucion: [[3,27],[7,18],[12,8]],
+    respuestaCorrecta: 'columna',
     N: 75
   }
 ];
 
-let probBActual = 0;
+let probBActual    = 0;
+let tipoEscogidoB  = null;
+let probBIniciado  = false;
+
+function escogerTipoB(tipo) {
+  tipoEscogidoB = tipo;
+  document.querySelectorAll('#page-8 .pts-btn').forEach(b => {
+    b.classList.remove('selected','correcto','incorrecto');
+    if (b.dataset.tipo === tipo) b.classList.add('selected');
+  });
+  const fb = document.getElementById('probB-tipo-feedback');
+  if (fb) fb.style.display = 'none';
+}
 
 function renderizarProbB() {
   const p = PROBLEMAS_B[probBActual];
-  document.getElementById('probB-enunciado').innerHTML = p.enunciado;
-  document.getElementById('probB-pregunta').innerHTML  = p.pregunta;
-  document.getElementById('probB-num').textContent     = probBActual + 1;
-  document.getElementById('probB-counter').textContent = `${probBActual+1} / ${PROBLEMAS_B.length}`;
-  document.getElementById('probB-feedback').style.display = 'none';
+  const el_en = document.getElementById('probB-enunciado');
+  const el_pq = document.getElementById('probB-pregunta');
+  const el_nm = document.getElementById('probB-num');
+  const el_ct = document.getElementById('probB-counter');
+  const el_fb = document.getElementById('probB-feedback');
+  if (el_en) el_en.innerHTML = p.enunciado;
+  if (el_pq) el_pq.innerHTML = p.pregunta;
+  if (el_nm) el_nm.textContent = probBActual + 1;
+  if (el_ct) el_ct.textContent = `${probBActual+1} / ${PROBLEMAS_B.length}`;
+  if (el_fb) el_fb.style.display = 'none';
 
   // Frases
   const frasesEl = document.getElementById('probB-frases');
-  if (frasesEl) {
-    frasesEl.innerHTML = p.frases.map(f => `<div class="prob-frase">• ${f}</div>`).join('');
-  }
+  if (frasesEl) frasesEl.innerHTML = p.frases.map(f => `<div class="prob-frase">• ${f}</div>`).join('');
 
-  // Tabla editable — todas las celdas vacías excepto encabezados
+  // Reset tipo
+  tipoEscogidoB = null;
+  document.querySelectorAll('#page-8 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
+  const fbTipo = document.getElementById('probB-tipo-feedback');
+  if (fbTipo) fbTipo.style.display = 'none';
+
+  // Tabla vacía
   const { filas, columnas, N } = p;
-  let html = '<table><thead><tr><th>↓ Filas / Columnas →</th>';
+  let html = '<table><thead><tr><th>↓ / →</th>';
   columnas.forEach(c => { html += `<th>${c}</th>`; });
   html += '<th>Total fila</th></tr></thead><tbody>';
-
   filas.forEach((fila, i) => {
     html += `<tr><td>${fila}</td>`;
     columnas.forEach((_, j) => {
-      html += `<td><input type="number" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${p.solucion[i][j]}" placeholder="?"></td>`;
+      html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${p.solucion[i][j]}" placeholder="?"></td>`;
     });
-    html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="fila" data-idx="${i}" placeholder="?"></td></tr>`;
+    const totalFila = p.solucion[i].reduce((s,v)=>s+v,0);
+    html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="fila" data-correcto="${totalFila}" placeholder="?"></td></tr>`;
   });
-
+  const totalesCol = columnas.map((_, j) => p.solucion.reduce((s,r)=>s+r[j],0));
   html += '<tr><td>Total col</td>';
-  columnas.forEach((_, j) => {
-    html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="col" data-idx="${j}" placeholder="?"></td>`;
+  totalesCol.forEach(tc => {
+    html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="col" data-correcto="${tc}" placeholder="?"></td>`;
   });
-  html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="n" placeholder="${N}"></td></tr>`;
+  html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="n" data-correcto="${N}" placeholder="?"></td></tr>`;
   html += '</tbody></table>';
-
   document.getElementById('probB-tabla-wrapper').innerHTML = html;
 }
 
 function verificarProblemaB() {
+  const p = PROBLEMAS_B[probBActual];
+
+  // 1. Escogencia del tipo
+  const fbTipo = document.getElementById('probB-tipo-feedback');
+  if (!tipoEscogidoB) {
+    if (fbTipo) { fbTipo.style.display='block'; fbTipo.className='pts-feedback error'; fbTipo.textContent='⚠️ Primero selecciona el sistema de representación.'; }
+    return;
+  }
+  const tipoOk = tipoEscogidoB === p.respuestaCorrecta;
+  document.querySelectorAll('#page-8 .pts-btn').forEach(b => {
+    b.classList.remove('correcto','incorrecto');
+    if (b.dataset.tipo === tipoEscogidoB) b.classList.add(tipoOk ? 'correcto' : 'incorrecto');
+  });
+  if (fbTipo) {
+    fbTipo.style.display = 'block';
+    fbTipo.className = tipoOk ? 'pts-feedback ok' : 'pts-feedback error';
+    fbTipo.innerHTML = tipoOk
+      ? `✅ ¡Correcto! <strong>${p.respuestaCorrecta}</strong> es el sistema adecuado.`
+      : `❌ El sistema <strong>${tipoEscogidoB}</strong> no es el adecuado para esta pregunta. ¿Quién es el "universo" de comparación?`;
+  }
+
+  // 2. Celdas internas
   const inputs = document.querySelectorAll('#probB-tabla-wrapper .cell-input:not(.cell-marg-input)');
-  let correctas = 0; let total = inputs.length;
+  let correctas=0; let total=inputs.length;
   inputs.forEach(inp => {
-    const val = parseFloat(inp.value);
-    const correcto = parseFloat(inp.dataset.correcto);
+    const val=parseFloat(inp.value), correcto=parseFloat(inp.dataset.correcto);
     inp.classList.remove('correcto','incorrecto');
-    if (!isNaN(val) && val === correcto) { inp.classList.add('correcto'); correctas++; }
-    else if (inp.value !== '') inp.classList.add('incorrecto');
+    if (!isNaN(val) && Math.abs(val-correcto)<0.2) { inp.classList.add('correcto'); correctas++; }
+    else if (inp.value!=='') inp.classList.add('incorrecto');
   });
 
   const fb = document.getElementById('probB-feedback');
-  fb.style.display = 'block';
-  const p = PROBLEMAS_B[probBActual];
-
-  if (correctas === total) {
-    fb.className = 'prob-feedback ok';
-    fb.innerHTML = `✅ ¡Excelente! Construiste correctamente la tabla completa.`;
-    enviarContextoProbB(`El estudiante construyó correctamente toda la tabla del Problema ${probBActual+1}. Felicítalo y refuerza por qué este sistema de representación responde la pregunta planteada.`);
-  } else if (correctas === 0) {
-    fb.className = 'prob-feedback error';
-    fb.innerHTML = `❌ Todavía no hay celdas correctas. Usa las frases del enunciado como pistas.`;
-    enviarContextoProbB(`El estudiante no pudo construir ninguna celda del Problema ${probBActual+1}. Las frases pista son: ${p.frases.join(' | ')}. Guíalo sin dar la respuesta directa.`);
-  } else {
-    fb.className = 'prob-feedback parcial';
-    fb.innerHTML = `⚠️ ${correctas} de ${total} celdas correctas. Sigue revisando.`;
-    enviarContextoProbB(`El estudiante tiene ${correctas} de ${total} celdas correctas en el Problema ${probBActual+1}. Tiene errores. Haz una pregunta guía para que revise sus cálculos.`);
+  if (fb) {
+    fb.style.display='block';
+    if (correctas===total && tipoOk) {
+      fb.className='prob-feedback ok';
+      fb.innerHTML='✅ ¡Excelente! Escogiste el sistema correcto y construiste la tabla completa correctamente.';
+    } else if (correctas===total && !tipoOk) {
+      fb.className='prob-feedback parcial';
+      fb.innerHTML='⚠️ Los valores son correctos pero el sistema de representación no responde la pregunta planteada.';
+    } else {
+      fb.className='prob-feedback parcial';
+      fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas. Las incorrectas están en rojo.`;
+    }
   }
+
+  // 3. Contexto al tutor
+  const contexto = `Reto ${probBActual+1} — Pregunta: "${p.pregunta}".
+Sistema correcto: ${p.respuestaCorrecta}. Estudiante escogió: ${tipoEscogidoB} (${tipoOk?'CORRECTO':'INCORRECTO'}).
+Celdas correctas: ${correctas} de ${total}.
+Pistas del enunciado: ${p.frases.join(' | ')}.
+${correctas===total && tipoOk ? 'Todo correcto. Felicítalo e institucionaliza el concepto clave.' :
+  !tipoOk ? 'Sistema incorrecto. Guíalo con una pregunta sobre cuál es el universo de la pregunta.' :
+  'Celdas con errores. Haz una pregunta guía sobre las pistas del enunciado.'}`;
+  enviarContextoProbB(contexto);
 }
 
 function cambiarProbB(dir) {
   const nuevo = probBActual + dir;
   if (nuevo < 0 || nuevo >= PROBLEMAS_B.length) return;
   probBActual = nuevo;
+  tipoEscogidoB = null;
   renderizarProbB();
 }
 
-/* ── Tutor Tipo B ── */
-async function enviarContextoProbB(contexto) {
-  setStatusProbB('Analizando…');
+/* ── Tutor Pág 8 ── */
+async function inicializarTutorProbB() {
+  setStatusProbB('Conectando…');
   try {
     const res = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `[CONTEXTO AUTOMÁTICO]: ${contexto}`, session_id: `probB_${sessionId}` })
+      body: JSON.stringify({
+        message: 'Hola, estoy en la fase de validación. Voy a construir tablas de contingencia desde cero.',
+        session_id: `probB_${sessionId}`
+      })
     });
     const data = await res.json();
     if (data.reply) agregarMensajeProbB(data.reply, 'tutor');
     setStatusProbB('En línea');
-  } catch { setStatusProbB('En línea'); }
+  } catch(e) {
+    console.error('Error tutor probB:', e);
+    agregarMensajeProbB('¡Hola! Escoge el sistema de representación, construye la tabla usando las pistas y presiona Verificar cuando estés listo.', 'tutor');
+    setStatusProbB('En línea');
+  }
+}
+
+async function enviarContextoProbB(contexto) {
+  setStatusProbB('Analizando…');
+  const tid = agregarTypingGen('chat-probB');
+  try {
+    const res = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `[CONTEXTO]: ${contexto}`, session_id: `probB_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    if (data.reply) agregarMensajeProbB(data.reply, 'tutor');
+    setStatusProbB('En línea');
+  } catch(e) {
+    quitarTypingGen(tid);
+    console.error('Error contexto probB:', e);
+    setStatusProbB('En línea');
+  }
 }
 
 async function enviarMensajeProbB() {
@@ -1145,7 +1286,11 @@ async function enviarMensajeProbB() {
     quitarTypingGen(tid);
     if (data.reply) agregarMensajeProbB(data.reply, 'tutor');
     setStatusProbB('En línea');
-  } catch { quitarTypingGen(tid); setStatusProbB('En línea'); }
+  } catch(e) {
+    quitarTypingGen(tid);
+    console.error('Error mensaje probB:', e);
+    setStatusProbB('En línea');
+  }
 }
 
 function agregarMensajeProbB(texto, tipo) {
@@ -1161,11 +1306,7 @@ function agregarMensajeProbB(texto, tipo) {
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
-
-function setStatusProbB(txt) {
-  const el = document.getElementById('tutor-status-probB');
-  if (el) el.textContent = txt;
-}
+function setStatusProbB(txt) { const el=document.getElementById('tutor-status-probB'); if(el) el.textContent=txt; }
 
 /* ── Helper typing genérico ── */
 function agregarTypingGen(boxId) {
@@ -1184,26 +1325,40 @@ function quitarTypingGen(id) { if (id) document.getElementById(id)?.remove(); }
    INIT
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(ocultarLoading, 800);
+  setTimeout(ocultarLoading, 800);
 
-    const repDot = document.getElementById('rep-dot');
-    if (repDot) repDot.className = 'rep-dot is-tabla';
+  const repDot = document.getElementById('rep-dot');
+  if (repDot) repDot.className = 'rep-dot is-tabla';
 
-    cargarHistorial(sessionId, 'chat-box');
-    cargarHistorial('cap3_user', 'chat-box2');
+  // Historiales Cap 2 y Cap 3 (cap3 usa sessionId único por dispositivo)
+  cargarHistorial(sessionId, 'chat-box');
+  cargarHistorial(`cap3_${sessionId}`, 'chat-box2');
 
-    renderizarFPTabla('absoluta');
-    renderizarFPRefTable();
-
-    // Pág 6
-    renderizarEjTabla('absoluta');
-    renderizarEjGrafico('absoluta');
-
-    // Pág 7 — Formulación
-    renderizarProbA();
-
-    // Pág 8 — Validación
-    renderizarProbB();
+  renderizarFPTabla('absoluta');
+  renderizarFPRefTable();
+  renderizarEjTabla('absoluta');
+  renderizarEjGrafico('absoluta');
+  renderizarProbA();
+  renderizarProbB();
 });
 
-// irAPagina ya está definida arriba, no redeclarar
+// Detectar entrada a páginas con tutor por primera vez
+// (se llama dentro de irAPagina que ya existe arriba)
+// Extender irAPagina para inicializar tutores de problemas
+const _irAPaginaOrig = irAPagina;
+function irAPagina(n) {
+  _irAPaginaOrig(n);
+  if (n === 5 && !cap3Iniciado) {
+    cap3Iniciado = true;
+    // Usar sessionId único para cap3
+    setTimeout(() => inicializarChat2(), 400);
+  }
+  if (n === 7 && !probAIniciado) {
+    probAIniciado = true;
+    setTimeout(inicializarTutorProbA, 400);
+  }
+  if (n === 8 && !probBIniciado) {
+    probBIniciado = true;
+    setTimeout(inicializarTutorProbB, 400);
+  }
+}
