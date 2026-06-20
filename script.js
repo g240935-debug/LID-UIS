@@ -823,10 +823,17 @@ function renderizarProbA() {
   document.getElementById('probA-enunciado').innerHTML = p.enunciado;
   document.getElementById('probA-pregunta').innerHTML  = p.pregunta;
   document.getElementById('probA-counter').textContent = `${probAActual+1} / ${PROBLEMAS_A.length}`;
+  // Actualizar badge (nueva estructura)
+  const badge = document.getElementById('probA-num-badge');
+  if (badge) badge.textContent = probAActual + 1;
   document.getElementById('probA-feedback').style.display = 'none';
   repAActual = 'absoluta';
   document.getElementById('btn-rep-A-label').textContent = 'Ver como % por fila';
   document.getElementById('btn-rep-A')?.classList.remove('is-chart');
+  const repDot = document.getElementById('repA-dot');
+  const repTxt = document.getElementById('repA-text');
+  if (repDot) repDot.className = 'rep-dot is-tabla';
+  if (repTxt) repTxt.textContent = 'Frecuencias absolutas';
 
   const { filas, columnas, matriz, ocultas, N } = p;
   const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
@@ -861,14 +868,19 @@ function toggleRepA() {
   const tipos = ['absoluta','total','fila','columna'];
   const idx = tipos.indexOf(repAActual);
   repAActual = tipos[(idx+1) % tipos.length];
+  const nextIdx = (tipos.indexOf(repAActual) + 1) % tipos.length;
   const labels = { absoluta:'Ver como % total', total:'Ver como % fila', fila:'Ver como % columna', columna:'Ver como frecuencias' };
+  const repNames = { absoluta:'Frecuencias absolutas', total:'% sobre el total', fila:'% por fila', columna:'% por columna' };
   document.getElementById('btn-rep-A-label').textContent = labels[repAActual];
+  const repDot = document.getElementById('repA-dot');
+  const repTxt = document.getElementById('repA-text');
+  if (repDot) repDot.className = repAActual === 'absoluta' ? 'rep-dot is-tabla' : 'rep-dot is-grafico';
+  if (repTxt) repTxt.textContent = repNames[repAActual];
   // Re-renderizar manteniendo los valores ingresados
   const inputs = document.querySelectorAll('#probA-tabla-wrapper .cell-input');
   const valores = {};
   inputs.forEach(inp => { valores[`${inp.dataset.fila}_${inp.dataset.col}`] = inp.value; });
   renderizarProbA();
-  // Restaurar valores
   setTimeout(() => {
     document.querySelectorAll('#probA-tabla-wrapper .cell-input').forEach(inp => {
       const key = `${inp.dataset.fila}_${inp.dataset.col}`;
@@ -1155,14 +1167,6 @@ function setStatusProbB(txt) {
   if (el) el.textContent = txt;
 }
 
-/* ── Cambiar entre tipo A y B ── */
-function cambiarTipoProblema(tipo) {
-  document.querySelectorAll('.prob-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(`ptab-${tipo}`)?.classList.add('active');
-  document.getElementById('prob-tipo-A').style.display = tipo === 'A' ? 'block' : 'none';
-  document.getElementById('prob-tipo-B').style.display = tipo === 'B' ? 'block' : 'none';
-}
-
 /* ── Helper typing genérico ── */
 function agregarTypingGen(boxId) {
   const box = document.getElementById(boxId);
@@ -1195,8 +1199,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarEjTabla('absoluta');
     renderizarEjGrafico('absoluta');
 
-    // Pág 7
+    // Pág 7 — Formulación
     renderizarProbA();
+
+    // Pág 8 — Validación
     renderizarProbB();
 });
 
+// irAPagina ya está definida arriba, no redeclarar
