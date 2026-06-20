@@ -1006,9 +1006,44 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: .72rem; color: #889;
 }
-.prob-grid { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
-.prob-card { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); }
-@media (max-width: 900px) { .prob-grid { grid-template-columns: 1fr; } }
+
+/* ══════════════════════════════════════════════
+   PÁGINAS 7 Y 8 — estilos adicionales
+══════════════════════════════════════════════ */
+
+/* Panel de tutor de altura completa en problemas */
+.prob-tutor-panel {
+  height: 100%;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+}
+.prob-tutor-panel .chat-box {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+
+/* Tira de contexto fija encima del chat */
+.tutor-context-strip {
+  background: #F7F4EE;
+  border-left: 3px solid var(--sky);
+  padding: 8px 12px;
+  font-size: .78rem;
+  color: #445;
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+
+/* Tabla de construcción con celdas más amplias */
+.prob-tabla-build .cell-input {
+  width: 64px;
+}
+
+/* Badge número de problema */
+#probA-num-badge, #probB-num {
+  font-weight: 700;
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
