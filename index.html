@@ -538,7 +538,7 @@
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(4)">← Formas parciales</button>
-          <span class="footer-note">Más capítulos próximamente · Cuadrados 3–7 del esquema</span>
+          <button class="btn-nav next" onclick="irAPagina(6)">Ejemplos →</button>
         </div>
       </div>
     </div>
@@ -597,7 +597,7 @@
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 7: FASE DE FORMULACIÓN — tabla incompleta + chat ══════════ -->
+    <!-- ══════════ PÁGINA 7: FASE DE FORMULACIÓN ══════════ -->
     <div class="page" id="page-7">
       <div class="page-inner page-problems">
         <div class="page-header">
@@ -609,13 +609,14 @@
           <span class="page-num">07</span>
         </div>
 
-        <div class="prob-two-col" style="flex:1;">
+        <div class="prob-two-col">
 
-          <!-- ── Izquierda: enunciado + tabla incompleta + controles ── -->
+          <!-- ── Izquierda ── -->
           <div class="prob-col">
 
+            <!-- Enunciado -->
             <div class="prob-enunciado">
-              <div class="prob-num-badge">Fase de Formulación · Problema <span id="probA-num-badge">1</span> de 3</div>
+              <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
               <p class="prob-enunciado-text" id="probA-enunciado"></p>
               <div class="prob-pregunta-box">
                 <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
@@ -623,28 +624,39 @@
               </div>
             </div>
 
-            <!-- Botón transnumeración -->
-            <div class="transnum-zone" style="display:flex;">
-              <button class="btn-transnum" onclick="toggleRepA()" id="btn-rep-A">
-                <span class="transnum-icon">⇄</span>
-                <span id="btn-rep-A-label">Ver como % por fila</span>
-              </button>
-              <div class="rep-label" style="margin-left:10px;">
-                <span class="rep-dot is-tabla" id="repA-dot"></span>
-                <span id="repA-text">Frecuencias absolutas</span>
+            <!-- Selector de tipo de tabla (escogencia evaluada) -->
+            <div class="prob-tipo-selector">
+              <div class="pts-label">1. Escoge el sistema de representación que mejor responde la pregunta:</div>
+              <div class="pts-options">
+                <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoA('absoluta')">Frecuencias absolutas</button>
+                <button class="pts-btn" data-tipo="total"    onclick="escogerTipoA('total')">% sobre el total</button>
+                <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoA('fila')">% por fila</button>
+                <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoA('columna')">% por columna</button>
               </div>
+              <div id="probA-tipo-feedback" class="pts-feedback" style="display:none;"></div>
             </div>
 
-            <!-- Tabla editable -->
+            <!-- Tabla editable (cambia según escogencia) -->
+            <div class="pts-step2-label">2. Completa las celdas vacías de la tabla seleccionada:</div>
             <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
 
-            <!-- Feedback inmediato -->
+            <!-- Feedback de celdas -->
             <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
 
             <!-- Verificar -->
             <button class="btn-verificar" onclick="verificarProblemaA()">
-              🔍 Verificar y enviar al tutor
+              🔍 Verificar escogencia y valores
             </button>
+
+            <!-- Fórmulas clave fijas -->
+            <div class="prob-formulas-strip">
+              <div class="fps-title">Fórmulas clave</div>
+              <div class="fps-row">
+                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ / N</span></div>
+                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ / fᵢ·</span></div>
+                <div class="fps-item"><span class="fps-label">% columna</span><span class="fps-expr">fᵢⱼ / f·ⱼ</span></div>
+              </div>
+            </div>
 
             <!-- Navegación -->
             <div class="prob-nav">
@@ -654,7 +666,7 @@
             </div>
           </div>
 
-          <!-- ── Derecha: tutor IA — valida el razonamiento ── -->
+          <!-- ── Derecha: tutor ── -->
           <div class="prob-col">
             <div class="tutor-panel prob-tutor-panel">
               <div class="tutor-header">
@@ -663,13 +675,12 @@
                   <div class="tutor-name">Tutor Virtual UIS</div>
                   <div class="tutor-status">
                     <span class="status-dot"></span>
-                    <span id="tutor-status-probA">En espera…</span>
+                    <span id="tutor-status-probA">Conectando…</span>
                   </div>
                 </div>
               </div>
-              <!-- Contexto fijo que el tutor siempre ve -->
               <div class="tutor-context-strip">
-                💬 Usa el chat para explicar tu estrategia. El tutor te preguntará: <em>¿Qué tipo de frecuencia elegiste y por qué?</em>
+                💬 Escoge el tipo de tabla, completa las celdas y presiona <strong>Verificar</strong>. El tutor analizará tu razonamiento y te guiará si hay errores.
               </div>
               <div id="chat-probA" class="chat-box"></div>
               <div class="chat-input-area">
@@ -681,7 +692,7 @@
             </div>
           </div>
 
-        </div><!-- /prob-two-col -->
+        </div>
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(6)">← Ejemplos</button>
@@ -690,7 +701,7 @@
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 8: FASE DE VALIDACIÓN — construir tabla + tutor evaluativo ══════════ -->
+    <!-- ══════════ PÁGINA 8: FASE DE VALIDACIÓN ══════════ -->
     <div class="page" id="page-8">
       <div class="page-inner page-problems">
         <div class="page-header">
@@ -702,33 +713,51 @@
           <span class="page-num">08</span>
         </div>
 
-        <div class="prob-two-col" style="flex:1;">
+        <div class="prob-two-col">
 
-          <!-- ── Izquierda: reto de construcción desde cero ── -->
+          <!-- ── Izquierda ── -->
           <div class="prob-col">
 
             <div class="prob-enunciado">
-              <div class="prob-num-badge">Fase de Validación · Reto <span id="probB-num">1</span> de 3</div>
+              <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
               <p class="prob-enunciado-text" id="probB-enunciado"></p>
-
-              <!-- Frases/pistas -->
               <div class="prob-contexto-frases" id="probB-frases"></div>
-
-              <div class="prob-pregunta-box" style="border-left-color: var(--moss);">
+              <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
                 <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
                 <p id="probB-pregunta" class="prob-pregunta-text"></p>
               </div>
             </div>
 
-            <!-- Tabla construible vacía -->
+            <!-- Selector de tipo (también evaluado en pág 8) -->
+            <div class="prob-tipo-selector">
+              <div class="pts-label">1. Escoge el sistema de representación adecuado para responder la pregunta:</div>
+              <div class="pts-options">
+                <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoB('absoluta')">Frecuencias absolutas</button>
+                <button class="pts-btn" data-tipo="total"    onclick="escogerTipoB('total')">% sobre el total</button>
+                <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoB('fila')">% por fila</button>
+                <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoB('columna')">% por columna</button>
+              </div>
+              <div id="probB-tipo-feedback" class="pts-feedback" style="display:none;"></div>
+            </div>
+
+            <div class="pts-step2-label">2. Construye la tabla completa (todas las celdas vacías):</div>
             <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
 
-            <!-- Feedback -->
             <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
 
             <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">
-              ✅ Verificar construcción
+              ✅ Verificar construcción completa
             </button>
+
+            <!-- Fórmulas clave fijas -->
+            <div class="prob-formulas-strip">
+              <div class="fps-title">Fórmulas clave</div>
+              <div class="fps-row">
+                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ / N</span></div>
+                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ / fᵢ·</span></div>
+                <div class="fps-item"><span class="fps-label">% columna</span><span class="fps-expr">fᵢⱼ / f·ⱼ</span></div>
+              </div>
+            </div>
 
             <div class="prob-nav">
               <button class="btn-prob-nav" onclick="cambiarProbB(-1)">← Anterior</button>
@@ -737,21 +766,21 @@
             </div>
           </div>
 
-          <!-- ── Derecha: tutor evaluativo + institucionalización ── -->
+          <!-- ── Derecha: tutor evaluativo ── -->
           <div class="prob-col">
             <div class="tutor-panel prob-tutor-panel">
-              <div class="tutor-header" style="background: #0d2034;">
+              <div class="tutor-header" style="background:#0d2034;">
                 <div class="tutor-avatar">🎓</div>
                 <div class="tutor-info">
                   <div class="tutor-name">Tutor Virtual UIS</div>
                   <div class="tutor-status">
                     <span class="status-dot"></span>
-                    <span id="tutor-status-probB">En espera…</span>
+                    <span id="tutor-status-probB">Conectando…</span>
                   </div>
                 </div>
               </div>
-              <div class="tutor-context-strip" style="border-left-color: var(--moss);">
-                🎯 Cuando verifiques tu tabla, el tutor evaluará si tu construcción responde realmente la pregunta planteada.
+              <div class="tutor-context-strip" style="border-left-color:var(--moss);">
+                🎯 Escoge el tipo, construye la tabla y presiona <strong>Verificar</strong>. El tutor evaluará si tu construcción responde la pregunta y dará el cierre conceptual.
               </div>
               <div id="chat-probB" class="chat-box"></div>
               <div class="chat-input-area">
@@ -763,7 +792,7 @@
             </div>
           </div>
 
-        </div><!-- /prob-two-col -->
+        </div>
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(7)">← Formulación</button>
