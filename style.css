@@ -1006,6 +1006,9 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: .72rem; color: #889;
 }
+.prob-grid { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+.prob-card { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); }
+@media (max-width: 900px) { .prob-grid { grid-template-columns: 1fr; } }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
