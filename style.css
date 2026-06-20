@@ -839,6 +839,174 @@ html, body {
 .fps-label { font-size: .65rem; color: rgba(255,255,255,.5); font-family: 'JetBrains Mono', monospace; }
 .fps-expr  { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--gold); font-weight: 600; }
 
+/* ══════════════════════════════════════════════
+   PÁG 6 — EJEMPLOS DINÁMICOS
+══════════════════════════════════════════════ */
+.ej-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  flex: 1;
+  min-height: 0;
+}
+.ej-left  { display: flex; flex-direction: column; gap: 8px; }
+.ej-right { display: flex; flex-direction: column; gap: 10px; }
+
+.ej-chart-box {
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 12px;
+  flex: 1;
+}
+.ej-chart-box canvas { max-height: 220px; width: 100% !important; }
+
+.ej-explain-box {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ══════════════════════════════════════════════
+   PÁG 7 — PROBLEMAS
+══════════════════════════════════════════════ */
+.page-problems { padding: 20px 24px 16px; }
+
+/* Tabs de tipo de problema */
+.prob-tabs {
+  display: flex; gap: 6px;
+  margin-bottom: 14px;
+}
+.prob-tab {
+  background: var(--cream); border: 1px solid var(--rule);
+  color: var(--slate); border-radius: 2px;
+  padding: 8px 16px; font-size: .82rem; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.prob-tab:hover  { background: #EBF2F9; color: var(--navy); }
+.prob-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* Layout dos columnas */
+.prob-section { flex: 1; }
+.prob-two-col {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 18px;
+  height: 100%;
+}
+.prob-col { display: flex; flex-direction: column; gap: 10px; }
+
+/* Enunciado */
+.prob-enunciado {
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.prob-num-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; text-transform: uppercase; letter-spacing: .13em;
+  color: var(--gold); font-weight: 600;
+}
+.prob-enunciado-text { font-size: .84rem; line-height: 1.55; color: var(--ink); }
+
+.prob-pregunta-box {
+  background: #EBF2F9;
+  border-left: 3px solid var(--navy);
+  border-radius: 2px; padding: 10px 12px;
+}
+.prob-pregunta-label {
+  font-size: .68rem; font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--slate);
+  display: block; margin-bottom: 4px;
+}
+.prob-pregunta-text { font-size: .84rem; line-height: 1.5; color: var(--navy); }
+
+/* Frases contextuales (Tipo B) */
+.prob-contexto-frases {
+  background: #FEF9EC;
+  border: 1px solid #E8CE6A;
+  border-radius: 2px; padding: 10px 12px;
+}
+.prob-frase {
+  font-size: .82rem; line-height: 1.55; color: #5a4200;
+  padding: 3px 0; border-bottom: 1px dashed #E8CE6A;
+}
+.prob-frase:last-child { border-bottom: none; }
+
+/* Tabla editable */
+.prob-tabla-wrapper {
+  border: 1px solid var(--rule);
+  border-radius: 3px; overflow: hidden;
+  background: var(--cream);
+}
+.prob-tabla-wrapper table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.prob-tabla-wrapper th {
+  background: var(--navy); color: white;
+  padding: 8px 10px; font-size: .76rem; text-align: center;
+}
+.prob-tabla-wrapper th:first-child { text-align: left; }
+.prob-tabla-wrapper td {
+  padding: 6px 8px; text-align: center;
+  border-bottom: 1px solid var(--rule); color: var(--ink);
+}
+.prob-tabla-wrapper td:first-child { font-weight: 600; text-align: left; }
+.prob-tabla-wrapper tr:last-child td { background: #E8F5ED; font-weight: 700; color: var(--moss); }
+
+/* Celda editable */
+.cell-input {
+  width: 52px; text-align: center;
+  border: 1px solid var(--sky);
+  border-radius: 2px; padding: 4px 6px;
+  font-size: .82rem; font-family: 'JetBrains Mono', monospace;
+  background: white; color: var(--ink);
+  outline: none;
+  transition: border-color .2s, background .2s;
+}
+.cell-input:focus { border-color: var(--navy); background: #EBF2F9; }
+.cell-input.correcto { background: #d4edda; border-color: #28a745; color: #155724; }
+.cell-input.incorrecto { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.cell-input.disabled { background: var(--cream); border-color: var(--rule); color: #888; }
+
+/* Feedback */
+.prob-feedback {
+  border-radius: 3px; padding: 10px 14px;
+  font-size: .82rem; line-height: 1.5;
+}
+.prob-feedback.ok    { background: #d4edda; border: 1px solid #28a745; color: #155724; }
+.prob-feedback.error { background: #f8d7da; border: 1px solid #dc3545; color: #721c24; }
+.prob-feedback.parcial { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+
+/* Botones */
+.btn-verificar {
+  background: var(--moss); color: white; border: none;
+  padding: 10px 18px; border-radius: 3px;
+  font-size: .84rem; font-weight: 600; font-family: 'Inter', sans-serif;
+  cursor: pointer; align-self: flex-start;
+  transition: background .15s, transform .1s;
+}
+.btn-verificar:hover { background: #245a41; transform: translateY(-1px); }
+
+.prob-nav {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 4px;
+}
+.btn-prob-nav {
+  background: none; border: 1px solid var(--rule);
+  color: var(--slate); padding: 6px 12px; border-radius: 2px;
+  font-size: .78rem; font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: background .15s;
+}
+.btn-prob-nav:hover { background: var(--navy); color: white; border-color: var(--navy); }
+.prob-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem; color: #889;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
   .book-spine { display: none; }
