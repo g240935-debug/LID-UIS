@@ -1045,6 +1045,49 @@ html, body {
   font-weight: 700;
 }
 
+/* ── Selector de tipo de tabla (páginas 7 y 8) ── */
+.prob-tipo-selector {
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pts-label {
+  font-size: .78rem; color: var(--ink); font-weight: 500; line-height: 1.4;
+}
+.pts-options {
+  display: flex; gap: 5px; flex-wrap: wrap;
+}
+.pts-btn {
+  background: white; border: 1px solid var(--rule);
+  color: var(--slate); border-radius: 2px;
+  padding: 6px 11px; font-size: .76rem; font-weight: 500;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.pts-btn:hover    { background: #EBF2F9; border-color: var(--sky); color: var(--navy); }
+.pts-btn.selected { background: var(--navy); color: white; border-color: var(--navy); }
+.pts-btn.correcto { background: #d4edda; border-color: #28a745; color: #155724; }
+.pts-btn.incorrecto { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.pts-feedback {
+  font-size: .78rem; line-height: 1.45; padding: 6px 10px;
+  border-radius: 2px; border: 1px solid transparent;
+}
+.pts-feedback.ok    { background: #d4edda; border-color: #28a745; color: #155724; }
+.pts-feedback.error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+.pts-step2-label {
+  font-size: .78rem; font-weight: 500; color: var(--ink);
+  padding: 4px 0;
+}
+
+/* Fórmulas fijas en problemas */
+.prob-formulas-strip {
+  background: #0d2034; border-radius: 3px; padding: 10px 14px;
+  flex-shrink: 0;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
   .book-spine { display: none; }
