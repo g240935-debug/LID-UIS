@@ -1200,8 +1200,3 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarProbB();
 });
 
-// Hooks de paginación para caps nuevos
-const _irBase = irAPagina;
-function irAPagina(n) {
-  _irBase(n);
-}
