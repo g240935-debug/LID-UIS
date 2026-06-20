@@ -538,121 +538,255 @@
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(4)">← Formas parciales</button>
-          <button class="btn-nav next" onclick="irAPagina(6)">Ejemplos →</button>
+          <span class="footer-note">Más capítulos próximamente · Cuadrados 3–7 del esquema</span>
         </div>
       </div>
     </div>
 
     <!-- ══════════ PÁGINA 6: EJEMPLOS DINÁMICOS ══════════ -->
-   <div class="page" id="page-6">
-  <div class="page-inner">
-    <div class="page-header">
-      <span class="chapter-tag">Capítulo II · Fase de Acción</span>
-      <span class="page-num">06</span>
-    </div>
-    
-    <h2 class="page-title">Exploración de la Facultad UIS</h2>
-    
-    <div class="fp-selector">
-      <p class="fp-sel-label">Selecciona el tipo de frecuencia para analizar la preferencia:</p>
-      <div class="fp-tabs">
-        <button class="fp-tab active" onclick="cambiarEjemplo('absoluta')" id="etab-absoluta">Absolutas</button>
-        <button class="fp-tab" onclick="cambiarEjemplo('total')" id="etab-total">% Total</button>
-        <button class="fp-tab" onclick="cambiarEjemplo('fila')" id="etab-fila">% Fila</button>
-        <button class="fp-tab" onclick="cambiarEjemplo('columna')" id="etab-columna">% Columna</button>
-      </div>
-    </div>
-
-    <div class="ej-layout">
-      <div class="ej-left">
-        <div id="ej-tabla-wrapper" class="fp-tabla-wrapper"></div>
-      </div>
-
-      <div class="ej-right">
-        <div class="ej-chart-box">
-          <canvas id="ejGrafico"></canvas>
+    <div class="page" id="page-6">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo IV · Ejemplos</span>
+          <span class="page-num">06</span>
         </div>
-        <div class="ej-explain-box">
-          <p class="fpe-text" id="ej-explain-text">Selecciona una opción para visualizar la distribución de los estudiantes UIS y sus modalidades.</p>
+        <h2 class="page-title">Ejemplos dinámicos</h2>
+
+        <!-- Selector de tipo (misma lógica que pág 4) -->
+        <div class="fp-selector" style="margin-bottom:10px;">
+          <div class="fp-sel-label">Cambia la representación y observa cómo cambia la tabla Y el gráfico simultáneamente:</div>
+          <div class="fp-tabs">
+            <button class="fp-tab active" onclick="cambiarEjemplo('absoluta')" id="etab-absoluta">Frecuencias absolutas</button>
+            <button class="fp-tab" onclick="cambiarEjemplo('total')"    id="etab-total">% sobre el total</button>
+            <button class="fp-tab" onclick="cambiarEjemplo('fila')"     id="etab-fila">% por fila</button>
+            <button class="fp-tab" onclick="cambiarEjemplo('columna')"  id="etab-columna">% por columna</button>
+          </div>
+        </div>
+
+        <div class="ej-layout">
+          <!-- Columna izquierda: tabla + pregunta -->
+          <div class="ej-left">
+            <div class="fp-context-box" style="margin-bottom:10px;">
+              <span class="sit-badge">Contexto · 150 estudiantes UIS</span>
+              <p class="fp-context-text">Cruce entre <strong>Facultad</strong> (Ciencias / Ingenierías / Humanidades) y <strong>Modalidad de estudio preferida</strong> (Presencial / Virtual / Híbrida).</p>
+            </div>
+            <div id="ej-tabla-wrapper" class="fp-tabla-wrapper"></div>
+            <div class="fp-question-box" id="ej-question-box" style="margin-top:8px;">
+              <span class="fq-icon">🔍</span>
+              <span id="ej-question-text">¿Cuántos estudiantes de Ingenierías prefieren la modalidad Presencial?</span>
+            </div>
+          </div>
+
+          <!-- Columna derecha: gráfico + explicación -->
+          <div class="ej-right">
+            <div class="ej-chart-box">
+              <canvas id="ejGrafico"></canvas>
+            </div>
+            <div class="ej-explain-box" id="ej-explain-box">
+              <div class="fpe-tag" id="ej-tag">Representación 1 de 4</div>
+              <p class="fpe-text" id="ej-explain-text">Muestra los <strong>conteos directos</strong>. Útil para saber cuántos hay, pero no permite comparar grupos de distinto tamaño.</p>
+              <div class="fpe-alert" id="ej-alert">💡 Cambia el tipo arriba y observa cómo el gráfico transforma su escala automáticamente.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(5)">← Actividad Cap. III</button>
+          <button class="btn-nav next" onclick="irAPagina(7)">Problemas →</button>
         </div>
       </div>
     </div>
 
-    <div class="page-footer">
-      <button class="btn-nav prev" onclick="irAPagina(5)">← Actividad</button>
-      <button class="btn-nav next" onclick="irAPagina(7)">Desafío →</button>
-    </div>
-  </div>
-</div>
-
-    <!-- ══════════ PÁGINA 7: PROBLEMAS ══════════ -->
-   <div class="page" id="page-7">
+    <!-- ══════════ PÁGINA 7: FASE DE FORMULACIÓN — tabla incompleta + chat ══════════ -->
+    <div class="page" id="page-7">
       <div class="page-inner page-problems">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Formulación</span>
+          <span class="chapter-tag">Capítulo IV · Fase de Formulación</span>
+          <span class="phase-indicator">
+            <span class="phase-dot phase-b"></span>
+            <span class="phase-label">Formula y conjetura</span>
+          </span>
           <span class="page-num">07</span>
         </div>
-        <h2 class="page-title">Análisis de Datos</h2>
-        <div class="prob-grid">
-          <div class="prob-main-area">
-             <p>Explica qué observas en la tabla incompleta. ¿Qué grupo predomina?</p>
-             <div id="probA-tabla-wrapper" class="prob-tabla-wrapper"></div>
+
+        <div class="prob-two-col" style="flex:1;">
+
+          <!-- ── Izquierda: enunciado + tabla incompleta + controles ── -->
+          <div class="prob-col">
+
+            <div class="prob-enunciado">
+              <div class="prob-num-badge">Fase de Formulación · Problema <span id="probA-num-badge">1</span> de 3</div>
+              <p class="prob-enunciado-text" id="probA-enunciado"></p>
+              <div class="prob-pregunta-box">
+                <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
+                <p id="probA-pregunta" class="prob-pregunta-text"></p>
+              </div>
+            </div>
+
+            <!-- Botón transnumeración -->
+            <div class="transnum-zone" style="display:flex;">
+              <button class="btn-transnum" onclick="toggleRepA()" id="btn-rep-A">
+                <span class="transnum-icon">⇄</span>
+                <span id="btn-rep-A-label">Ver como % por fila</span>
+              </button>
+              <div class="rep-label" style="margin-left:10px;">
+                <span class="rep-dot is-tabla" id="repA-dot"></span>
+                <span id="repA-text">Frecuencias absolutas</span>
+              </div>
+            </div>
+
+            <!-- Tabla editable -->
+            <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
+
+            <!-- Feedback inmediato -->
+            <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
+
+            <!-- Verificar -->
+            <button class="btn-verificar" onclick="verificarProblemaA()">
+              🔍 Verificar y enviar al tutor
+            </button>
+
+            <!-- Navegación -->
+            <div class="prob-nav">
+              <button class="btn-prob-nav" onclick="cambiarProbA(-1)">← Anterior</button>
+              <span id="probA-counter" class="prob-counter">1 / 3</span>
+              <button class="btn-prob-nav" onclick="cambiarProbA(1)">Siguiente →</button>
+            </div>
           </div>
-          <div class="tutor-side">
-             <div class="tutor-panel">
-               <div id="chat-probA" class="chat-box"></div>
-               <input type="text" id="input-probA" placeholder="Explica tu conjetura...">
-               <button onclick="enviarMensajeProbA()">Enviar</button>
-             </div>
+
+          <!-- ── Derecha: tutor IA — valida el razonamiento ── -->
+          <div class="prob-col">
+            <div class="tutor-panel prob-tutor-panel">
+              <div class="tutor-header">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status">
+                    <span class="status-dot"></span>
+                    <span id="tutor-status-probA">En espera…</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Contexto fijo que el tutor siempre ve -->
+              <div class="tutor-context-strip">
+                💬 Usa el chat para explicar tu estrategia. El tutor te preguntará: <em>¿Qué tipo de frecuencia elegiste y por qué?</em>
+              </div>
+              <div id="chat-probA" class="chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-probA" class="chat-input"
+                  placeholder="Explica tu razonamiento o pregunta aquí…"
+                  onkeydown="if(event.key==='Enter') enviarMensajeProbA()">
+                <button class="btn-send" onclick="enviarMensajeProbA()">Enviar <span class="send-icon">↑</span></button>
+              </div>
+            </div>
           </div>
-        </div>
+
+        </div><!-- /prob-two-col -->
+
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(6)">← Exploración</button>
-          <button class="btn-nav next" onclick="irAPagina(8)">Validación →</button>
+          <button class="btn-nav prev" onclick="irAPagina(6)">← Ejemplos</button>
+          <button class="btn-nav next" onclick="irAPagina(8)">Fase de Validación →</button>
         </div>
       </div>
     </div>
 
+    <!-- ══════════ PÁGINA 8: FASE DE VALIDACIÓN — construir tabla + tutor evaluativo ══════════ -->
     <div class="page" id="page-8">
       <div class="page-inner page-problems">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Validación</span>
+          <span class="chapter-tag">Capítulo IV · Fase de Validación</span>
+          <span class="phase-indicator">
+            <span class="phase-dot phase-c"></span>
+            <span class="phase-label">Valida y construye</span>
+          </span>
           <span class="page-num">08</span>
         </div>
-        <h2 class="page-title">Construcción de Conocimiento</h2>
-        <div class="prob-grid">
-           <div class="prob-main-area">
-              <p>Construye la tabla a partir de las descripciones:</p>
-              <div id="probB-tabla-wrapper" class="prob-tabla-wrapper"></div>
-           </div>
-           <div class="tutor-side">
-              <div class="tutor-panel">
-                <div id="chat-probB" class="chat-box"></div>
-                <input type="text" id="input-probB" placeholder="Valida tu modelo...">
-                <button onclick="enviarMensajeProbB()">Validar</button>
+
+        <div class="prob-two-col" style="flex:1;">
+
+          <!-- ── Izquierda: reto de construcción desde cero ── -->
+          <div class="prob-col">
+
+            <div class="prob-enunciado">
+              <div class="prob-num-badge">Fase de Validación · Reto <span id="probB-num">1</span> de 3</div>
+              <p class="prob-enunciado-text" id="probB-enunciado"></p>
+
+              <!-- Frases/pistas -->
+              <div class="prob-contexto-frases" id="probB-frases"></div>
+
+              <div class="prob-pregunta-box" style="border-left-color: var(--moss);">
+                <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
+                <p id="probB-pregunta" class="prob-pregunta-text"></p>
               </div>
-           </div>
-        </div>
+            </div>
+
+            <!-- Tabla construible vacía -->
+            <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
+
+            <!-- Feedback -->
+            <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
+
+            <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">
+              ✅ Verificar construcción
+            </button>
+
+            <div class="prob-nav">
+              <button class="btn-prob-nav" onclick="cambiarProbB(-1)">← Anterior</button>
+              <span id="probB-counter" class="prob-counter">1 / 3</span>
+              <button class="btn-prob-nav" onclick="cambiarProbB(1)">Siguiente →</button>
+            </div>
+          </div>
+
+          <!-- ── Derecha: tutor evaluativo + institucionalización ── -->
+          <div class="prob-col">
+            <div class="tutor-panel prob-tutor-panel">
+              <div class="tutor-header" style="background: #0d2034;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status">
+                    <span class="status-dot"></span>
+                    <span id="tutor-status-probB">En espera…</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tutor-context-strip" style="border-left-color: var(--moss);">
+                🎯 Cuando verifiques tu tabla, el tutor evaluará si tu construcción responde realmente la pregunta planteada.
+              </div>
+              <div id="chat-probB" class="chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-probB" class="chat-input"
+                  placeholder="Explica cómo construiste la tabla…"
+                  onkeydown="if(event.key==='Enter') enviarMensajeProbB()">
+                <button class="btn-send" onclick="enviarMensajeProbB()">Enviar <span class="send-icon">↑</span></button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /prob-two-col -->
+
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(7)">← Volver</button>
+          <button class="btn-nav prev" onclick="irAPagina(7)">← Formulación</button>
+          <span class="footer-note">Fin del Capítulo IV · Capítulos 5–7 próximamente</span>
         </div>
       </div>
     </div>
 
   </div><!-- /book-pages -->
 
-  <!-- Indicadores de página — 8 puntos (0–7) -->
- <div class="page-indicators">
+  <!-- Indicadores de página — 9 puntos (0–8) -->
+  <div class="page-indicators">
     <span class="pi-dot active" onclick="irAPagina(0)" title="Portada"></span>
     <span class="pi-dot" onclick="irAPagina(1)" title="Presentación"></span>
-    <span class="pi-dot" onclick="irAPagina(2)" title="Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(3)" title="Síntesis"></span>
-    <span class="pi-dot" onclick="irAPagina(4)" title="Formas Parciales"></span>
-    <span class="pi-dot" onclick="irAPagina(5)" title="Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(6)" title="Exploración"></span>
-    <span class="pi-dot" onclick="irAPagina(7)" title="Formulación"></span>
-    <span class="pi-dot" onclick="irAPagina(8)" title="Validación"></span>
+    <span class="pi-dot" onclick="irAPagina(2)" title="Cap II · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(3)" title="Cap II · Síntesis"></span>
+    <span class="pi-dot" onclick="irAPagina(4)" title="Cap III · Formas Parciales"></span>
+    <span class="pi-dot" onclick="irAPagina(5)" title="Cap III · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(6)" title="Cap IV · Ejemplos"></span>
+    <span class="pi-dot" onclick="irAPagina(7)" title="Cap IV · Formulación"></span>
+    <span class="pi-dot" onclick="irAPagina(8)" title="Cap IV · Validación"></span>
   </div>
+
 </div><!-- /book-shell -->
 
 <!-- Overlay de carga inicial -->
