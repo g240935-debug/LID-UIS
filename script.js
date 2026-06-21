@@ -76,6 +76,18 @@ function irAPagina(n) {
     cap3Iniciado = true;
     setTimeout(inicializarChat2, 400);
   }
+
+  // Iniciar tutor Formulación al llegar a página 7
+  if (n === 7 && !probAIniciado) {
+    probAIniciado = true;
+    setTimeout(inicializarTutorProbA, 400);
+  }
+
+  // Iniciar tutor Validación al llegar a página 8
+  if (n === 8 && !probBIniciado) {
+    probBIniciado = true;
+    setTimeout(inicializarTutorProbB, 400);
+  }
 }
 
 function actualizarIndicadores() {
@@ -1330,7 +1342,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const repDot = document.getElementById('rep-dot');
   if (repDot) repDot.className = 'rep-dot is-tabla';
 
-  // Historiales Cap 2 y Cap 3 (cap3 usa sessionId único por dispositivo)
   cargarHistorial(sessionId, 'chat-box');
   cargarHistorial(`cap3_${sessionId}`, 'chat-box2');
 
@@ -1341,24 +1352,3 @@ document.addEventListener('DOMContentLoaded', () => {
   renderizarProbA();
   renderizarProbB();
 });
-
-// Detectar entrada a páginas con tutor por primera vez
-// (se llama dentro de irAPagina que ya existe arriba)
-// Extender irAPagina para inicializar tutores de problemas
-const _irAPaginaOrig = irAPagina;
-function irAPagina(n) {
-  _irAPaginaOrig(n);
-  if (n === 5 && !cap3Iniciado) {
-    cap3Iniciado = true;
-    // Usar sessionId único para cap3
-    setTimeout(() => inicializarChat2(), 400);
-  }
-  if (n === 7 && !probAIniciado) {
-    probAIniciado = true;
-    setTimeout(inicializarTutorProbA, 400);
-  }
-  if (n === 8 && !probBIniciado) {
-    probBIniciado = true;
-    setTimeout(inicializarTutorProbB, 400);
-  }
-}
