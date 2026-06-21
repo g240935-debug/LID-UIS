@@ -1088,6 +1088,159 @@ html, body {
   flex-shrink: 0;
 }
 
+/* ══════════════════════════════════════════════
+   PÁG 7 y 8 — columna única (sin tutor)
+══════════════════════════════════════════════ */
+.prob-single-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 780px;
+  flex: 1;
+}
+.prob-bottom-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.prob-bottom-row .btn-verificar { flex-shrink: 0; }
+.prob-bottom-row .prob-formulas-strip { flex: 1; min-width: 220px; }
+
+/* ══════════════════════════════════════════════
+   PÁG 9 — ABREBOCAS CHI-CUADRADO
+══════════════════════════════════════════════ */
+
+/* Intro pedagógica */
+.chi-intro {
+  background: linear-gradient(135deg, #0d2034 0%, var(--navy) 100%);
+  border-radius: 3px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+}
+.chi-intro-text {
+  font-size: .86rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,.85);
+}
+
+/* Tabs de situación */
+.chi-prob-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.chi-tab {
+  background: var(--cream); border: 1px solid var(--rule);
+  color: var(--slate); border-radius: 2px;
+  padding: 7px 18px; font-size: .82rem; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.chi-tab:hover  { background: #EBF2F9; color: var(--navy); }
+.chi-tab.active { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+
+/* Controles de tabla libre */
+.chi-tabla-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Tira de totales de fila (fijos, referencia) */
+.chi-totales-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chi-total-item {
+  background: #EBF2F9;
+  border: 1px solid var(--sky);
+  border-radius: 2px;
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.chi-total-label {
+  font-size: .65rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--slate);
+}
+.chi-total-val {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--navy);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Inputs de la tabla Chi (libres) */
+.chi-input {
+  width: 58px;
+  text-align: center;
+  border: 1px solid var(--sky);
+  border-radius: 2px;
+  padding: 5px 6px;
+  font-size: .82rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: white;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s, background .2s;
+}
+.chi-input:focus { border-color: var(--gold); background: #FEF9EC; }
+
+/* Barra de progreso del total */
+.chi-total-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .8rem;
+  color: var(--slate);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 8px 12px;
+}
+.chi-contador-num {
+  font-weight: 700;
+  color: var(--navy);
+  font-size: .9rem;
+  min-width: 28px;
+}
+.chi-total-progress {
+  flex: 1;
+  height: 6px;
+  background: var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.chi-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--sky);
+  border-radius: 3px;
+  transition: width .25s ease, background .25s;
+}
+
+/* Tabla Chi — hereda estilos de prob-tabla-wrapper pero con chi-input */
+#chi-tabla-wrapper table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+#chi-tabla-wrapper th {
+  background: var(--navy); color: white;
+  padding: 8px 10px; font-size: .76rem; text-align: center;
+}
+#chi-tabla-wrapper th:first-child { text-align: left; }
+#chi-tabla-wrapper td {
+  padding: 7px 8px; text-align: center;
+  border-bottom: 1px solid var(--rule);
+}
+#chi-tabla-wrapper td:first-child { font-weight: 600; text-align: left; }
+#chi-tabla-wrapper tr:last-child td { background: #E8F5ED; font-weight: 700; color: var(--moss); }
+#chi-tabla-wrapper .td-marg { background: #E8F5ED; font-weight: 700; color: var(--moss); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
   .book-spine { display: none; }
