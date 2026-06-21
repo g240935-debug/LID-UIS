@@ -77,18 +77,6 @@ function irAPagina(n) {
     setTimeout(inicializarChat2, 400);
   }
 
-  // Iniciar tutor Formulación al llegar a página 7
-  if (n === 7 && !probAIniciado) {
-    probAIniciado = true;
-    setTimeout(inicializarTutorProbA, 400);
-  }
-
-  // Iniciar tutor Validación al llegar a página 8
-  if (n === 8 && !probBIniciado) {
-    probBIniciado = true;
-    setTimeout(inicializarTutorProbB, 400);
-  }
-
   // Iniciar tutor Chi al llegar a página 9
   if (n === 9 && !chiIniciado) {
     chiIniciado = true;
@@ -956,7 +944,7 @@ function verificarProblemaA() {
     fb.style.display = 'block';
     if (correctas === total && tipoOk) {
       fb.className='prob-feedback ok';
-      fb.innerHTML=`✅ ¡Perfecto! Escogiste el sistema correcto y completaste todas las celdas. `;
+      fb.innerHTML=`✅ ¡Perfecto! Escogiste el sistema correcto y completaste todas las celdas.`;
     } else if (correctas === total && !tipoOk) {
       fb.className='prob-feedback parcial';
       fb.innerHTML=`⚠️ Las celdas son correctas para el tipo que escogiste, pero el sistema no es el más adecuado para responder la pregunta.`;
@@ -965,16 +953,6 @@ function verificarProblemaA() {
       fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas. Las incorrectas están en rojo.`;
     }
   }
-
-  // 3. Enviar contexto al tutor
-  const contexto = `Problema ${probAActual+1} — Pregunta: "${p.pregunta}". 
-Sistema correcto: % por ${p.respuestaCorrecta}. 
-El estudiante escogió: ${tipoEscogidoA} (${tipoOk ? 'CORRECTO' : 'INCORRECTO'}).
-Celdas correctas: ${correctas} de ${total}.
-${correctas === total && tipoOk ? 'Todo bien. Felicítalo y explica brevemente por qué ese sistema responde la pregunta.' :
-  !tipoOk ? 'El sistema de representación no es el adecuado. Guíalo con una pregunta sobre cuál es el "universo" de la pregunta sin revelar la respuesta.' :
-  'Las celdas tienen errores. Haz una pregunta guía para que revise sus cálculos.'}`;
-  enviarContextoProbA(contexto);
 }
 
 function cambiarProbA(dir) {
@@ -984,87 +962,6 @@ function cambiarProbA(dir) {
   tipoEscogidoA = null;
   renderizarProbA();
 }
-
-/* ── Tutor Pág 7 ── */
-async function inicializarTutorProbA() {
-  setStatusProbA('Conectando…');
-  try {
-    const res = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Hola, estoy en la sección de formulación. Estoy listo para resolver los problemas.',
-        session_id: `probA_${sessionId}`
-      })
-    });
-    const data = await res.json();
-    if (data.reply) agregarMensajeProbA(data.reply, 'tutor');
-    setStatusProbA('En línea');
-  } catch(e) {
-    console.error('Error tutor probA:', e);
-    agregarMensajeProbA('¡Hola! Estoy aquí para guiarte. Escoge el tipo de tabla, completa las celdas y presiona Verificar cuando estés listo.', 'tutor');
-    setStatusProbA('En línea');
-  }
-}
-
-async function enviarContextoProbA(contexto) {
-  setStatusProbA('Analizando…');
-  const tid = agregarTypingGen('chat-probA');
-  try {
-    const res = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `[CONTEXTO]: ${contexto}`, session_id: `probA_${sessionId}` })
-    });
-    const data = await res.json();
-    quitarTypingGen(tid);
-    if (data.reply) agregarMensajeProbA(data.reply, 'tutor');
-    setStatusProbA('En línea');
-  } catch(e) {
-    quitarTypingGen(tid);
-    console.error('Error contexto probA:', e);
-    setStatusProbA('En línea');
-  }
-}
-
-async function enviarMensajeProbA() {
-  const input = document.getElementById('input-probA');
-  if (!input?.value.trim()) return;
-  const texto = input.value.trim(); input.value = '';
-  agregarMensajeProbA(texto, 'user');
-  setStatusProbA('Escribiendo…');
-  const tid = agregarTypingGen('chat-probA');
-  try {
-    const res = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: texto, session_id: `probA_${sessionId}` })
-    });
-    const data = await res.json();
-    quitarTypingGen(tid);
-    if (data.reply) agregarMensajeProbA(data.reply, 'tutor');
-    setStatusProbA('En línea');
-  } catch(e) {
-    quitarTypingGen(tid);
-    console.error('Error mensaje probA:', e);
-    setStatusProbA('En línea');
-  }
-}
-
-function agregarMensajeProbA(texto, tipo) {
-  const box = document.getElementById('chat-probA');
-  if (!box) return;
-  const div = document.createElement('div');
-  div.className = tipo === 'user' ? 'msg-user' : 'msg-tutor';
-  const procesado = tipo === 'tutor' ? limpiarFormulas(texto) : texto;
-  div.innerHTML = procesado
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*(.*?)\*/g,'<em>$1</em>')
-    .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
-function setStatusProbA(txt) { const el=document.getElementById('tutor-status-probA'); if(el) el.textContent=txt; }
 
 /* ════════════════════════════════════════════════
    PÁG 8 — PROBLEMAS TIPO B (construir tabla)
@@ -1132,6 +1029,8 @@ function escogerTipoB(tipo) {
   });
   const fb = document.getElementById('probB-tipo-feedback');
   if (fb) fb.style.display = 'none';
+  // Actualizar tabla inmediatamente — misma lógica que probA
+  _renderizarTablaB();
 }
 
 function renderizarProbB() {
@@ -1159,29 +1058,37 @@ function renderizarProbB() {
   _renderizarTablaB();
 }
 
-// Renderiza SOLO la tabla B (todas vacías)
+// Renderiza tabla B con los valores según el tipo escogido
 function _renderizarTablaB() {
-  const p = PROBLEMAS_B[probBActual];
+  const p    = PROBLEMAS_B[probBActual];
+  const tipo = tipoEscogidoB || 'absoluta';
   const { filas, columnas, N } = p;
+  const totalesCol  = columnas.map((_, j) => p.solucion.reduce((s,r)=>s+r[j],0));
+  const totalesFila = p.solucion.map(r => r.reduce((s,v)=>s+v,0));
+
   let html = '<table><thead><tr><th>↓ / →</th>';
   columnas.forEach(c => { html += `<th>${c}</th>`; });
   html += '<th>Total fila</th></tr></thead><tbody>';
+
   filas.forEach((fila, i) => {
     html += `<tr><td>${fila}</td>`;
     columnas.forEach((_, j) => {
-      html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${p.solucion[i][j]}" placeholder="?"></td>`;
+      const valorCorrecto = calcularCeldaNum(tipo, p.solucion[i][j], totalesFila[i], totalesCol[j], N);
+      html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${valorCorrecto}" placeholder="?"></td>`;
     });
-    const totalFila = p.solucion[i].reduce((s,v)=>s+v,0);
-    html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="fila" data-correcto="${totalFila}" placeholder="?"></td></tr>`;
+    const margVal = calcularMarginalFila(tipo, totalesFila[i], N);
+    html += `<td class="td-marg">${margVal}</td></tr>`;
   });
-  const totalesCol = columnas.map((_, j) => p.solucion.reduce((s,r)=>s+r[j],0));
+
   html += '<tr><td>Total col</td>';
   totalesCol.forEach(tc => {
-    html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="col" data-correcto="${tc}" placeholder="?"></td>`;
+    const margCol = calcularMarginalCol(tipo, tc, N);
+    html += `<td class="td-marg">${margCol}</td>`;
   });
-  html += `<td><input type="number" class="cell-input cell-marg-input" data-tipo="n" data-correcto="${N}" placeholder="?"></td></tr>`;
+  html += `<td class="td-marg">${tipo === 'absoluta' ? N : '100%'}</td></tr>`;
   html += '</tbody></table>';
-  document.getElementById('probB-tabla-wrapper').innerHTML = html;
+  const w = document.getElementById('probB-tabla-wrapper');
+  if (w) w.innerHTML = html;
 }
 
 function verificarProblemaB() {
@@ -1203,11 +1110,11 @@ function verificarProblemaB() {
     fbTipo.className = tipoOk ? 'pts-feedback ok' : 'pts-feedback error';
     fbTipo.innerHTML = tipoOk
       ? `✅ ¡Correcto! <strong>${p.respuestaCorrecta}</strong> es el sistema adecuado.`
-      : `❌ El sistema <strong>${tipoEscogidoB}</strong> no es el adecuado para esta pregunta. ¿Quién es el "universo" de comparación?`;
+      : `❌ El sistema <strong>${tipoEscogidoB}</strong> no es el adecuado. ¿Quién es el "universo" de comparación?`;
   }
 
   // 2. Celdas internas
-  const inputs = document.querySelectorAll('#probB-tabla-wrapper .cell-input:not(.cell-marg-input)');
+  const inputs = document.querySelectorAll('#probB-tabla-wrapper .cell-input');
   let correctas=0; let total=inputs.length;
   inputs.forEach(inp => {
     const val=parseFloat(inp.value), correcto=parseFloat(inp.dataset.correcto);
@@ -1230,16 +1137,6 @@ function verificarProblemaB() {
       fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas. Las incorrectas están en rojo.`;
     }
   }
-
-  // 3. Contexto al tutor
-  const contexto = `Reto ${probBActual+1} — Pregunta: "${p.pregunta}".
-Sistema correcto: ${p.respuestaCorrecta}. Estudiante escogió: ${tipoEscogidoB} (${tipoOk?'CORRECTO':'INCORRECTO'}).
-Celdas correctas: ${correctas} de ${total}.
-Pistas del enunciado: ${p.frases.join(' | ')}.
-${correctas===total && tipoOk ? 'Todo correcto. Felicítalo e institucionaliza el concepto clave.' :
-  !tipoOk ? 'Sistema incorrecto. Guíalo con una pregunta sobre cuál es el universo de la pregunta.' :
-  'Celdas con errores. Haz una pregunta guía sobre las pistas del enunciado.'}`;
-  enviarContextoProbB(contexto);
 }
 
 function cambiarProbB(dir) {
@@ -1249,87 +1146,6 @@ function cambiarProbB(dir) {
   tipoEscogidoB = null;
   renderizarProbB();
 }
-
-/* ── Tutor Pág 8 ── */
-async function inicializarTutorProbB() {
-  setStatusProbB('Conectando…');
-  try {
-    const res = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Hola, estoy en la fase de validación. Voy a construir tablas de contingencia desde cero.',
-        session_id: `probB_${sessionId}`
-      })
-    });
-    const data = await res.json();
-    if (data.reply) agregarMensajeProbB(data.reply, 'tutor');
-    setStatusProbB('En línea');
-  } catch(e) {
-    console.error('Error tutor probB:', e);
-    agregarMensajeProbB('¡Hola! Escoge el sistema de representación, construye la tabla usando las pistas y presiona Verificar cuando estés listo.', 'tutor');
-    setStatusProbB('En línea');
-  }
-}
-
-async function enviarContextoProbB(contexto) {
-  setStatusProbB('Analizando…');
-  const tid = agregarTypingGen('chat-probB');
-  try {
-    const res = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `[CONTEXTO]: ${contexto}`, session_id: `probB_${sessionId}` })
-    });
-    const data = await res.json();
-    quitarTypingGen(tid);
-    if (data.reply) agregarMensajeProbB(data.reply, 'tutor');
-    setStatusProbB('En línea');
-  } catch(e) {
-    quitarTypingGen(tid);
-    console.error('Error contexto probB:', e);
-    setStatusProbB('En línea');
-  }
-}
-
-async function enviarMensajeProbB() {
-  const input = document.getElementById('input-probB');
-  if (!input?.value.trim()) return;
-  const texto = input.value.trim(); input.value = '';
-  agregarMensajeProbB(texto, 'user');
-  setStatusProbB('Escribiendo…');
-  const tid = agregarTypingGen('chat-probB');
-  try {
-    const res = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: texto, session_id: `probB_${sessionId}` })
-    });
-    const data = await res.json();
-    quitarTypingGen(tid);
-    if (data.reply) agregarMensajeProbB(data.reply, 'tutor');
-    setStatusProbB('En línea');
-  } catch(e) {
-    quitarTypingGen(tid);
-    console.error('Error mensaje probB:', e);
-    setStatusProbB('En línea');
-  }
-}
-
-function agregarMensajeProbB(texto, tipo) {
-  const box = document.getElementById('chat-probB');
-  if (!box) return;
-  const div = document.createElement('div');
-  div.className = tipo === 'user' ? 'msg-user' : 'msg-tutor';
-  const procesado = tipo === 'tutor' ? limpiarFormulas(texto) : texto;
-  div.innerHTML = procesado
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*(.*?)\*/g,'<em>$1</em>')
-    .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
-function setStatusProbB(txt) { const el=document.getElementById('tutor-status-probB'); if(el) el.textContent=txt; }
 
 /* ════════════════════════════════════════════════
    PÁG 9 — ABREBOCAS CHI-CUADRADO
