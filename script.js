@@ -88,6 +88,12 @@ function irAPagina(n) {
     probBIniciado = true;
     setTimeout(inicializarTutorProbB, 400);
   }
+
+  // Iniciar tutor Chi al llegar a página 9
+  if (n === 9 && !chiIniciado) {
+    chiIniciado = true;
+    setTimeout(inicializarTutorChi, 400);
+  }
 }
 
 function actualizarIndicadores() {
@@ -831,19 +837,16 @@ let probAActual  = 0;
 let tipoEscogidoA = null;  // tipo que el estudiante seleccionó
 let probAIniciado = false;
 
-/* ── Escogencia del tipo en pág 7 ── */
+/* ── Escogencia del tipo en pág 7 — actualiza tabla inmediatamente ── */
 function escogerTipoA(tipo) {
   tipoEscogidoA = tipo;
-  // Marcar botón seleccionado
   document.querySelectorAll('#page-7 .pts-btn').forEach(b => {
     b.classList.remove('selected','correcto','incorrecto');
     if (b.dataset.tipo === tipo) b.classList.add('selected');
   });
-  // Ocultar feedback de tipo anterior
   const fb = document.getElementById('probA-tipo-feedback');
   if (fb) fb.style.display = 'none';
-  // Re-renderizar la tabla con el tipo escogido
-  renderizarProbA();
+  _renderizarTablaA(); // solo re-renderiza la tabla, no toca el enunciado
 }
 
 function renderizarProbA() {
@@ -859,12 +862,18 @@ function renderizarProbA() {
   if (el_bg) el_bg.textContent = probAActual + 1;
   if (el_fb) el_fb.style.display = 'none';
 
-  // Resetear tipo al cambiar problema
+  // Reset tipo SOLO al cargar un problema nuevo (no al cambiar tipo)
   tipoEscogidoA = null;
   document.querySelectorAll('#page-7 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
   const fbTipo = document.getElementById('probA-tipo-feedback');
   if (fbTipo) fbTipo.style.display = 'none';
 
+  _renderizarTablaA();
+}
+
+// Renderiza SOLO la tabla según el tipo activo (sin tocar el enunciado)
+function _renderizarTablaA() {
+  const p    = PROBLEMAS_A[probAActual];
   const tipo = tipoEscogidoA || 'absoluta';
   const { filas, columnas, matriz, ocultas, N } = p;
   const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
@@ -878,7 +887,6 @@ function renderizarProbA() {
     html += `<tr><td>${filas[i]}</td>`;
     fila.forEach((val, j) => {
       const esOculta = ocultas.some(([oi,oj]) => oi===i && oj===j);
-      // El valor correcto cambia según el tipo escogido
       const valorCorrecto = calcularCeldaNum(tipo, val, totalesFila[i], totalesCol[j], N);
       const celdaDisplay  = calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N);
       if (esOculta) {
@@ -887,8 +895,7 @@ function renderizarProbA() {
         html += `<td>${celdaDisplay}</td>`;
       }
     });
-    const margVal = calcularMarginalFila(tipo, totalesFila[i], N);
-    html += `<td class="td-marg">${margVal}</td></tr>`;
+    html += `<td class="td-marg">${calcularMarginalFila(tipo, totalesFila[i], N)}</td></tr>`;
   });
 
   html += '<tr><td>Total</td>';
@@ -1140,17 +1147,21 @@ function renderizarProbB() {
   if (el_ct) el_ct.textContent = `${probBActual+1} / ${PROBLEMAS_B.length}`;
   if (el_fb) el_fb.style.display = 'none';
 
-  // Frases
   const frasesEl = document.getElementById('probB-frases');
   if (frasesEl) frasesEl.innerHTML = p.frases.map(f => `<div class="prob-frase">• ${f}</div>`).join('');
 
-  // Reset tipo
+  // Reset tipo SOLO al cargar problema nuevo
   tipoEscogidoB = null;
   document.querySelectorAll('#page-8 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
   const fbTipo = document.getElementById('probB-tipo-feedback');
   if (fbTipo) fbTipo.style.display = 'none';
 
-  // Tabla vacía
+  _renderizarTablaB();
+}
+
+// Renderiza SOLO la tabla B (todas vacías)
+function _renderizarTablaB() {
+  const p = PROBLEMAS_B[probBActual];
   const { filas, columnas, N } = p;
   let html = '<table><thead><tr><th>↓ / →</th>';
   columnas.forEach(c => { html += `<th>${c}</th>`; });
@@ -1320,6 +1331,250 @@ function agregarMensajeProbB(texto, tipo) {
 }
 function setStatusProbB(txt) { const el=document.getElementById('tutor-status-probB'); if(el) el.textContent=txt; }
 
+/* ════════════════════════════════════════════════
+   PÁG 9 — ABREBOCAS CHI-CUADRADO
+   El estudiante distribuye libremente datos en una
+   tabla y la IA lo lleva a sentir la necesidad de
+   una prueba formal — sin introducirla aún.
+════════════════════════════════════════════════ */
+
+const PROBLEMAS_CHI = [
+  {
+    badge: 'Situación 1',
+    enunciado: 'En la UIS se quiere estudiar si existe relación entre el <strong>turno de clase preferido</strong> (Mañana / Tarde / Noche) y el <strong>rendimiento académico</strong> (Alto / Bajo). Se encuestaron <strong>90 estudiantes</strong>.',
+    afirmacion: '"Los estudiantes que prefieren el turno de mañana tienden a tener mejor rendimiento académico."',
+    filas: ['Mañana', 'Tarde', 'Noche'],
+    columnas: ['Alto', 'Bajo'],
+    totalesFila: [30, 35, 25],   // fijos — el estudiante solo distribuye dentro de cada fila
+    N: 90
+  },
+  {
+    badge: 'Situación 2',
+    enunciado: 'Se investiga si hay relación entre el <strong>tipo de alimentación</strong> (Casera / Restaurante / Cafetería UIS) y el <strong>nivel de energía auto-reportado</strong> (Alto / Medio / Bajo) en <strong>120 estudiantes</strong> de la UIS.',
+    afirmacion: '"Los estudiantes que comen en casa tienen mayor nivel de energía que los que comen en restaurante o cafetería."',
+    filas: ['Casera', 'Restaurante', 'Cafetería UIS'],
+    columnas: ['Alto', 'Medio', 'Bajo'],
+    totalesFila: [40, 45, 35],
+    N: 120
+  }
+];
+
+let chiActual   = 0;
+let chiIniciado = false;
+
+function cambiarProbChi(idx) {
+  chiActual = idx;
+  document.querySelectorAll('.chi-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  renderizarChi();
+}
+
+function renderizarChi() {
+  const p = PROBLEMAS_CHI[chiActual];
+  const el_en = document.getElementById('chi-enunciado');
+  const el_af = document.getElementById('chi-afirmacion');
+  const el_bg = document.getElementById('chi-badge');
+  const el_nl = document.getElementById('chi-N-label');
+  const el_nd = document.getElementById('chi-N-display');
+  const el_fb = document.getElementById('chi-feedback');
+  if (el_en) el_en.innerHTML = p.enunciado;
+  if (el_af) el_af.innerHTML = p.afirmacion;
+  if (el_bg) el_bg.textContent = p.badge;
+  if (el_nl) el_nl.textContent = p.N;
+  if (el_nd) el_nd.textContent = p.N;
+  if (el_fb) el_fb.style.display = 'none';
+
+  // Tira de totales de fila (fijos)
+  const strip = document.getElementById('chi-totales-strip');
+  if (strip) {
+    strip.innerHTML = p.filas.map((f,i) =>
+      `<div class="chi-total-item"><span class="chi-total-label">${f}</span><span class="chi-total-val">${p.totalesFila[i]} encuestados</span></div>`
+    ).join('');
+  }
+
+  // Tabla editable — el estudiante llena la distribución dentro de cada fila
+  const { filas, columnas, totalesFila } = p;
+  let html = '<table><thead><tr><th>Turno / Categoría</th>';
+  columnas.forEach(c => { html += `<th>${c}</th>`; });
+  html += '<th>Total fila</th></tr></thead><tbody>';
+
+  filas.forEach((fila, i) => {
+    html += `<tr><td>${fila}</td>`;
+    columnas.forEach((_, j) => {
+      html += `<td><input type="number" min="0" class="cell-input chi-input"
+        data-fila="${i}" data-col="${j}" placeholder="?"
+        oninput="actualizarContadorChi()"></td>`;
+    });
+    html += `<td class="td-marg chi-total-fila" id="chi-marg-fila-${i}">${totalesFila[i]}</td></tr>`;
+  });
+
+  // Fila de totales de columna (calculados automáticamente)
+  html += '<tr><td>Total col</td>';
+  columnas.forEach((_, j) => {
+    html += `<td class="td-marg" id="chi-marg-col-${j}">0</td>`;
+  });
+  html += `<td class="td-marg" id="chi-marg-total">${p.N}</td></tr>`;
+  html += '</tbody></table>';
+
+  const w = document.getElementById('chi-tabla-wrapper');
+  if (w) w.innerHTML = html;
+
+  actualizarContadorChi();
+}
+
+function actualizarContadorChi() {
+  const p = PROBLEMAS_CHI[chiActual];
+  const inputs = document.querySelectorAll('.chi-input');
+  let total = 0;
+
+  // Calcular totales de columna
+  const totalPorCol = p.columnas.map(() => 0);
+  inputs.forEach(inp => {
+    const val = parseInt(inp.value) || 0;
+    total += val;
+    const j = parseInt(inp.dataset.col);
+    totalPorCol[j] += val;
+  });
+
+  // Actualizar totales de columna en tabla
+  p.columnas.forEach((_, j) => {
+    const el = document.getElementById(`chi-marg-col-${j}`);
+    if (el) el.textContent = totalPorCol[j];
+  });
+
+  // Barra de progreso
+  const contador = document.getElementById('chi-total-contador');
+  const barra    = document.getElementById('chi-progress-bar');
+  if (contador) contador.textContent = total;
+  if (barra) {
+    const pct = Math.min(100, Math.round(total / p.N * 100));
+    barra.style.width = pct + '%';
+    barra.style.background = total === p.N ? 'var(--moss)' : total > p.N ? '#dc3545' : 'var(--sky)';
+  }
+}
+
+function enviarTablaChiAlTutor() {
+  const p = PROBLEMAS_CHI[chiActual];
+  const inputs = document.querySelectorAll('.chi-input');
+
+  // Leer tabla
+  const tabla = p.filas.map((_, i) =>
+    p.columnas.map((_, j) => {
+      const inp = document.querySelector(`.chi-input[data-fila="${i}"][data-col="${j}"]`);
+      return parseInt(inp?.value) || 0;
+    })
+  );
+
+  // Verificar que suma N
+  const total = tabla.flat().reduce((s,v)=>s+v,0);
+  const fb = document.getElementById('chi-feedback');
+  if (total !== p.N) {
+    if (fb) { fb.style.display='block'; fb.className='prob-feedback error'; fb.innerHTML=`⚠️ La suma de tus celdas es <strong>${total}</strong>, pero deben ser <strong>${p.N}</strong>. Ajusta los valores.`; }
+    return;
+  }
+  if (fb) fb.style.display = 'none';
+
+  // Calcular % por fila para dar contexto al tutor
+  const porcentajesFila = tabla.map((fila, i) =>
+    fila.map(val => `${(val/p.totalesFila[i]*100).toFixed(1)}%`).join(' / ')
+  );
+
+  const contexto = `El estudiante está explorando la Situación ${chiActual+1}.
+Afirmación: ${p.afirmacion}
+Encuestados: N=${p.N}
+
+La tabla que construyó es:
+${p.filas.map((f,i) => `${f}: ${tabla[i].join(', ')} (total=${p.totalesFila[i]}) → % por fila: ${porcentajesFila[i]}`).join('\n')}
+
+Totales por columna: ${p.columnas.map((c,j) => `${c}=${tabla.map(r=>r[j]).reduce((s,v)=>s+v,0)}`).join(', ')}
+
+Tu rol: Hazle preguntas que lo lleven a notar que:
+1. La afirmación parece cumplirse con su distribución — pero también podrían construirse otras tablas que la contradigan con los mismos totales marginales.
+2. Desde la descripción de los datos no se puede afirmar con certeza si la asociación es real o producto del azar.
+3. Genera la curiosidad: ¿existirá alguna herramienta estadística que permita responder esto con certeza? (NO menciones chi-cuadrado aún — solo deja la pregunta abierta).`;
+
+  enviarContextoChi(contexto);
+}
+
+async function inicializarTutorChi() {
+  setStatusChi('Conectando…');
+  try {
+    const res = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Hola, estoy en la sección de exploración libre. Quiero distribuir datos y discutir si puedo afirmar algo con certeza.',
+        session_id: `chi_${sessionId}`
+      })
+    });
+    const data = await res.json();
+    if (data.reply) agregarMensajeChi(data.reply, 'tutor');
+    setStatusChi('En línea');
+  } catch(e) {
+    console.error('Error tutor chi:', e);
+    agregarMensajeChi('¡Hola! Distribuye los datos en la tabla como creas que refleja la afirmación y envíamela. Te haré preguntas para que reflexionemos juntos.', 'tutor');
+    setStatusChi('En línea');
+  }
+}
+
+async function enviarContextoChi(contexto) {
+  setStatusChi('Analizando…');
+  const tid = agregarTypingGen('chat-chi');
+  try {
+    const res = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `[CONTEXTO]: ${contexto}`, session_id: `chi_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    if (data.reply) agregarMensajeChi(data.reply, 'tutor');
+    setStatusChi('En línea');
+  } catch(e) {
+    quitarTypingGen(tid);
+    console.error('Error contexto chi:', e);
+    setStatusChi('En línea');
+  }
+}
+
+async function enviarMensajeChi() {
+  const input = document.getElementById('input-chi');
+  if (!input?.value.trim()) return;
+  const texto = input.value.trim(); input.value = '';
+  agregarMensajeChi(texto, 'user');
+  setStatusChi('Escribiendo…');
+  const tid = agregarTypingGen('chat-chi');
+  try {
+    const res = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: texto, session_id: `chi_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    if (data.reply) agregarMensajeChi(data.reply, 'tutor');
+    setStatusChi('En línea');
+  } catch(e) {
+    quitarTypingGen(tid);
+    console.error('Error mensaje chi:', e);
+    setStatusChi('En línea');
+  }
+}
+
+function agregarMensajeChi(texto, tipo) {
+  const box = document.getElementById('chat-chi');
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = tipo === 'user' ? 'msg-user' : 'msg-tutor';
+  const procesado = tipo === 'tutor' ? limpiarFormulas(texto) : texto;
+  div.innerHTML = procesado
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function setStatusChi(txt) { const el=document.getElementById('tutor-status-chi'); if(el) el.textContent=txt; }
+
 /* ── Helper typing genérico ── */
 function agregarTypingGen(boxId) {
   const box = document.getElementById(boxId);
@@ -1351,4 +1606,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderizarEjGrafico('absoluta');
   renderizarProbA();
   renderizarProbB();
+  renderizarChi();
 });
