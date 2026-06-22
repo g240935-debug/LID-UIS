@@ -1098,6 +1098,37 @@ html, body {
   max-width: 780px;
   flex: 1;
 }
+
+/* Layout mejorado para pág 7 y 8: ocupa todo el ancho */
+.prob-layout-full {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Fila superior: enunciado + selector en dos columnas */
+.prob-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.prob-enunciado-half {
+  /* hereda estilos de .prob-enunciado */
+}
+
+.prob-selector-half {
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .prob-bottom-row {
   display: flex;
   align-items: flex-start;
