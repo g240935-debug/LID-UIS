@@ -1290,20 +1290,14 @@ function enviarTablaChiAlTutor() {
     fila.map(val => `${(val/p.totalesFila[i]*100).toFixed(1)}%`).join(' / ')
   );
 
-  const contexto = `[CONTEXTO] El estudiante está explorando la Situación ${chiActual+1}.
+ const contexto = `[CONTEXTO AUTOMÁTICO]
+Situación: ${chiActual + 1}
 Afirmación a demostrar: ${p.afirmacion}
-Encuestados: N=${p.N}
+Encuestados totales: ${p.N}
 Columnas: ${p.columnas.join(' / ')}
 
-Tabla que construyó el estudiante:
-${p.filas.map((f,i) => `  ${f} (total=${p.totalesFila[i]}): ${tabla[i].join(', ')} → % por fila: ${porcentajesFila[i]}`).join('\n')}
-
-Totales por columna: ${p.columnas.map((c,j) => `${c}=${tabla.map(r=>r[j]).reduce((s,v)=>s+v,0)}`).join(', ')}
-
-INSTRUCCIÓN: Analiza si los porcentajes por fila realmente apoyan la afirmación antes de responder. Luego haz UNA SOLA pregunta al estudiante siguiendo el PASO 1 de tu protocolo.`;
-
-  enviarContextoChi(contexto);
-}
+Frecuencias absolutas distribuidas por el estudiante y su equivalente en porcentaje por fila:
+${p.filas.map((f, i) => `  - ${f} (Total fila=${p.totalesFila[i]}): ${tabla[i].join(' / ')}  -->  [Equivale a: ${porcentajesFila[i]}]`).join('\n')}`;
 
 async function inicializarTutorChi() {
   setStatusChi('Conectando…');
