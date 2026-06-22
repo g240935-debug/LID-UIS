@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   LID — Tablas de Contingencia · UIS · 2026
+   LID — Estadística Descriptiva · UIS · 2026
    Paleta:
      --ink    #0F1923   casi negro
      --navy   #1A3A5A   azul UIS oscuro
@@ -240,6 +240,53 @@ html, body {
   margin-bottom: 36px;
 }
 .meta-sep { color: var(--gold); }
+
+/* Índice de capítulos en portada */
+.cover-chapters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.cover-ch-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 3px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.cover-ch-item:hover {
+  background: rgba(255,255,255,.14);
+  border-color: var(--gold);
+}
+.cover-ch-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--gold);
+  min-width: 22px;
+}
+.cover-ch-title {
+  flex: 1;
+  font-size: .84rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.85);
+  font-family: 'Inter', sans-serif;
+}
+.cover-ch-arrow {
+  font-size: .9rem;
+  color: rgba(255,255,255,.3);
+  transition: color .2s, transform .2s;
+}
+.cover-ch-item:hover .cover-ch-arrow {
+  color: var(--gold);
+  transform: translateX(4px);
+}
+
 .btn-start {
   background: var(--gold);
   color: var(--ink);
@@ -1273,6 +1320,130 @@ html, body {
 #chi-tabla-wrapper tr:last-child td { background: #E8F5ED; font-weight: 700; color: var(--moss); }
 #chi-tabla-wrapper .td-marg { background: #E8F5ED; font-weight: 700; color: var(--moss); }
 
+/* ══════════════════════════════════════════════
+   CAP I — TABLAS DE FRECUENCIA
+   Estilos exclusivos de páginas 1–5.
+══════════════════════════════════════════════ */
+
+/* ── Tablas de frecuencia progresivas (pág 2 y 4) ── */
+.freq-tabla-display {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--cream);
+  animation: fadeInUp .35s ease;
+}
+.freq-tabla-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  color: var(--slate);
+  background: #EBF2F9;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.freq-tabla-display table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+.freq-tabla-display th {
+  background: var(--navy);
+  color: white;
+  padding: 8px 12px;
+  font-size: .76rem;
+  text-align: center;
+}
+.freq-tabla-display th:first-child { text-align: left; }
+.freq-tabla-display td {
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+}
+.freq-tabla-display td:first-child { font-weight: 600; text-align: left; }
+.freq-tabla-display tr.freq-total-row td {
+  background: var(--navy);
+  color: white;
+  font-weight: 700;
+}
+/* Columna de frec. relativa (hᵢ) — tono suave */
+.freq-tabla-display td:nth-child(3) {
+  color: var(--moss);
+  font-weight: 600;
+}
+/* Columna de acumuladas (Fᵢ, Hᵢ) */
+.freq-tabla-display td:nth-child(4),
+.freq-tabla-display td:nth-child(5) {
+  color: var(--slate);
+  background: rgba(235,242,249,.45);
+}
+
+/* ── Botón siguiente deshabilitado → habilitado ── */
+#btn-freq-a-next,
+#btn-freq-b-next {
+  transition: opacity .4s ease, pointer-events 0s;
+}
+
+/* ── Síntesis Cap I — tarjetas de fases ── */
+/* Reutiliza .synthesis-grid y .syn-card — solo ajustes de color de tag */
+.syn-card .syn-tag { color: var(--gold); }
+
+/* ── Tabla completa síntesis (pág 5) ── */
+#page-5 table { border-radius: 3px; overflow: hidden; }
+#page-5 table td { padding: 5px 10px; }
+#page-5 table tbody tr:nth-child(odd) { background: var(--cream); }
+
+/* ── RESPONSIVE Cap I ── */
+@media (max-width: 880px) {
+  .freq-tabla-display { font-size: .78rem; }
+}
+
+/* ══════════════════════════════════════════════
+   CAP I — PÁGINA 4: frec. acumuladas
+   Las tablas Fi y Hi aparecen progresivamente.
+══════════════════════════════════════════════ */
+
+/* Apilado vertical de tablas en la vis-panel */
+#page-4 .vis-panel { gap: 10px; }
+
+/* Tabla de referencia inicial — discreta */
+#freq-tabla-ref-acum { opacity: .75; }
+
+/* Tabla Fi — borde izquierdo accent color slate */
+#freq-tabla-Fi {
+  border-left: 3px solid var(--slate);
+}
+#freq-tabla-Fi .freq-tabla-label {
+  background: rgba(61,90,122,.1);
+  color: var(--slate);
+  border-bottom-color: rgba(61,90,122,.2);
+}
+
+/* Tabla Hi — borde izquierdo accent moss (completo) */
+#freq-tabla-Hi {
+  border-left: 3px solid var(--moss);
+}
+#freq-tabla-Hi .freq-tabla-label {
+  background: #E8F5ED;
+  color: var(--moss);
+  border-bottom-color: rgba(46,107,79,.2);
+}
+
+/* ══════════════════════════════════════════════
+   CAP I — RESPONSIVE para actividad (pág 2-4)
+══════════════════════════════════════════════ */
+@media (max-width: 880px) {
+  #page-2 .activity-layout,
+  #page-3 .activity-layout,
+  #page-4 .activity-layout {
+    grid-template-columns: 1fr;
+  }
+  #page-4 .vis-panel { order: 2; }
+  #page-4 .tutor-panel { order: 1; }
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 880px) {
   .book-spine { display: none; }
@@ -1288,4 +1459,10 @@ html, body {
   .rs-levels { flex-direction: column; }
   .rs-arrow { transform: rotate(90deg); }
   .cover-title { font-size: 2.6rem; }
+  /* Cap I responsive */
+  .fp-layout { grid-template-columns: 1fr; }
+  .ej-layout  { grid-template-columns: 1fr; }
+  .prob-top-row { grid-template-columns: 1fr; }
+  .prob-two-col { grid-template-columns: 1fr; }
+  .cover-chapters { gap: 6px; }
 }
