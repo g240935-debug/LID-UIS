@@ -1418,4 +1418,3 @@ document.addEventListener('DOMContentLoaded', () => {
   renderizarProbB();
   renderizarChi();
 });
-}
