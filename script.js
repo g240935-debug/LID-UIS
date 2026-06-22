@@ -1333,7 +1333,7 @@ async function enviarContextoChi(contexto) {
     const res = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `[CONTEXTO]: ${contexto}`, session_id: `chi_${sessionId}` })
+      body: JSON.stringify({ message: contexto, session_id: `chi_${sessionId}` }) 
     });
     const data = await res.json();
     quitarTypingGen(tid);
