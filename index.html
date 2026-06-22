@@ -256,22 +256,26 @@
             <div class="situation-header">
               <span class="sit-badge">Continuación · Curcio Niveles 3 y 4</span>
               <h3 class="sit-title">¿Qué nos dicen los datos?</h3>
-              <p class="sit-desc">Ya conoces la frecuencia absoluta y relativa. Ahora el tutor te invitará a <strong>interpretar tendencias</strong> y a <strong>buscar causas</strong> detrás de los datos.</p>
+              <p class="sit-desc">Ya conoces la frecuencia absoluta y relativa. Ahora el tutor te invitará a <strong>interpretar tendencias</strong> y a <strong>buscar causas</strong> detrás de los datos. La tabla se irá completando a medida que el tutor institucionalice cada concepto.</p>
             </div>
-            <div class="freq-tabla-display">
-              <div class="freq-tabla-label">Tabla de referencia</div>
-              <table>
-                <thead><tr><th>Bebida</th><th>fᵢ</th><th>hᵢ</th></tr></thead>
-                <tbody>
-                  <tr><td>Café Negro</td><td>18</td><td>0.45</td></tr>
-                  <tr><td>Té / Aromática</td><td>10</td><td>0.25</td></tr>
-                  <tr><td>Jugo Natural</td><td>8</td><td>0.20</td></tr>
-                  <tr><td>Bebida Energizante</td><td>4</td><td>0.10</td></tr>
-                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td></tr>
-                </tbody>
-              </table>
+
+            <!-- Tabla dinámica de página 3 — columnas aparecen progresivamente -->
+            <div class="freq-tabla-display" id="p3-tabla-wrapper">
+              <div class="freq-tabla-label" id="p3-tabla-label">Tabla de referencia</div>
+              <div class="p3-tabla-anim" id="p3-tabla-inner">
+                <!-- renderizada por JS -->
+              </div>
             </div>
-            <div class="note-card" style="margin-top:12px;">
+
+            <!-- Leyenda de progreso de columnas -->
+            <div class="p3-col-progress" id="p3-col-progress">
+              <span class="p3-col-badge p3-col-fi active" title="Frecuencia absoluta">fᵢ ✓</span>
+              <span class="p3-col-badge p3-col-hi" id="p3-badge-hi" title="Frecuencia relativa">hᵢ</span>
+              <span class="p3-col-badge p3-col-fi-acum" id="p3-badge-Fi" title="Frecuencia absoluta acumulada">Fᵢ</span>
+              <span class="p3-col-badge p3-col-hi-acum" id="p3-badge-Hi" title="Frecuencia relativa acumulada">Hᵢ</span>
+            </div>
+
+            <div class="note-card" style="margin-top:10px;">
               <div class="note-title">📌 Niveles de Curcio</div>
               <p class="note-text"><strong>Nivel 3</strong>: leer más allá de los datos (tendencias, predicciones).<br><strong>Nivel 4</strong>: leer detrás de los datos (causas, explicaciones).</p>
             </div>
@@ -454,6 +458,74 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(4)">← Frecuencias acumuladas</button>
+          <button class="btn-nav next" onclick="irAPagina('5b')">Ejemplos Dinámicos →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 5b: EJEMPLOS DINÁMICOS — TABLAS DE FRECUENCIA ══════════ -->
+    <div class="page" id="page-5b">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Ejemplos Dinámicos</span>
+          <span class="page-num">5b</span>
+        </div>
+        <h2 class="page-title" style="font-size:1.5rem;margin-bottom:12px;">Explora la Tabla de Frecuencias</h2>
+
+        <!-- Controles superiores -->
+        <div class="ejf-controls-row">
+          <!-- Modo: tabla completa o personalizada -->
+          <div class="ejf-mode-toggle">
+            <button class="ejf-mode-btn active" id="ejf-btn-completa" onclick="ejfCambiarModo('completa')">📋 Tabla completa</button>
+            <button class="ejf-mode-btn" id="ejf-btn-personalizada" onclick="ejfCambiarModo('personalizada')">🎛️ Vista personalizada</button>
+          </div>
+          <!-- Vista: tabla o gráfico -->
+          <div class="ejf-view-toggle">
+            <button class="ejf-view-btn active" id="ejf-vbtn-tabla" onclick="ejfCambiarVista('tabla')">📊 Tabla</button>
+            <button class="ejf-view-btn" id="ejf-vbtn-grafico" onclick="ejfCambiarVista('grafico')">📈 Gráfico</button>
+          </div>
+        </div>
+
+        <!-- Selector de columnas (modo personalizado) -->
+        <div class="ejf-custom-panel" id="ejf-custom-panel" style="display:none;">
+          <div class="ejf-custom-label">Elige qué columnas mostrar:</div>
+          <div class="ejf-col-checks">
+            <label class="ejf-check"><input type="checkbox" id="ejf-chk-fi" checked onchange="ejfActualizarVista()"><span>fᵢ (absoluta)</span></label>
+            <label class="ejf-check"><input type="checkbox" id="ejf-chk-hi" onchange="ejfActualizarVista()"><span>hᵢ (relativa)</span></label>
+            <label class="ejf-check"><input type="checkbox" id="ejf-chk-Fi" onchange="ejfActualizarVista()"><span>Fᵢ (abs. acumulada)</span></label>
+            <label class="ejf-check"><input type="checkbox" id="ejf-chk-Hi" onchange="ejfActualizarVista()"><span>Hᵢ (rel. acumulada)</span></label>
+          </div>
+          <div class="ejf-cat-row">
+            <div class="ejf-custom-label">Filtrar categorías (opcional):</div>
+            <div class="ejf-cat-checks" id="ejf-cat-checks"></div>
+          </div>
+        </div>
+
+        <!-- Área principal: tabla o gráfico -->
+        <div class="ejf-main-area">
+          <div id="ejf-tabla-area" class="ejf-area-block">
+            <div class="ejf-tabla-label" id="ejf-tabla-title">Tabla de frecuencias completa — Bebidas para estudiar (N = 40)</div>
+            <div id="ejf-tabla-wrapper"></div>
+          </div>
+          <div id="ejf-grafico-area" class="ejf-area-block" style="display:none;">
+            <div class="ejf-grafico-tabs" id="ejf-grafico-tabs">
+              <button class="ejf-gtab active" id="ejf-gtab-barras" onclick="ejfCambiarGrafico('barras')">Barras</button>
+              <button class="ejf-gtab" id="ejf-gtab-pie" onclick="ejfCambiarGrafico('pie')">Pastel</button>
+              <button class="ejf-gtab" id="ejf-gtab-acum" onclick="ejfCambiarGrafico('acum')">Acumulada</button>
+            </div>
+            <div style="max-height:320px;position:relative;">
+              <canvas id="ejf-canvas" style="max-height:300px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recuadro informativo dinámico -->
+        <div class="ejf-info-bar" id="ejf-info-bar">
+          <span id="ejf-info-text">Tabla completa con las 4 frecuencias. Usa el modo personalizado para explorar columnas por separado.</span>
+        </div>
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(5)">← Síntesis Cap. I</button>
           <button class="btn-nav next" onclick="irAPagina(6)">Capítulo II: Tablas de Contingencia →</button>
         </div>
       </div>
@@ -937,23 +1009,24 @@
 
   </div><!-- /book-pages -->
 
-  <!-- Indicadores de página — 15 puntos (0–14) -->
+  <!-- Indicadores de página — 16 puntos (0–5b–6–14) -->
   <div class="page-indicators">
-    <span class="pi-dot active" onclick="irAPagina(0)"  title="Portada"></span>
-    <span class="pi-dot" onclick="irAPagina(1)"  title="Cap I · Presentación"></span>
-    <span class="pi-dot" onclick="irAPagina(2)"  title="Cap I · frec. abs. y rel."></span>
-    <span class="pi-dot" onclick="irAPagina(3)"  title="Cap I · Curcio N3/N4"></span>
-    <span class="pi-dot" onclick="irAPagina(4)"  title="Cap I · frec. acumuladas"></span>
-    <span class="pi-dot" onclick="irAPagina(5)"  title="Cap I · Síntesis"></span>
-    <span class="pi-dot" onclick="irAPagina(6)"  title="Cap II · Presentación"></span>
-    <span class="pi-dot" onclick="irAPagina(7)"  title="Cap II · Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(8)"  title="Cap II · Síntesis"></span>
-    <span class="pi-dot" onclick="irAPagina(9)"  title="Cap III · Formas Parciales"></span>
-    <span class="pi-dot" onclick="irAPagina(10)" title="Cap III · Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(11)" title="Cap IV · Ejemplos"></span>
-    <span class="pi-dot" onclick="irAPagina(12)" title="Cap IV · Formulación"></span>
-    <span class="pi-dot" onclick="irAPagina(13)" title="Cap IV · Validación"></span>
-    <span class="pi-dot" onclick="irAPagina(14)" title="Cap V · ¿Se puede probar?"></span>
+    <span class="pi-dot active" onclick="irAPagina(0)"   title="Portada"></span>
+    <span class="pi-dot" onclick="irAPagina(1)"   title="Cap I · Presentación"></span>
+    <span class="pi-dot" onclick="irAPagina(2)"   title="Cap I · frec. abs. y rel."></span>
+    <span class="pi-dot" onclick="irAPagina(3)"   title="Cap I · Curcio N3/N4"></span>
+    <span class="pi-dot" onclick="irAPagina(4)"   title="Cap I · frec. acumuladas"></span>
+    <span class="pi-dot" onclick="irAPagina(5)"   title="Cap I · Síntesis"></span>
+    <span class="pi-dot pi-dot-5b" onclick="irAPagina('5b')" title="Cap I · Ejemplos Dinámicos"></span>
+    <span class="pi-dot" onclick="irAPagina(6)"   title="Cap II · Presentación"></span>
+    <span class="pi-dot" onclick="irAPagina(7)"   title="Cap II · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(8)"   title="Cap II · Síntesis"></span>
+    <span class="pi-dot" onclick="irAPagina(9)"   title="Cap III · Formas Parciales"></span>
+    <span class="pi-dot" onclick="irAPagina(10)"  title="Cap III · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(11)"  title="Cap IV · Ejemplos"></span>
+    <span class="pi-dot" onclick="irAPagina(12)"  title="Cap IV · Formulación"></span>
+    <span class="pi-dot" onclick="irAPagina(13)"  title="Cap IV · Validación"></span>
+    <span class="pi-dot" onclick="irAPagina(14)"  title="Cap V · ¿Se puede probar?"></span>
   </div>
 
 </div><!-- /book-shell -->
