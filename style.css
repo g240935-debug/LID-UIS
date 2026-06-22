@@ -1021,7 +1021,8 @@ html, body {
 .prob-tutor-panel .chat-box {
   flex: 1;
   min-height: 0;
-  max-height: none;
+  max-height: 340px;
+  overflow-y: auto;
 }
 
 /* Tira de contexto fija encima del chat */
