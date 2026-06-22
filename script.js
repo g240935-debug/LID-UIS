@@ -1401,6 +1401,9 @@ function quitarTypingGen(id) { if (id) document.getElementById(id)?.remove(); }
 /* ════════════════════════════════
    INIT
 ════════════════════════════════ */
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(ocultarLoading, 800);
 
