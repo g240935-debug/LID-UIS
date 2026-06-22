@@ -1299,6 +1299,9 @@ Columnas: ${p.columnas.join(' / ')}
 Frecuencias absolutas distribuidas por el estudiante y su equivalente en porcentaje por fila:
 ${p.filas.map((f, i) => `  - ${f} (Total fila=${p.totalesFila[i]}): ${tabla[i].join(' / ')}  -->  [Equivale a: ${porcentajesFila[i]}]`).join('\n')}`;
 
+  enviarContextoChi(contexto);
+}
+
 async function inicializarTutorChi() {
   setStatusChi('Conectando…');
   try {
@@ -1398,9 +1401,6 @@ function agregarTypingGen(boxId) {
 }
 function quitarTypingGen(id) { if (id) document.getElementById(id)?.remove(); }
 
-/* ════════════════════════════════
-   INIT
-════════════════════════════════ */
 /* ════════════════════════════════
    INIT
 ════════════════════════════════ */
