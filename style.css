@@ -1466,3 +1466,186 @@ html, body {
   .prob-two-col { grid-template-columns: 1fr; }
   .cover-chapters { gap: 6px; }
 }
+
+/* ═══════════════════════════════════════════════════════
+   NUEVOS ESTILOS — Tabla dinámica pág 3 + Ejemplos Dinámicos pág 5b
+═══════════════════════════════════════════════════════ */
+
+/* ── Botones de navegación mejorados ── */
+.btn-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cream);
+  border: 1.5px solid var(--rule);
+  color: var(--slate);
+  padding: 9px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .82rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: .01em;
+  transition: background .18s, color .18s, border-color .18s, box-shadow .18s, transform .12s;
+  box-shadow: 0 1px 4px rgba(15,25,35,.07);
+}
+.btn-nav:hover {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+  box-shadow: 0 3px 12px rgba(26,58,90,.22);
+  transform: translateY(-1px);
+}
+.btn-nav.prev::before { content: '←'; margin-right: 2px; }
+.btn-nav.next::after  { content: '→'; margin-left: 2px; }
+.btn-nav:disabled, .btn-nav[style*="pointer-events:none"] {
+  opacity: 0.38 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Tabla dinámica página 3 — columnas animadas ── */
+.p3-tabla-anim { transition: all .35s ease; }
+.p3-tabla-anim table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.p3-tabla-anim th {
+  background: var(--navy); color: white;
+  padding: 6px 10px; text-align: center; font-weight: 600;
+}
+.p3-tabla-anim th:first-child { text-align: left; }
+.p3-tabla-anim td { padding: 5px 10px; text-align: center; border-bottom: 1px solid var(--rule); }
+.p3-tabla-anim td:first-child { text-align: left; font-weight: 500; }
+.p3-tabla-anim tr:last-child td { font-weight: 700; background: var(--navy); color: white; }
+.p3-tabla-anim tr:nth-child(even) td { background: #f3f0eb; }
+.p3-tabla-anim tr:nth-child(even):last-child td { background: var(--navy); }
+/* Columna nueva: animación de entrada */
+.col-nueva { animation: colEntra .45s ease; }
+@keyframes colEntra {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.col-hi { background: #e8f5f0 !important; color: var(--moss) !important; }
+.col-Fi { background: #eaf2fb !important; color: var(--navy) !important; }
+.col-Hi { background: #fdf6e3 !important; color: #7a6010 !important; }
+.p3-tabla-anim tr:last-child .col-hi,
+.p3-tabla-anim tr:last-child .col-Fi,
+.p3-tabla-anim tr:last-child .col-Hi { background: var(--navy) !important; color: white !important; }
+
+/* Badge de progreso de columnas */
+.p3-col-progress {
+  display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+}
+.p3-col-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  border: 1.5px solid var(--rule);
+  background: #f0ede8; color: #aaa;
+  transition: all .3s ease;
+}
+.p3-col-badge.active { color: white; }
+.p3-col-fi.active  { background: var(--navy); border-color: var(--navy); }
+.p3-col-hi.active  { background: var(--moss); border-color: var(--moss); }
+.p3-col-fi-acum.active { background: var(--sky); border-color: var(--sky); }
+.p3-col-hi-acum.active { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+
+/* ── Página 5b — Ejemplos Dinámicos ── */
+.ejf-controls-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.ejf-mode-toggle, .ejf-view-toggle {
+  display: flex; gap: 4px;
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 5px; padding: 3px;
+}
+.ejf-mode-btn, .ejf-view-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: .78rem; font-family: 'Inter', sans-serif; font-weight: 500;
+  padding: 6px 14px; border-radius: 3px;
+  color: var(--slate); transition: all .18s;
+}
+.ejf-mode-btn.active, .ejf-view-btn.active {
+  background: var(--navy); color: white;
+  box-shadow: 0 1px 4px rgba(26,58,90,.25);
+}
+.ejf-mode-btn:hover:not(.active), .ejf-view-btn:hover:not(.active) {
+  background: #e8e3d9; color: var(--ink);
+}
+
+.ejf-custom-panel {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 12px 16px; margin-bottom: 10px;
+  animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+.ejf-custom-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; text-transform: uppercase; letter-spacing: .12em;
+  color: var(--slate); margin-bottom: 8px;
+}
+.ejf-col-checks, .ejf-cat-checks {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.ejf-check {
+  display: flex; align-items: center; gap: 5px;
+  font-size: .8rem; cursor: pointer; color: var(--ink);
+  background: white; border: 1px solid var(--rule);
+  border-radius: 3px; padding: 5px 10px;
+  transition: border-color .15s;
+}
+.ejf-check:hover { border-color: var(--navy); }
+.ejf-check input { accent-color: var(--navy); }
+.ejf-cat-row { margin-top: 10px; }
+
+.ejf-main-area { flex: 1; min-height: 0; }
+.ejf-area-block { width: 100%; }
+.ejf-tabla-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; text-transform: uppercase; letter-spacing: .13em;
+  color: var(--slate); margin-bottom: 8px;
+}
+#ejf-tabla-wrapper table {
+  width: 100%; border-collapse: collapse; font-size: .84rem;
+}
+#ejf-tabla-wrapper th {
+  background: var(--navy); color: white;
+  padding: 7px 10px; text-align: center; font-weight: 600;
+}
+#ejf-tabla-wrapper th:first-child { text-align: left; }
+#ejf-tabla-wrapper td { padding: 6px 10px; text-align: center; border-bottom: 1px solid var(--rule); }
+#ejf-tabla-wrapper td:first-child { text-align: left; font-weight: 500; }
+#ejf-tabla-wrapper tr.ejf-total-row td { background: var(--navy); color: white; font-weight: 700; }
+#ejf-tabla-wrapper tr:nth-child(even):not(.ejf-total-row) td { background: #f3f0eb; }
+/* Colores por tipo de columna */
+.ejf-th-hi, .ejf-td-hi { background: #e8f5f0; color: var(--moss); }
+.ejf-th-Fi, .ejf-td-Fi { background: #eaf2fb; color: var(--slate); }
+.ejf-th-Hi, .ejf-td-Hi { background: #fdf6e3; color: #7a6010; }
+#ejf-tabla-wrapper .ejf-total-row .ejf-td-hi,
+#ejf-tabla-wrapper .ejf-total-row .ejf-td-Fi,
+#ejf-tabla-wrapper .ejf-total-row .ejf-td-Hi { background: var(--navy); color: white; }
+
+.ejf-grafico-tabs {
+  display: flex; gap: 4px; margin-bottom: 10px;
+}
+.ejf-gtab {
+  background: var(--cream); border: 1px solid var(--rule);
+  font-size: .76rem; font-family: 'Inter', sans-serif; font-weight: 500;
+  padding: 5px 14px; border-radius: 3px; cursor: pointer;
+  color: var(--slate); transition: all .15s;
+}
+.ejf-gtab.active { background: var(--navy); color: white; border-color: var(--navy); }
+.ejf-gtab:hover:not(.active) { background: #e8e3d9; }
+
+.ejf-info-bar {
+  background: linear-gradient(90deg, #eaf2fb, #e8f5f0);
+  border: 1px solid var(--rule); border-radius: 3px;
+  padding: 8px 14px; margin-top: 8px;
+  font-size: .78rem; color: var(--slate);
+  font-family: 'Inter', sans-serif;
+  border-left: 3px solid var(--navy);
+}
+
+/* Dot especial para página 5b */
+.pi-dot-5b { background: var(--gold) !important; opacity: .45; }
+.pi-dot-5b.active { opacity: 1; }
