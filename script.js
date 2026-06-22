@@ -388,7 +388,7 @@ function ocultarLoading() {
    Columnas → Horas/semana: <5h / 5-10h / >10h
 ════════════════════════════════════════════════ */
 
-// Datos absolutos base (no se modifican)
+// Datos absolutos base (no se modifica)
 const FP_DATA = {
   filas:    ['Bajo', 'Medio', 'Alto'],
   columnas: ['< 5h', '5–10h', '> 10h'],
