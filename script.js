@@ -1290,19 +1290,17 @@ function enviarTablaChiAlTutor() {
     fila.map(val => `${(val/p.totalesFila[i]*100).toFixed(1)}%`).join(' / ')
   );
 
-  const contexto = `El estudiante está explorando la Situación ${chiActual+1}.
-Afirmación: ${p.afirmacion}
+  const contexto = `[CONTEXTO] El estudiante está explorando la Situación ${chiActual+1}.
+Afirmación a demostrar: ${p.afirmacion}
 Encuestados: N=${p.N}
+Columnas: ${p.columnas.join(' / ')}
 
-La tabla que construyó es:
-${p.filas.map((f,i) => `${f}: ${tabla[i].join(', ')} (total=${p.totalesFila[i]}) → % por fila: ${porcentajesFila[i]}`).join('\n')}
+Tabla que construyó el estudiante:
+${p.filas.map((f,i) => `  ${f} (total=${p.totalesFila[i]}): ${tabla[i].join(', ')} → % por fila: ${porcentajesFila[i]}`).join('\n')}
 
 Totales por columna: ${p.columnas.map((c,j) => `${c}=${tabla.map(r=>r[j]).reduce((s,v)=>s+v,0)}`).join(', ')}
 
-Tu rol: Hazle preguntas que lo lleven a notar que:
-1. La afirmación parece cumplirse con su distribución — pero también podrían construirse otras tablas que la contradigan con los mismos totales marginales.
-2. Desde la descripción de los datos no se puede afirmar con certeza si la asociación es real o producto del azar.
-3. Genera la curiosidad: ¿existirá alguna herramienta estadística que permita responder esto con certeza? (NO menciones chi-cuadrado aún — solo deja la pregunta abierta).`;
+INSTRUCCIÓN: Analiza si los porcentajes por fila realmente apoyan la afirmación antes de responder. Luego haz UNA SOLA pregunta al estudiante siguiendo el PASO 1 de tu protocolo.`;
 
   enviarContextoChi(contexto);
 }
