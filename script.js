@@ -16,6 +16,11 @@ let graficoActual  = null;
 let vistaActual    = 'tabla';   // 'tabla' | 'grafico'
 let paginaActual   = 0;
 let chatIniciado   = false;
+// para que funcione la IA
+let cap3Iniciado   = false; // Para la página 5
+let probAIniciado  = false; // Para la página 7
+let probBIniciado  = false; // Para la página 8
+let chiIniciado    = false; // Para la página 9
 
 // Datos por defecto (se sobreescriben con la respuesta del backend)
 let datosGrafico = {
