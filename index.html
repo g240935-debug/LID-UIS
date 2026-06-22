@@ -609,73 +609,59 @@
           <span class="page-num">07</span>
         </div>
 
-        <div class="prob-two-col" style="flex:1;">
+        <div class="prob-layout-full">
 
-          <!-- Columna izquierda: enunciado + selector + tabla + verificar -->
-          <div class="prob-col">
+          <!-- Fila superior: enunciado + selector lado a lado -->
+          <div class="prob-top-row">
 
-          <!-- Enunciado -->\n          <div class="prob-enunciado">
-            <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
-            <p class="prob-enunciado-text" id="probA-enunciado"></p>
-            <div class="prob-pregunta-box">
-              <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
-              <p id="probA-pregunta" class="prob-pregunta-text"></p>
+            <div class="prob-enunciado prob-enunciado-half">
+              <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
+              <p class="prob-enunciado-text" id="probA-enunciado"></p>
+              <div class="prob-pregunta-box">
+                <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
+                <p id="probA-pregunta" class="prob-pregunta-text"></p>
+              </div>
             </div>
-          </div>
 
-          <!-- Selector de tipo -->\n          <div class="prob-tipo-selector">
-            <div class="pts-label">1. Escoge el sistema de representación que mejor responde la pregunta:</div>
-            <div class="pts-options">
-              <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoA('absoluta')">Frecuencias absolutas</button>
-              <button class="pts-btn" data-tipo="total"    onclick="escogerTipoA('total')">% sobre el total</button>
-              <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoA('fila')">% por fila</button>
-              <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoA('columna')">% por columna</button>
+            <div class="prob-tipo-selector prob-selector-half">
+              <div class="pts-label">Escoge el sistema de representación que mejor responde la pregunta:</div>
+              <div class="pts-options">
+                <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoA('absoluta')">Frecuencias absolutas</button>
+                <button class="pts-btn" data-tipo="total"    onclick="escogerTipoA('total')">% sobre el total</button>
+                <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoA('fila')">% por fila</button>
+                <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoA('columna')">% por columna</button>
+              </div>
+              <div id="probA-tipo-feedback" class="pts-feedback" style="display:none;"></div>
+              <div class="prob-formulas-strip" style="margin-top:10px;">
+                <div class="fps-title">Fórmulas clave</div>
+                <div class="fps-row">
+                  <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
+                  <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
+                  <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
+                  <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
+                </div>
+              </div>
             </div>
-            <div id="probA-tipo-feedback" class="pts-feedback" style="display:none;"></div>
-          </div>
 
-          <div class="pts-step2-label">2. La tabla se actualiza según tu selección. Completa las celdas vacías:</div>
+          </div><!-- /prob-top-row -->
+
+          <!-- Tabla -->
+          <div class="pts-step2-label">La tabla se actualiza según tu selección. Completa las celdas vacías:</div>
           <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
 
           <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
 
+          <!-- Fila inferior: verificar + nav -->
           <div class="prob-bottom-row">
             <button class="btn-verificar" onclick="verificarProblemaA()">🔍 Verificar escogencia y valores</button>
-            <div class="prob-formulas-strip">
-              <div class="fps-title">Fórmulas clave</div>
-              <div class="fps-row">
-                <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
-                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
-                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
-                <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
-              </div>
+            <div class="prob-nav" style="margin-left:auto;">
+              <button class="btn-prob-nav" onclick="cambiarProbA(-1)">← Anterior</button>
+              <span id="probA-counter" class="prob-counter">1 / 3</span>
+              <button class="btn-prob-nav" onclick="cambiarProbA(1)">Siguiente →</button>
             </div>
           </div>
 
-          <div class="prob-nav">
-            <button class="btn-prob-nav" onclick="cambiarProbA(-1)">← Anterior</button>
-            <span id="probA-counter" class="prob-counter">1 / 3</span>
-            <button class="btn-prob-nav" onclick="cambiarProbA(1)">Siguiente →</button>
-          </div>
-
-          </div><!-- /prob-col izquierda -->
-
-          <!-- Columna derecha: gráfico dinámico -->
-          <div class="prob-col">
-            <div class="ej-chart-box" style="flex:1; display:flex; flex-direction:column;">
-              <div style="font-size:.78rem; font-family:'Inter',sans-serif; color:var(--slate); margin-bottom:6px; font-weight:600;">
-                📊 Gráfico — se actualiza al cambiar el sistema de representación
-              </div>
-              <canvas id="grafico-probA" style="flex:1; max-height:320px;"></canvas>
-            </div>
-            <div class="ej-explain-box" style="margin-top:0;">
-              <p style="font-size:.8rem; color:var(--slate); line-height:1.5; margin:0;">
-                💡 <strong>Transnumeración:</strong> Al presionar cada botón, la tabla y este gráfico cambian simultáneamente. Observa cómo la misma información se ve diferente según el sistema de representación elegido.
-              </p>
-            </div>
-          </div><!-- /prob-col derecha -->
-
-        </div><!-- /prob-two-col -->
+        </div><!-- /prob-layout-full -->
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(6)">← Ejemplos</button>
@@ -683,6 +669,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- ══════════ PÁGINA 8: FASE DE VALIDACIÓN (sin tutor) ══════════ -->
     <div class="page" id="page-8">
@@ -696,75 +683,60 @@
           <span class="page-num">08</span>
         </div>
 
-        <div class="prob-two-col" style="flex:1;">
+        <div class="prob-layout-full">
 
-          <!-- Columna izquierda -->
-          <div class="prob-col">
+          <!-- Fila superior: enunciado + selector lado a lado -->
+          <div class="prob-top-row">
 
-          <div class="prob-enunciado">
-            <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
-            <p class="prob-enunciado-text" id="probB-enunciado"></p>
-            <div class="prob-contexto-frases" id="probB-frases"></div>
-            <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
-              <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
-              <p id="probB-pregunta" class="prob-pregunta-text"></p>
+            <div class="prob-enunciado prob-enunciado-half">
+              <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
+              <p class="prob-enunciado-text" id="probB-enunciado"></p>
+              <div class="prob-contexto-frases" id="probB-frases"></div>
+              <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
+                <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
+                <p id="probB-pregunta" class="prob-pregunta-text"></p>
+              </div>
             </div>
-          </div>
 
-          <!-- Selector de tipo -->
-          <div class="prob-tipo-selector">
-            <div class="pts-label">1. Escoge el sistema de representación adecuado:</div>
-            <div class="pts-options">
-              <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoB('absoluta')">Frecuencias absolutas</button>
-              <button class="pts-btn" data-tipo="total"    onclick="escogerTipoB('total')">% sobre el total</button>
-              <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoB('fila')">% por fila</button>
-              <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoB('columna')">% por columna</button>
+            <div class="prob-tipo-selector prob-selector-half">
+              <div class="pts-label">Escoge el sistema de representación adecuado:</div>
+              <div class="pts-options">
+                <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoB('absoluta')">Frecuencias absolutas</button>
+                <button class="pts-btn" data-tipo="total"    onclick="escogerTipoB('total')">% sobre el total</button>
+                <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoB('fila')">% por fila</button>
+                <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoB('columna')">% por columna</button>
+              </div>
+              <div id="probB-tipo-feedback" class="pts-feedback" style="display:none;"></div>
+              <div class="prob-formulas-strip" style="margin-top:10px;">
+                <div class="fps-title">Fórmulas clave</div>
+                <div class="fps-row">
+                  <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
+                  <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
+                  <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
+                  <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
+                </div>
+              </div>
             </div>
-            <div id="probB-tipo-feedback" class="pts-feedback" style="display:none;"></div>
-          </div>
 
-          <div class="pts-step2-label">2. Construye la tabla completa (todas las celdas vacías):</div>
+          </div><!-- /prob-top-row -->
+
+          <!-- Tabla -->
+          <div class="pts-step2-label">Construye la tabla completa (todas las celdas vacías):</div>
           <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
 
           <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
 
+          <!-- Fila inferior: verificar + nav -->
           <div class="prob-bottom-row">
             <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">✅ Verificar construcción completa</button>
-            <div class="prob-formulas-strip">
-              <div class="fps-title">Fórmulas clave</div>
-              <div class="fps-row">
-                <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
-                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
-                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
-                <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
-              </div>
+            <div class="prob-nav" style="margin-left:auto;">
+              <button class="btn-prob-nav" onclick="cambiarProbB(-1)">← Anterior</button>
+              <span id="probB-counter" class="prob-counter">1 / 3</span>
+              <button class="btn-prob-nav" onclick="cambiarProbB(1)">Siguiente →</button>
             </div>
           </div>
 
-          <div class="prob-nav">
-            <button class="btn-prob-nav" onclick="cambiarProbB(-1)">← Anterior</button>
-            <span id="probB-counter" class="prob-counter">1 / 3</span>
-            <button class="btn-prob-nav" onclick="cambiarProbB(1)">Siguiente →</button>
-          </div>
-
-          </div><!-- /prob-col izquierda -->
-
-          <!-- Columna derecha: gráfico dinámico de la solución -->
-          <div class="prob-col">
-            <div class="ej-chart-box" style="flex:1; display:flex; flex-direction:column;">
-              <div style="font-size:.78rem; font-family:'Inter',sans-serif; color:var(--slate); margin-bottom:6px; font-weight:600;">
-                📊 Gráfico — refleja los datos de la solución según tu representación
-              </div>
-              <canvas id="grafico-probB" style="flex:1; max-height:320px;"></canvas>
-            </div>
-            <div class="ej-explain-box" style="margin-top:0;">
-              <p style="font-size:.8rem; color:var(--slate); line-height:1.5; margin:0;">
-                💡 <strong>Pista visual:</strong> El gráfico muestra la solución correcta. Úsalo para entender la <em>forma</em> de la distribución antes de completar tu tabla.
-              </p>
-            </div>
-          </div><!-- /prob-col derecha -->
-
-        </div><!-- /prob-two-col -->
+        </div><!-- /prob-layout-full -->
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(7)">← Formulación</button>
@@ -772,6 +744,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- ══════════ PÁGINA 9: ABREBOCAS CHI-CUADRADO ══════════
          El estudiante distribuye libremente los datos y la IA
