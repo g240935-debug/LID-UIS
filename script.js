@@ -53,8 +53,12 @@ let datosGrafico = {
 };
 
 /* ════════════════════════════════
-   PAGINACIÓN
+   PAGINACIÓN — soporta IDs mixtos (número o string como '5b')
 ════════════════════════════════ */
+
+// Orden lógico de páginas para determinar dirección de animación
+const ORDEN_PAGINAS = [0,1,2,3,4,5,'5b',6,7,8,9,10,11,12,13,14];
+
 function irAPagina(n) {
   if (n === paginaActual) return;
 
@@ -62,7 +66,9 @@ function irAPagina(n) {
   const pNueva = document.getElementById(`page-${n}`);
   if (!pVieja || !pNueva) return;
 
-  const avanza = n > paginaActual;
+  const idxVieja = ORDEN_PAGINAS.indexOf(paginaActual);
+  const idxNueva = ORDEN_PAGINAS.indexOf(n);
+  const avanza   = idxNueva > idxVieja;
 
   pNueva.style.transform = avanza ? 'translateX(48px)' : 'translateX(-48px)';
   pNueva.style.opacity   = '0';
@@ -97,16 +103,21 @@ function irAPagina(n) {
     setTimeout(inicializarChatFreqA, 400);
   }
 
-  // Cap I — Fase B (Curcio N3/N4)
+  // Cap I — Fase B (Curcio N3/N4) — también inicializar tabla dinámica
   if (n === 3 && !chatFreqBIniciado) {
     chatFreqBIniciado = true;
-    setTimeout(inicializarChatFreqB, 400);
+    setTimeout(() => { renderizarP3Tabla(); inicializarChatFreqB(); }, 400);
   }
 
   // Cap I — Fase C+D (frec. acumuladas)
   if (n === 4 && !chatFreqCIniciado) {
     chatFreqCIniciado = true;
     setTimeout(inicializarChatFreqC, 400);
+  }
+
+  // Cap I — Ejemplos Dinámicos (pág 5b)
+  if (n === '5b') {
+    setTimeout(inicializarEjemplosDinamicos, 300);
   }
 
   // Cap II — Tablas de contingencia
@@ -129,9 +140,9 @@ function irAPagina(n) {
 }
 
 function actualizarIndicadores() {
-  document.querySelectorAll('.pi-dot').forEach((d, i) =>
-    d.classList.toggle('active', i === paginaActual)
-  );
+  const dots = document.querySelectorAll('.pi-dot');
+  const idx  = ORDEN_PAGINAS.indexOf(paginaActual);
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
 }
 
 /* ════════════════════════════════
@@ -383,6 +394,7 @@ async function enviarMensajeFreqA() {
 
 // ── Fase B: Curcio N3/N4 (pág 3) ──
 async function inicializarChatFreqB() {
+  renderizarP3Tabla(); // inicializar tabla con solo fᵢ
   setStatusFreq('tutor-status-freq-b', 'Conectando…');
   try {
     const res  = await fetch(URL_BACKEND, {
@@ -394,6 +406,7 @@ async function inicializarChatFreqB() {
     if (data.reply) {
       agregarMensajeGen('chat-freq-b', data.reply, 'tutor');
       actualizarFaseFreqB(data.reply);
+      detectarInstitucionalizacionP3(data.reply);
     }
     setStatusFreq('tutor-status-freq-b', 'En línea');
   } catch (err) {
@@ -421,6 +434,7 @@ async function enviarMensajeFreqB() {
     if (data.reply) {
       agregarMensajeGen('chat-freq-b', data.reply, 'tutor');
       actualizarFaseFreqB(data.reply);
+      detectarInstitucionalizacionP3(data.reply); // ← tabla dinámica
     }
   } catch (err) {
     quitarTypingGen(tid);
@@ -428,6 +442,8 @@ async function enviarMensajeFreqB() {
     agregarMensajeGen('chat-freq-b', 'Problema de conexión. Intenta de nuevo.', 'tutor');
   }
 }
+
+
 
 // ── Fase C: frec. absoluta acumulada (pág 4) ──
 async function inicializarChatFreqC() {
@@ -701,7 +717,13 @@ async function cargarHistorial(idSesion, contenedorId) {
       const ultimo = data.history[data.history.length - 1].content;
       if (contenedorId === 'chat-box')  actualizarFaseCap2(ultimo);
       if (contenedorId === 'chat-freq-a') actualizarFaseFreqA(ultimo);
-      if (contenedorId === 'chat-freq-b') actualizarFaseFreqB(ultimo);
+      if (contenedorId === 'chat-freq-b') {
+        actualizarFaseFreqB(ultimo);
+        // Replay all messages for p3 column detection
+        data.history.forEach(m => {
+          if (m.role === 'assistant') detectarInstitucionalizacionP3(m.content);
+        });
+      }
       if (contenedorId === 'chat-freq-c') { actualizarFaseFreqC(ultimo); actualizarFaseFreqD(ultimo); }
     }
   } catch (err) { console.error(`Error al recuperar historial ${idSesion}:`, err); }
@@ -1312,6 +1334,377 @@ async function enviarMensajeChi() {
   } catch(e) { quitarTypingGen(tid); setStatusGen('tutor-status-chi', 'En línea'); }
 }
 
+/* ════════════════════════════════════════════════
+   PÁGINA 3 — TABLA DINÁMICA (columnas progresivas)
+   Columnas aparecen al detectar institucionalización en la IA
+════════════════════════════════════════════════ */
+
+const P3_DATA = [
+  { bebida: 'Café Negro',          fi: 18, hi: 0.45, Fi: 18, Hi: 0.45 },
+  { bebida: 'Té / Aromática',      fi: 10, hi: 0.25, Fi: 28, Hi: 0.70 },
+  { bebida: 'Jugo Natural',        fi:  8, hi: 0.20, Fi: 36, Hi: 0.90 },
+  { bebida: 'Bebida Energizante',  fi:  4, hi: 0.10, Fi: 40, Hi: 1.00 },
+];
+
+// Estado de columnas visibles en página 3
+let p3Columnas = { fi: true, hi: false, Fi: false, Hi: false };
+
+function renderizarP3Tabla() {
+  const inner = document.getElementById('p3-tabla-inner');
+  if (!inner) return;
+  const { fi, hi, Fi, Hi } = p3Columnas;
+
+  let html = '<table><thead><tr><th>Bebida</th>';
+  if (fi) html += '<th>fᵢ</th>';
+  if (hi) html += '<th class="col-nueva col-hi">hᵢ = fᵢ/N</th>';
+  if (Fi) html += '<th class="col-nueva col-Fi">Fᵢ (acum.)</th>';
+  if (Hi) html += '<th class="col-nueva col-Hi">Hᵢ (acum.)</th>';
+  html += '</tr></thead><tbody>';
+
+  P3_DATA.forEach(row => {
+    html += `<tr><td>${row.bebida}</td>`;
+    if (fi) html += `<td>${row.fi}</td>`;
+    if (hi) html += `<td class="col-hi">${row.hi.toFixed(2)}</td>`;
+    if (Fi) html += `<td class="col-Fi">${row.Fi}</td>`;
+    if (Hi) html += `<td class="col-Hi">${row.Hi.toFixed(2)}</td>`;
+    html += '</tr>';
+  });
+
+  // Fila total
+  html += '<tr class="freq-total-row"><td><strong>Total</strong></td>';
+  if (fi) html += '<td><strong>40</strong></td>';
+  if (hi) html += '<td class="col-hi"><strong>1.00</strong></td>';
+  if (Fi) html += '<td class="col-Fi"><strong>40</strong></td>';
+  if (Hi) html += '<td class="col-Hi"><strong>1.00</strong></td>';
+  html += '</tr></tbody></table>';
+
+  inner.innerHTML = html;
+
+  // Actualizar badges de progreso
+  _p3ActualizarBadges();
+}
+
+function _p3ActualizarBadges() {
+  const badgeHi = document.getElementById('p3-badge-hi');
+  const badgeFi = document.getElementById('p3-badge-Fi');
+  const badgeHi2= document.getElementById('p3-badge-Hi');
+  if (badgeHi)  badgeHi.classList.toggle('active',  p3Columnas.hi);
+  if (badgeFi)  badgeFi.classList.toggle('active',  p3Columnas.Fi);
+  if (badgeHi2) badgeHi2.classList.toggle('active', p3Columnas.Hi);
+
+  // Actualizar etiqueta
+  const label = document.getElementById('p3-tabla-label');
+  if (!label) return;
+  const cols = [];
+  if (p3Columnas.fi) cols.push('fᵢ');
+  if (p3Columnas.hi) cols.push('hᵢ');
+  if (p3Columnas.Fi) cols.push('Fᵢ');
+  if (p3Columnas.Hi) cols.push('Hᵢ');
+  label.textContent = `Tabla con: ${cols.join(', ')} — Bebidas para estudiar (N = 40)`;
+}
+
+// Detectar institucionalización en respuestas del tutor de página 3
+function detectarInstitucionalizacionP3(texto) {
+  // hᵢ: frecuencia relativa institucionalizada
+  if (!p3Columnas.hi && (
+    texto.includes('frecuencia relativa') ||
+    texto.includes('hᵢ') || texto.includes('h_i') ||
+    texto.includes('dividir entre N') || texto.includes('dividir entre el total')
+  )) {
+    p3Columnas.hi = true;
+    setTimeout(renderizarP3Tabla, 300);
+    _p3MostrarNotificacion('hᵢ — Frecuencia Relativa');
+  }
+  // Fᵢ: absoluta acumulada
+  if (!p3Columnas.Fi && (
+    texto.includes('absoluta acumulada') || texto.includes('Fᵢ') || texto.includes('F_i') ||
+    texto.includes('acumulando') || texto.includes('suma progresiva')
+  )) {
+    p3Columnas.Fi = true;
+    setTimeout(renderizarP3Tabla, 600);
+    _p3MostrarNotificacion('Fᵢ — Frecuencia Absoluta Acumulada');
+  }
+  // Hᵢ: relativa acumulada
+  if (!p3Columnas.Hi && (
+    texto.includes('relativa acumulada') || texto.includes('Hᵢ') || texto.includes('H_i') ||
+    texto.includes('proporción acumulada') || texto.includes('fracción acumulada')
+  )) {
+    p3Columnas.Hi = true;
+    setTimeout(renderizarP3Tabla, 900);
+    _p3MostrarNotificacion('Hᵢ — Frecuencia Relativa Acumulada');
+  }
+}
+
+function _p3MostrarNotificacion(nombre) {
+  const wrapper = document.getElementById('p3-tabla-wrapper');
+  if (!wrapper) return;
+  const notif = document.createElement('div');
+  notif.style.cssText = 'background:var(--moss);color:white;font-size:.75rem;padding:5px 12px;border-radius:3px;margin-bottom:6px;animation:colEntra .4s ease;font-family:Inter,sans-serif;';
+  notif.textContent = `✨ Nueva columna añadida: ${nombre}`;
+  wrapper.insertBefore(notif, wrapper.firstChild);
+  setTimeout(() => notif.remove(), 3500);
+}
+
+/* ════════════════════════════════════════════════
+   PÁGINA 5b — EJEMPLOS DINÁMICOS TABLAS DE FRECUENCIA
+════════════════════════════════════════════════ */
+
+const EJF_DATA = [
+  { bebida: 'Café Negro',         fi: 18, hi: 0.45, Fi: 18, Hi: 0.45 },
+  { bebida: 'Té / Aromática',     fi: 10, hi: 0.25, Fi: 28, Hi: 0.70 },
+  { bebida: 'Jugo Natural',       fi:  8, hi: 0.20, Fi: 36, Hi: 0.90 },
+  { bebida: 'Bebida Energizante', fi:  4, hi: 0.10, Fi: 40, Hi: 1.00 },
+];
+
+let ejfModoActual    = 'completa';   // 'completa' | 'personalizada'
+let ejfVistaActual   = 'tabla';      // 'tabla' | 'grafico'
+let ejfGraficoActual = 'barras';     // 'barras' | 'pie' | 'acum'
+let ejfChart         = null;
+
+function inicializarEjemplosDinamicos() {
+  // Inicializar checkboxes de categorías
+  const catBox = document.getElementById('ejf-cat-checks');
+  if (catBox && !catBox.dataset.init) {
+    catBox.dataset.init = '1';
+    catBox.innerHTML = EJF_DATA.map((r, i) =>
+      `<label class="ejf-check"><input type="checkbox" class="ejf-cat-chk" data-idx="${i}" checked onchange="ejfActualizarVista()"><span>${r.bebida}</span></label>`
+    ).join('');
+  }
+  ejfActualizarVista();
+}
+
+function ejfCambiarModo(modo) {
+  ejfModoActual = modo;
+  document.getElementById('ejf-btn-completa').classList.toggle('active', modo === 'completa');
+  document.getElementById('ejf-btn-personalizada').classList.toggle('active', modo === 'personalizada');
+  const panel = document.getElementById('ejf-custom-panel');
+  if (panel) panel.style.display = modo === 'personalizada' ? 'block' : 'none';
+  ejfActualizarVista();
+}
+
+function ejfCambiarVista(vista) {
+  ejfVistaActual = vista;
+  document.getElementById('ejf-vbtn-tabla').classList.toggle('active', vista === 'tabla');
+  document.getElementById('ejf-vbtn-grafico').classList.toggle('active', vista === 'grafico');
+  const tablaArea   = document.getElementById('ejf-tabla-area');
+  const graficoArea = document.getElementById('ejf-grafico-area');
+  if (tablaArea)   tablaArea.style.display   = vista === 'tabla'   ? 'block' : 'none';
+  if (graficoArea) graficoArea.style.display = vista === 'grafico' ? 'block' : 'none';
+  if (vista === 'grafico') ejfRenderizarGrafico();
+}
+
+function ejfCambiarGrafico(tipo) {
+  ejfGraficoActual = tipo;
+  ['barras','pie','acum'].forEach(t => {
+    document.getElementById(`ejf-gtab-${t}`)?.classList.toggle('active', t === tipo);
+  });
+  ejfRenderizarGrafico();
+}
+
+function _ejfGetColumnas() {
+  if (ejfModoActual === 'completa') return { fi: true, hi: true, Fi: true, Hi: true };
+  return {
+    fi: document.getElementById('ejf-chk-fi')?.checked ?? true,
+    hi: document.getElementById('ejf-chk-hi')?.checked ?? false,
+    Fi: document.getElementById('ejf-chk-Fi')?.checked ?? false,
+    Hi: document.getElementById('ejf-chk-Hi')?.checked ?? false,
+  };
+}
+
+function _ejfGetFilas() {
+  if (ejfModoActual === 'completa') return EJF_DATA;
+  const chks = document.querySelectorAll('.ejf-cat-chk');
+  return EJF_DATA.filter((_, i) => {
+    const chk = document.querySelector(`.ejf-cat-chk[data-idx="${i}"]`);
+    return chk ? chk.checked : true;
+  });
+}
+
+function ejfActualizarVista() {
+  if (ejfVistaActual === 'tabla') ejfRenderizarTabla();
+  else ejfRenderizarGrafico();
+}
+
+function ejfRenderizarTabla() {
+  const cols = _ejfGetColumnas();
+  const filas = _ejfGetFilas();
+  const wrapper = document.getElementById('ejf-tabla-wrapper');
+  const titleEl = document.getElementById('ejf-tabla-title');
+  if (!wrapper) return;
+
+  // Titulo
+  const colNames = [];
+  if (cols.fi) colNames.push('fᵢ');
+  if (cols.hi) colNames.push('hᵢ');
+  if (cols.Fi) colNames.push('Fᵢ');
+  if (cols.Hi) colNames.push('Hᵢ');
+  if (titleEl) titleEl.textContent = ejfModoActual === 'completa'
+    ? 'Tabla de frecuencias completa — Bebidas para estudiar (N = 40)'
+    : `Vista personalizada: ${colNames.join(', ')} — ${filas.length} categoría(s)`;
+
+  let html = '<table><thead><tr><th>Bebida</th>';
+  if (cols.fi) html += '<th>fᵢ</th>';
+  if (cols.hi) html += '<th class="ejf-th-hi">hᵢ</th>';
+  if (cols.Fi) html += '<th class="ejf-th-Fi">Fᵢ</th>';
+  if (cols.Hi) html += '<th class="ejf-th-Hi">Hᵢ</th>';
+  html += '</tr></thead><tbody>';
+
+  filas.forEach(row => {
+    html += `<tr><td>${row.bebida}</td>`;
+    if (cols.fi) html += `<td>${row.fi}</td>`;
+    if (cols.hi) html += `<td class="ejf-td-hi">${row.hi.toFixed(2)}</td>`;
+    if (cols.Fi) html += `<td class="ejf-td-Fi">${row.Fi}</td>`;
+    if (cols.Hi) html += `<td class="ejf-td-Hi">${row.Hi.toFixed(2)}</td>`;
+    html += '</tr>';
+  });
+
+  // Totales
+  const totFi = filas.reduce((s, r) => s + r.fi, 0);
+  const totHi = filas.reduce((s, r) => s + r.hi, 0);
+  html += '<tr class="ejf-total-row"><td><strong>Total</strong></td>';
+  if (cols.fi) html += `<td><strong>${totFi}</strong></td>`;
+  if (cols.hi) html += `<td class="ejf-td-hi"><strong>${totHi.toFixed(2)}</strong></td>`;
+  if (cols.Fi) html += `<td class="ejf-td-Fi"><strong>${filas[filas.length-1]?.Fi ?? '—'}</strong></td>`;
+  if (cols.Hi) html += `<td class="ejf-td-Hi"><strong>${filas[filas.length-1]?.Hi?.toFixed(2) ?? '—'}</strong></td>`;
+  html += '</tr></tbody></table>';
+
+  wrapper.style.opacity = '0';
+  setTimeout(() => {
+    wrapper.innerHTML  = html;
+    wrapper.style.opacity = '1';
+    wrapper.style.transition = 'opacity .2s ease';
+  }, 100);
+
+  // Info bar
+  const info = document.getElementById('ejf-info-text');
+  if (info) {
+    if (ejfModoActual === 'completa') {
+      info.textContent = 'Tabla completa con las 4 frecuencias. Cambia a "Vista personalizada" para explorar columnas por separado.';
+    } else if (colNames.length === 0) {
+      info.textContent = '⚠️ Selecciona al menos una columna para mostrar.';
+    } else {
+      const mensajes = {
+        fi: 'fᵢ: conteo directo de observaciones en cada categoría.',
+        hi: 'hᵢ = fᵢ/N: proporción de cada categoría respecto al total.',
+        Fi: 'Fᵢ: suma acumulada de frecuencias absolutas.',
+        Hi: 'Hᵢ = Fᵢ/N: proporción acumulada hasta la categoría i.',
+      };
+      info.textContent = Object.entries(mensajes).filter(([k]) => cols[k]).map(([,v]) => v).join('  |  ');
+    }
+  }
+}
+
+function ejfRenderizarGrafico() {
+  const ctx = document.getElementById('ejf-canvas')?.getContext('2d');
+  if (!ctx) return;
+  if (ejfChart) { ejfChart.destroy(); ejfChart = null; }
+
+  const filas = _ejfGetFilas();
+  const labels = filas.map(r => r.bebida);
+  const tipo = ejfGraficoActual;
+
+  const COLORES = ['rgba(26,58,90,.85)','rgba(46,107,79,.85)','rgba(200,168,75,.85)','rgba(91,141,184,.85)'];
+
+  let config;
+  if (tipo === 'barras') {
+    config = {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Frecuencia absoluta (fᵢ)',
+          data: filas.map(r => r.fi),
+          backgroundColor: filas.map((_,i) => COLORES[i % COLORES.length]),
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Frecuencia Absoluta por Bebida', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+        },
+        animation: { duration: 500, easing: 'easeOutQuart' }
+      }
+    };
+  } else if (tipo === 'pie') {
+    config = {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          label: 'hᵢ',
+          data: filas.map(r => r.hi),
+          backgroundColor: filas.map((_,i) => COLORES[i % COLORES.length]),
+          borderWidth: 2, borderColor: '#fff',
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12 } },
+          title: { display: true, text: 'Frecuencia Relativa (hᵢ) — Pastel', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+        },
+        animation: { duration: 500 }
+      }
+    };
+  } else {
+    // Acumulada (línea)
+    config = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Fᵢ (abs. acumulada)',
+            data: filas.map(r => r.Fi),
+            borderColor: 'rgba(26,58,90,1)',
+            backgroundColor: 'rgba(26,58,90,.08)',
+            fill: true, tension: .3, pointRadius: 5,
+          },
+          {
+            label: 'Hᵢ×40 (rel. acumulada ×N)',
+            data: filas.map(r => +(r.Hi * 40).toFixed(1)),
+            borderColor: 'rgba(200,168,75,1)',
+            backgroundColor: 'rgba(200,168,75,.08)',
+            fill: false, tension: .3, pointRadius: 5,
+            borderDash: [5, 3],
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12 } },
+          title: { display: true, text: 'Frecuencias Acumuladas', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
+          x: { ticks: { font: { family: 'Inter', size: 10 } } }
+        },
+        animation: { duration: 500 }
+      }
+    };
+  }
+
+  ejfChart = new Chart(ctx, config);
+
+  // Info bar
+  const info = document.getElementById('ejf-info-text');
+  if (info) {
+    const msgs = {
+      barras: 'Diagrama de barras: visualiza las frecuencias absolutas (fᵢ) de cada categoría.',
+      pie:    'Gráfico de pastel (doughnut): muestra la proporción relativa (hᵢ) de cada categoría.',
+      acum:   'Gráfico de frecuencias acumuladas: Fᵢ crece de 0 a N=40; Hᵢ×40 superpone la misma curva normalizada.',
+    };
+    info.textContent = msgs[tipo];
+  }
+}
+
 /* ════════════════════════════════
    INIT — DOMContentLoaded
 ════════════════════════════════ */
@@ -1320,6 +1713,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const repDot = document.getElementById('rep-dot');
   if (repDot) repDot.className = 'rep-dot is-tabla';
+
+  // Inicializar tabla dinámica página 3
+  renderizarP3Tabla();
 
   // Recuperar historiales de sesiones previas
   cargarHistorial(sessionId,             'chat-box');
