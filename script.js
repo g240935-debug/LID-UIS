@@ -16,8 +16,6 @@ let graficoActual  = null;
 let vistaActual    = 'tabla';   // 'tabla' | 'grafico'
 let paginaActual   = 0;
 let chatIniciado   = false;
-// para que funcione la IA
-let chiIniciado    = false; // Para la página 9
 
 // Datos por defecto (se sobreescriben con la respuesta del backend)
 let datosGrafico = {
@@ -827,7 +825,7 @@ let probAActual  = 0;
 let tipoEscogidoA = null;  // tipo que el estudiante seleccionó
 let probAIniciado = false;
 
-/* ── Escogencia del tipo en pág 7 — actualiza tabla inmediatamente ── */
+/* ── Escogencia del tipo en pág 7 — actualiza tabla Y gráfico inmediatamente ── */
 function escogerTipoA(tipo) {
   tipoEscogidoA = tipo;
   document.querySelectorAll('#page-7 .pts-btn').forEach(b => {
@@ -836,7 +834,8 @@ function escogerTipoA(tipo) {
   });
   const fb = document.getElementById('probA-tipo-feedback');
   if (fb) fb.style.display = 'none';
-  _renderizarTablaA(); // solo re-renderiza la tabla, no toca el enunciado
+  _renderizarTablaA();
+  renderizarGraficoA(tipo);
 }
 
 function renderizarProbA() {
@@ -963,6 +962,7 @@ function cambiarProbA(dir) {
   probAActual = nuevo;
   tipoEscogidoA = null;
   renderizarProbA();
+  renderizarGraficoA('absoluta');
 }
 
 /* ════════════════════════════════════════════════
@@ -1031,8 +1031,8 @@ function escogerTipoB(tipo) {
   });
   const fb = document.getElementById('probB-tipo-feedback');
   if (fb) fb.style.display = 'none';
-  // Actualizar tabla inmediatamente — misma lógica que probA
   _renderizarTablaB();
+  renderizarGraficoB(tipo);
 }
 
 function renderizarProbB() {
@@ -1147,10 +1147,104 @@ function cambiarProbB(dir) {
   probBActual = nuevo;
   tipoEscogidoB = null;
   renderizarProbB();
+  renderizarGraficoB('absoluta');
 }
 
 /* ════════════════════════════════════════════════
-   PÁG 9 — ABREBOCAS CHI-CUADRADO
+   PÁG 7 — GRÁFICO DINÁMICO (columna derecha)
+   Refleja la misma tabla del problema activo según el tipo seleccionado.
+════════════════════════════════════════════════ */
+let graficoA = null;
+
+function renderizarGraficoA(tipo) {
+  const ctx = document.getElementById('grafico-probA')?.getContext('2d');
+  if (!ctx) return;
+  if (graficoA) graficoA.destroy();
+
+  const p = PROBLEMAS_A[probAActual];
+  const { filas, columnas, matriz, N } = p;
+  const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
+  const totalesFila = matriz.map(r => r.reduce((s, v) => s + v, 0));
+
+  const colores = ['rgba(26,58,90,.82)', 'rgba(46,107,79,.82)', 'rgba(200,168,75,.82)'];
+  const datasets = filas.map((fila, i) => ({
+    label: fila,
+    data: matriz[i].map((val, j) => {
+      const v = calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N);
+      return parseFloat(String(v).replace('%',''));
+    }),
+    backgroundColor: colores[i % colores.length],
+    borderRadius: 3
+  }));
+
+  const titulos = { absoluta: 'Frecuencias absolutas', total: '% sobre el total', fila: '% por fila', columna: '% por columna' };
+
+  graficoA = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: columnas, datasets },
+    options: {
+      responsive: true,
+      animation: { duration: 450, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 10 } },
+        title: { display: true, text: titulos[tipo] || tipo, font: { family: 'Playfair Display', size: 11 }, color: '#1A3A5A' }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 9 } }, grid: { color: 'rgba(0,0,0,.05)' } },
+        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════
+   PÁG 8 — GRÁFICO DINÁMICO (columna derecha)
+   Usa la solución del problema activo (datos completos).
+════════════════════════════════════════════════ */
+let graficoB = null;
+
+function renderizarGraficoB(tipo) {
+  const ctx = document.getElementById('grafico-probB')?.getContext('2d');
+  if (!ctx) return;
+  if (graficoB) graficoB.destroy();
+
+  const p = PROBLEMAS_B[probBActual];
+  const { filas, columnas, solucion, N } = p;
+  const totalesCol  = columnas.map((_, j) => solucion.reduce((s, r) => s + r[j], 0));
+  const totalesFila = solucion.map(r => r.reduce((s, v) => s + v, 0));
+
+  const colores = ['rgba(26,58,90,.82)', 'rgba(46,107,79,.82)', 'rgba(200,168,75,.82)'];
+  const datasets = filas.map((fila, i) => ({
+    label: fila,
+    data: solucion[i].map((val, j) => {
+      const v = calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N);
+      return parseFloat(String(v).replace('%',''));
+    }),
+    backgroundColor: colores[i % colores.length],
+    borderRadius: 3
+  }));
+
+  const titulos = { absoluta: 'Frecuencias absolutas', total: '% sobre el total', fila: '% por fila', columna: '% por columna' };
+
+  graficoB = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: columnas, datasets },
+    options: {
+      responsive: true,
+      animation: { duration: 450, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 10 } },
+        title: { display: true, text: titulos[tipo] || tipo, font: { family: 'Playfair Display', size: 11 }, color: '#1A3A5A' }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 9 } }, grid: { color: 'rgba(0,0,0,.05)' } },
+        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════
    El estudiante distribuye libremente datos en una
    tabla y la IA lo lleva a sentir la necesidad de
    una prueba formal — sin introducirla aún.
@@ -1378,13 +1472,19 @@ async function enviarMensajeChi() {
   }
 }
 
+/* Limpia texto plano del tutor para renderizar cursivas y saltos */
+function limpiarFormulas(texto) {
+  // Simplemente devuelve el texto — el formateo se hace en el innerHTML pipeline
+  return texto;
+}
+
 function agregarMensajeChi(texto, tipo) {
   const box = document.getElementById('chat-chi');
   if (!box) return;
   const div = document.createElement('div');
   div.className = tipo === 'user' ? 'msg-user' : 'msg-tutor';
-  const procesado = tipo === 'tutor' ? limpiarFormulas(texto) : texto;
-  div.innerHTML = procesado
+  // Escapar HTML PRIMERO, luego aplicar formato Markdown-lite
+  div.innerHTML = texto
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*(.*?)\*/g,'<em>$1</em>')
     .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
@@ -1423,6 +1523,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderizarEjTabla('absoluta');
   renderizarEjGrafico('absoluta');
   renderizarProbA();
+  renderizarGraficoA('absoluta');
   renderizarProbB();
+  renderizarGraficoB('absoluta');
   renderizarChi();
 });
