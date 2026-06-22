@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LID — Tablas de Contingencia · UIS</title>
+    <title>LID — Estadística · UIS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -15,46 +15,36 @@
 
   <!-- Lomo del libro -->
   <div class="book-spine">
-    <span class="spine-text">LID · Tablas de Contingencia · UIS · 2026</span>
+    <span class="spine-text">LID · Estadística Descriptiva · UIS · 2026</span>
   </div>
 
   <!-- Páginas -->
   <div class="book-pages" id="bookPages">
 
-    <!-- ══════════ PÁGINA 0: PORTADA ══════════ -->
+    <!-- ══════════ PÁGINA 0: PORTADA GENERAL ══════════ -->
     <div class="page active" id="page-0">
       <div class="cover-page">
-        <!-- Decoración de fondo: cuadrícula tipo tabla -->
         <div class="cover-grid-bg">
           <div class="cgb-row">
-            <div class="cgb-cell header-cell"></div>
-            <div class="cgb-cell header-cell"></div>
-            <div class="cgb-cell header-cell"></div>
-            <div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell header-cell"></div><div class="cgb-cell header-cell"></div>
+            <div class="cgb-cell header-cell"></div><div class="cgb-cell header-cell"></div>
           </div>
           <div class="cgb-row">
-            <div class="cgb-cell header-cell"></div>
-            <div class="cgb-cell data-cell lit"></div>
-            <div class="cgb-cell data-cell"></div>
-            <div class="cgb-cell data-cell marg-cell"></div>
+            <div class="cgb-cell header-cell"></div><div class="cgb-cell data-cell lit"></div>
+            <div class="cgb-cell data-cell"></div><div class="cgb-cell data-cell marg-cell"></div>
           </div>
           <div class="cgb-row">
-            <div class="cgb-cell header-cell"></div>
-            <div class="cgb-cell data-cell"></div>
-            <div class="cgb-cell data-cell lit accent"></div>
-            <div class="cgb-cell data-cell marg-cell"></div>
+            <div class="cgb-cell header-cell"></div><div class="cgb-cell data-cell"></div>
+            <div class="cgb-cell data-cell lit accent"></div><div class="cgb-cell data-cell marg-cell"></div>
           </div>
           <div class="cgb-row">
-            <div class="cgb-cell marg-cell"></div>
-            <div class="cgb-cell marg-cell"></div>
-            <div class="cgb-cell marg-cell"></div>
-            <div class="cgb-cell grand-cell"></div>
+            <div class="cgb-cell marg-cell"></div><div class="cgb-cell marg-cell"></div>
+            <div class="cgb-cell marg-cell"></div><div class="cgb-cell grand-cell"></div>
           </div>
         </div>
-
         <div class="cover-content">
-          <div class="cover-eyebrow">Libro Interactivo Digital · Capítulo II</div>
-          <h1 class="cover-title">Tablas de<br>Contingencia</h1>
+          <div class="cover-eyebrow">Libro Interactivo Digital · Estadística Descriptiva</div>
+          <h1 class="cover-title">Del Dato<br>a la Decisión</h1>
           <div class="cover-rule"></div>
           <p class="cover-authors">Andrés Felipe Gómez Acevedo &amp; Juan Camilo Rojas Velasco</p>
           <p class="cover-director">Dirección: Mg. Tulia Esther Rivera Florez</p>
@@ -65,81 +55,448 @@
             <span class="meta-sep">·</span>
             <span>2026</span>
           </div>
-          <button class="btn-start" onclick="irAPagina(1)">
-            Abrir capítulo <span class="btn-arrow">→</span>
-          </button>
+          <!-- Índice de capítulos -->
+          <div class="cover-chapters">
+            <div class="cover-ch-item" onclick="irAPagina(1)">
+              <span class="cover-ch-num">I</span>
+              <span class="cover-ch-title">Tablas de Frecuencia</span>
+              <span class="cover-ch-arrow">→</span>
+            </div>
+            <div class="cover-ch-item" onclick="irAPagina(6)">
+              <span class="cover-ch-num">II</span>
+              <span class="cover-ch-title">Tablas de Contingencia</span>
+              <span class="cover-ch-arrow">→</span>
+            </div>
+            <div class="cover-ch-item" onclick="irAPagina(14)">
+              <span class="cover-ch-num">III</span>
+              <span class="cover-ch-title">Chi-cuadrado · Próximamente</span>
+              <span class="cover-ch-arrow">→</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 1: PRESENTACIÓN DEL CAPÍTULO ══════════ -->
+    <!-- ══════════ PÁGINA 1: PRESENTACIÓN CAP I — TABLAS DE FRECUENCIA ══════════ -->
     <div class="page" id="page-1">
       <div class="page-inner">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Presentación</span>
+          <span class="chapter-tag">Capítulo I · Presentación</span>
           <span class="page-num">01</span>
         </div>
-
-        <h2 class="page-title">Tablas de Contingencia</h2>
-
+        <h2 class="page-title">Tablas de Frecuencia</h2>
         <div class="intro-layout">
           <div class="intro-main">
-            <p class="lead-text">Una <strong>tabla de contingencia</strong> organiza simultáneamente dos variables categóricas, permitiendo analizar cómo se relacionan entre sí. A diferencia de una tabla de frecuencias simple, aquí cada celda recoge información de <em>dos categorías a la vez</em>.</p>
-
-            <p class="body-text">En este capítulo explorarás la estructura de una tabla cruzada, sus elementos clave y distintas formas de representar la misma información. El recorrido está organizado en tres momentos:</p>
-
+            <p class="lead-text">Una <strong>tabla de frecuencias</strong> organiza los datos de una variable categórica mostrando cuántas veces aparece cada categoría y qué proporción del total representa. Es la primera herramienta para resumir y leer un conjunto de datos.</p>
+            <p class="body-text">En este capítulo construirás, paso a paso y con la guía del tutor virtual, los cuatro tipos de frecuencia fundamentales:</p>
             <div class="moment-list">
               <div class="moment-item">
                 <div class="moment-num">1</div>
-                <div class="moment-body">
-                  <strong>Exploración</strong> — Interactúas con una situación real y descubres los elementos de la tabla por ti mismo, con la guía del tutor virtual.
-                </div>
+                <div class="moment-body"><strong>Frecuencia Absoluta (fᵢ)</strong> — Conteo directo de cada categoría.</div>
               </div>
               <div class="moment-item">
                 <div class="moment-num">2</div>
-                <div class="moment-body">
-                  <strong>Transnumeración</strong> — Cambias la forma de representar los mismos datos (tabla ↔ diagrama de barras) para ver qué revela cada representación.
-                </div>
+                <div class="moment-body"><strong>Frecuencia Relativa (hᵢ)</strong> — Proporción de cada categoría respecto al total N.</div>
               </div>
               <div class="moment-item">
                 <div class="moment-num">3</div>
-                <div class="moment-body">
-                  <strong>Institucionalización</strong> — El tutor formaliza los conceptos que construiste durante la exploración.
+                <div class="moment-body"><strong>Frecuencia Absoluta Acumulada (Fᵢ)</strong> — Suma progresiva de las frecuencias absolutas.</div>
+              </div>
+              <div class="moment-item">
+                <div class="moment-num">4</div>
+                <div class="moment-body"><strong>Frecuencia Relativa Acumulada (Hᵢ)</strong> — Proporción acumulada desde la primera hasta la i-ésima categoría.</div>
+              </div>
+            </div>
+            <!-- Tabla estructural -->
+            <div class="struct-box">
+              <div class="struct-label">Estructura de una tabla de frecuencias completa</div>
+              <div class="struct-table">
+                <div class="st-row">
+                  <div class="st-cell corner">Categoría</div>
+                  <div class="st-cell col-hdr">fᵢ</div>
+                  <div class="st-cell col-hdr">hᵢ</div>
+                  <div class="st-cell col-hdr marg-hdr">Fᵢ</div>
+                  <div class="st-cell col-hdr marg-hdr">Hᵢ</div>
+                </div>
+                <div class="st-row">
+                  <div class="st-cell row-hdr">Categoría 1</div>
+                  <div class="st-cell joint">f₁</div>
+                  <div class="st-cell joint">h₁=f₁/N</div>
+                  <div class="st-cell marg">F₁=f₁</div>
+                  <div class="st-cell marg">H₁=h₁</div>
+                </div>
+                <div class="st-row">
+                  <div class="st-cell row-hdr">Categoría 2</div>
+                  <div class="st-cell joint">f₂</div>
+                  <div class="st-cell joint">h₂=f₂/N</div>
+                  <div class="st-cell marg">F₂=f₁+f₂</div>
+                  <div class="st-cell marg">H₂=h₁+h₂</div>
+                </div>
+                <div class="st-row">
+                  <div class="st-cell row-hdr marg-hdr">Total</div>
+                  <div class="st-cell grand">N</div>
+                  <div class="st-cell grand">1.00</div>
+                  <div class="st-cell grand">N</div>
+                  <div class="st-cell grand">1.00</div>
+                </div>
+              </div>
+              <div class="legend-row">
+                <span class="leg-item"><span class="leg-dot joint-dot"></span>fᵢ frecuencia absoluta</span>
+                <span class="leg-item"><span class="leg-dot marg-dot"></span>hᵢ frecuencia relativa</span>
+                <span class="leg-item"><span class="leg-dot grand-dot"></span>Fᵢ / Hᵢ acumuladas</span>
+              </div>
+            </div>
+          </div>
+          <div class="intro-aside">
+            <div class="obj-card">
+              <div class="obj-icon">🎯</div>
+              <div class="obj-title">Objetivo del capítulo</div>
+              <p class="obj-text">Construir e interpretar tablas de frecuencia a través de la exploración activa guiada por TSD (Brousseau) y los niveles de lectura de Curcio, a partir de datos reales de la UIS.</p>
+            </div>
+            <div class="note-card">
+              <div class="note-title">📌 Antes de continuar</div>
+              <p class="note-text">En las páginas siguientes el tutor virtual te guiará para que <strong>descubras</strong> cada concepto antes de que sea formalizado. Responde con tus propias palabras y explica tu razonamiento.</p>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(0)">← Portada</button>
+          <button class="btn-nav next" onclick="irAPagina(2)">Actividad: frec. absoluta y relativa →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 2: ACTIVIDAD IA — FREC. ABSOLUTA + RELATIVA ══════════ -->
+    <div class="page" id="page-2">
+      <div class="page-inner page-activity">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Actividad</span>
+          <span class="phase-indicator" id="freqPhaseIndicator">
+            <span class="phase-dot phase-a" id="freqPhaseDot"></span>
+            <span class="phase-label" id="freqPhaseLabel">Exploración</span>
+          </span>
+          <span class="page-num">02</span>
+        </div>
+        <div class="activity-layout">
+          <!-- Panel izquierdo -->
+          <div class="vis-panel">
+            <div class="situation-header">
+              <span class="sit-badge">Situación · Bucaramanga</span>
+              <h3 class="sit-title">Bebidas para estudiar</h3>
+              <p class="sit-desc">Se encuestaron <strong>40 jóvenes</strong> de la UIS sobre su bebida preferida para jornadas de estudio. Los resultados fueron:</p>
+            </div>
+            <div id="freq-tabla-inicial" class="freq-tabla-display">
+              <table>
+                <thead><tr><th>Bebida para estudiar</th><th>Cantidad (fᵢ)</th></tr></thead>
+                <tbody>
+                  <tr><td>Café Negro</td><td>18</td></tr>
+                  <tr><td>Té / Aromática</td><td>10</td></tr>
+                  <tr><td>Jugo Natural</td><td>8</td></tr>
+                  <tr><td>Bebida Energizante</td><td>4</td></tr>
+                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Tabla expandida (aparece cuando la IA la menciona) -->
+            <div id="freq-tabla-hi" class="freq-tabla-display" style="display:none;">
+              <div class="freq-tabla-label">Tabla con frecuencia relativa (hᵢ)</div>
+              <table>
+                <thead><tr><th>Bebida</th><th>fᵢ</th><th>hᵢ = fᵢ/N</th></tr></thead>
+                <tbody>
+                  <tr><td>Café Negro</td><td>18</td><td>0.45</td></tr>
+                  <tr><td>Té / Aromática</td><td>10</td><td>0.25</td></tr>
+                  <tr><td>Jugo Natural</td><td>8</td><td>0.20</td></tr>
+                  <tr><td>Bebida Energizante</td><td>4</td><td>0.10</td></tr>
+                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Panel derecho: tutor -->
+          <div class="tutor-panel">
+            <div class="tutor-header">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status">
+                  <span class="status-dot"></span>
+                  <span id="tutor-status-freq-a">Conectando…</span>
                 </div>
               </div>
             </div>
+            <div id="chat-freq-a" class="chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-freq-a" class="chat-input"
+                     placeholder="Escribe tu respuesta aquí…"
+                     onkeydown="if(event.key==='Enter') enviarMensajeFreqA()">
+              <button class="btn-send" onclick="enviarMensajeFreqA()">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(1)">← Presentación</button>
+          <button class="btn-nav next" id="btn-freq-a-next" onclick="irAPagina(3)" style="opacity:0.4;pointer-events:none;">Análisis de tendencias →</button>
+        </div>
+      </div>
+    </div>
 
-            <!-- Mini tabla estructural -->
+    <!-- ══════════ PÁGINA 3: ACTIVIDAD IA — CURCIO N3/N4 (tendencias) ══════════ -->
+    <div class="page" id="page-3">
+      <div class="page-inner page-activity">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Análisis</span>
+          <span class="phase-indicator">
+            <span class="phase-dot phase-c" id="freqPhaseDotB"></span>
+            <span class="phase-label" id="freqPhaseLabelB">Niveles de Curcio</span>
+          </span>
+          <span class="page-num">03</span>
+        </div>
+        <div class="activity-layout">
+          <div class="vis-panel">
+            <div class="situation-header">
+              <span class="sit-badge">Continuación · Curcio Niveles 3 y 4</span>
+              <h3 class="sit-title">¿Qué nos dicen los datos?</h3>
+              <p class="sit-desc">Ya conoces la frecuencia absoluta y relativa. Ahora el tutor te invitará a <strong>interpretar tendencias</strong> y a <strong>buscar causas</strong> detrás de los datos.</p>
+            </div>
+            <div class="freq-tabla-display">
+              <div class="freq-tabla-label">Tabla de referencia</div>
+              <table>
+                <thead><tr><th>Bebida</th><th>fᵢ</th><th>hᵢ</th></tr></thead>
+                <tbody>
+                  <tr><td>Café Negro</td><td>18</td><td>0.45</td></tr>
+                  <tr><td>Té / Aromática</td><td>10</td><td>0.25</td></tr>
+                  <tr><td>Jugo Natural</td><td>8</td><td>0.20</td></tr>
+                  <tr><td>Bebida Energizante</td><td>4</td><td>0.10</td></tr>
+                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="note-card" style="margin-top:12px;">
+              <div class="note-title">📌 Niveles de Curcio</div>
+              <p class="note-text"><strong>Nivel 3</strong>: leer más allá de los datos (tendencias, predicciones).<br><strong>Nivel 4</strong>: leer detrás de los datos (causas, explicaciones).</p>
+            </div>
+          </div>
+          <div class="tutor-panel">
+            <div class="tutor-header">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status">
+                  <span class="status-dot"></span>
+                  <span id="tutor-status-freq-b">Esperando…</span>
+                </div>
+              </div>
+            </div>
+            <div id="chat-freq-b" class="chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-freq-b" class="chat-input"
+                     placeholder="Escribe tu respuesta aquí…"
+                     onkeydown="if(event.key==='Enter') enviarMensajeFreqB()">
+              <button class="btn-send" onclick="enviarMensajeFreqB()">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(2)">← Frec. absoluta y relativa</button>
+          <button class="btn-nav next" id="btn-freq-b-next" onclick="irAPagina(4)" style="opacity:0.4;pointer-events:none;">Frecuencias acumuladas →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 4: ACTIVIDAD IA — FREC. ACUMULADAS ══════════ -->
+    <div class="page" id="page-4">
+      <div class="page-inner page-activity">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Frecuencias Acumuladas</span>
+          <span class="phase-indicator">
+            <span class="phase-dot phase-b" id="freqPhaseDotC"></span>
+            <span class="phase-label" id="freqPhaseLabelC">Fase E</span>
+          </span>
+          <span class="page-num">04</span>
+        </div>
+        <div class="activity-layout">
+          <div class="vis-panel">
+            <div class="situation-header">
+              <span class="sit-badge">Continuación · Frecuencias acumuladas</span>
+              <h3 class="sit-title">Fᵢ y Hᵢ: acumulando información</h3>
+              <p class="sit-desc">Ahora explorarás cómo <strong>acumular</strong> las frecuencias te permite responder preguntas del tipo "¿cuántos estudiantes eligieron esta categoría <em>o una anterior</em>?"</p>
+            </div>
+            <!-- Tabla Fi (aparece cuando la IA la menciona) -->
+            <div id="freq-tabla-Fi" class="freq-tabla-display" style="display:none;">
+              <div class="freq-tabla-label">Tabla con frecuencia absoluta acumulada (Fᵢ)</div>
+              <table>
+                <thead><tr><th>Bebida</th><th>fᵢ</th><th>hᵢ</th><th>Fᵢ</th></tr></thead>
+                <tbody>
+                  <tr><td>Café Negro</td><td>18</td><td>0.45</td><td>18</td></tr>
+                  <tr><td>Té / Aromática</td><td>10</td><td>0.25</td><td>28</td></tr>
+                  <tr><td>Jugo Natural</td><td>8</td><td>0.20</td><td>36</td></tr>
+                  <tr><td>Bebida Energizante</td><td>4</td><td>0.10</td><td>40</td></tr>
+                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td><td><strong>40</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Tabla Hi (aparece cuando la IA la menciona) -->
+            <div id="freq-tabla-Hi" class="freq-tabla-display" style="display:none;">
+              <div class="freq-tabla-label">Tabla de frecuencias completa</div>
+              <table>
+                <thead><tr><th>Bebida</th><th>fᵢ</th><th>hᵢ</th><th>Fᵢ</th><th>Hᵢ</th></tr></thead>
+                <tbody>
+                  <tr><td>Café Negro</td><td>18</td><td>0.45</td><td>18</td><td>0.45</td></tr>
+                  <tr><td>Té / Aromática</td><td>10</td><td>0.25</td><td>28</td><td>0.70</td></tr>
+                  <tr><td>Jugo Natural</td><td>8</td><td>0.20</td><td>36</td><td>0.90</td></tr>
+                  <tr><td>Bebida Energizante</td><td>4</td><td>0.10</td><td>40</td><td>1.00</td></tr>
+                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Tabla de referencia inicial (siempre visible) -->
+            <div id="freq-tabla-ref-acum" class="freq-tabla-display">
+              <div class="freq-tabla-label">Tabla de referencia</div>
+              <table>
+                <thead><tr><th>Bebida</th><th>fᵢ</th><th>hᵢ</th></tr></thead>
+                <tbody>
+                  <tr><td>Café Negro</td><td>18</td><td>0.45</td></tr>
+                  <tr><td>Té / Aromática</td><td>10</td><td>0.25</td></tr>
+                  <tr><td>Jugo Natural</td><td>8</td><td>0.20</td></tr>
+                  <tr><td>Bebida Energizante</td><td>4</td><td>0.10</td></tr>
+                  <tr class="freq-total-row"><td><strong>Total</strong></td><td><strong>40</strong></td><td><strong>1.00</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tutor-panel">
+            <div class="tutor-header">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status">
+                  <span class="status-dot"></span>
+                  <span id="tutor-status-freq-c">Esperando…</span>
+                </div>
+              </div>
+            </div>
+            <div id="chat-freq-c" class="chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-freq-c" class="chat-input"
+                     placeholder="Escribe tu respuesta aquí…"
+                     onkeydown="if(event.key==='Enter') enviarMensajeFreqC()">
+              <button class="btn-send" onclick="enviarMensajeFreqC()">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(3)">← Análisis de tendencias</button>
+          <button class="btn-nav next" onclick="irAPagina(5)">Síntesis Cap. I →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 5: SÍNTESIS CAP I ══════════ -->
+    <div class="page" id="page-5">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Síntesis</span>
+          <span class="page-num">05</span>
+        </div>
+        <h2 class="page-title">Tabla de frecuencias completa</h2>
+        <p class="synthesis-intro">A través de la exploración con el tutor construiste los cuatro tipos de frecuencia. Aquí quedan formalizados con la tabla completa:</p>
+        <div class="synthesis-grid">
+          <div class="syn-card">
+            <div class="syn-tag">Fase A</div>
+            <div class="syn-num">fᵢ</div>
+            <h4>Frecuencia Absoluta</h4>
+            <p>Conteo directo de cuántas veces aparece cada categoría en el conjunto de datos.</p>
+            <div class="syn-example">Ej: Café Negro → fᵢ = 18</div>
+          </div>
+          <div class="syn-card">
+            <div class="syn-tag">Fase B</div>
+            <div class="syn-num">hᵢ</div>
+            <h4>Frecuencia Relativa</h4>
+            <p>Proporción que representa cada categoría respecto al total N. Se calcula como hᵢ = fᵢ / N.</p>
+            <div class="syn-example">Ej: Café Negro → hᵢ = 18/40 = 0.45</div>
+          </div>
+          <div class="syn-card">
+            <div class="syn-tag">Fase E</div>
+            <div class="syn-num">Fᵢ</div>
+            <h4>Frecuencia Absoluta Acumulada</h4>
+            <p>Suma de todas las frecuencias absolutas desde la primera categoría hasta la i-ésima. Fᵢ = f₁ + f₂ + … + fᵢ</p>
+            <div class="syn-example">Ej: Hasta Té → Fᵢ = 18 + 10 = 28</div>
+          </div>
+          <div class="syn-card accent-syn">
+            <div class="syn-tag">Fase F–H</div>
+            <div class="syn-num">Hᵢ</div>
+            <h4>Frecuencia Relativa Acumulada</h4>
+            <p>Proporción acumulada. Hᵢ = Fᵢ / N = Σhᵢ. Permite saber qué fracción del total se ha contabilizado hasta la categoría i.</p>
+            <div class="syn-example">Ej: Hasta Té → Hᵢ = 28/40 = 0.70</div>
+          </div>
+        </div>
+        <!-- Tabla final completa -->
+        <div class="struct-box" style="margin-top:20px;">
+          <div class="struct-label">Tabla de frecuencias completa — Bebidas para estudiar (N = 40)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+            <thead>
+              <tr style="background:var(--navy);color:white;">
+                <th style="padding:6px 10px;text-align:left;">Bebida</th>
+                <th style="padding:6px 10px;">fᵢ</th>
+                <th style="padding:6px 10px;">hᵢ</th>
+                <th style="padding:6px 10px;">Fᵢ</th>
+                <th style="padding:6px 10px;">Hᵢ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:5px 10px;">Café Negro</td><td style="text-align:center;">18</td><td style="text-align:center;">0.45</td><td style="text-align:center;">18</td><td style="text-align:center;">0.45</td></tr>
+              <tr style="background:#f3f0eb;"><td style="padding:5px 10px;">Té / Aromática</td><td style="text-align:center;">10</td><td style="text-align:center;">0.25</td><td style="text-align:center;">28</td><td style="text-align:center;">0.70</td></tr>
+              <tr><td style="padding:5px 10px;">Jugo Natural</td><td style="text-align:center;">8</td><td style="text-align:center;">0.20</td><td style="text-align:center;">36</td><td style="text-align:center;">0.90</td></tr>
+              <tr style="background:#f3f0eb;"><td style="padding:5px 10px;">Bebida Energizante</td><td style="text-align:center;">4</td><td style="text-align:center;">0.10</td><td style="text-align:center;">40</td><td style="text-align:center;">1.00</td></tr>
+              <tr style="background:var(--navy);color:white;font-weight:600;"><td style="padding:5px 10px;">Total</td><td style="text-align:center;">40</td><td style="text-align:center;">1.00</td><td style="text-align:center;">40</td><td style="text-align:center;">1.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(4)">← Frecuencias acumuladas</button>
+          <button class="btn-nav next" onclick="irAPagina(6)">Capítulo II: Tablas de Contingencia →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINAS 6–14: CAPÍTULOS II, III Y IV (contingencia + chi) ══════════
+         Estas páginas son las originales 0–9, renumeradas +5 excepto la portada (que desaparece
+         porque la nueva portada general ya las lista).
+         La portada original (page-0) pasa a ser page-5-síntesis; el contenido de las páginas
+         1–9 originales pasa a ser page-6 … page-14.
+    ══════════ -->
+
+    <!-- ── Página 6: Presentación Cap II (original page-1) ── -->
+    <div class="page" id="page-6">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo II · Presentación</span>
+          <span class="page-num">06</span>
+        </div>
+        <h2 class="page-title">Tablas de Contingencia</h2>
+        <div class="intro-layout">
+          <div class="intro-main">
+            <p class="lead-text">Una <strong>tabla de contingencia</strong> organiza simultáneamente dos variables categóricas, permitiendo analizar cómo se relacionan entre sí. A diferencia de una tabla de frecuencias simple, aquí cada celda recoge información de <em>dos categorías a la vez</em>.</p>
+            <p class="body-text">En este capítulo explorarás la estructura de una tabla cruzada, sus elementos clave y distintas formas de representar la misma información. El recorrido está organizado en tres momentos:</p>
+            <div class="moment-list">
+              <div class="moment-item"><div class="moment-num">1</div><div class="moment-body"><strong>Exploración</strong> — Interactúas con una situación real y descubres los elementos de la tabla por ti mismo, con la guía del tutor virtual.</div></div>
+              <div class="moment-item"><div class="moment-num">2</div><div class="moment-body"><strong>Transnumeración</strong> — Cambias la forma de representar los mismos datos (tabla ↔ diagrama de barras) para ver qué revela cada representación.</div></div>
+              <div class="moment-item"><div class="moment-num">3</div><div class="moment-body"><strong>Institucionalización</strong> — El tutor formaliza los conceptos que construiste durante la exploración.</div></div>
+            </div>
             <div class="struct-box">
               <div class="struct-label">Estructura de una tabla de contingencia r × c</div>
               <div class="struct-table">
                 <div class="st-row">
-                  <div class="st-cell corner"></div>
-                  <div class="st-cell col-hdr">B₁</div>
-                  <div class="st-cell col-hdr">B₂</div>
-                  <div class="st-cell col-hdr dots">···</div>
-                  <div class="st-cell col-hdr marg-hdr">Total</div>
+                  <div class="st-cell corner"></div><div class="st-cell col-hdr">B₁</div><div class="st-cell col-hdr">B₂</div><div class="st-cell col-hdr dots">···</div><div class="st-cell col-hdr marg-hdr">Total</div>
                 </div>
                 <div class="st-row">
-                  <div class="st-cell row-hdr">A₁</div>
-                  <div class="st-cell joint">f₁₁</div>
-                  <div class="st-cell joint">f₁₂</div>
-                  <div class="st-cell joint dots">···</div>
-                  <div class="st-cell marg">f₁·</div>
+                  <div class="st-cell row-hdr">A₁</div><div class="st-cell joint">f₁₁</div><div class="st-cell joint">f₁₂</div><div class="st-cell joint dots">···</div><div class="st-cell marg">f₁·</div>
                 </div>
                 <div class="st-row">
-                  <div class="st-cell row-hdr">A₂</div>
-                  <div class="st-cell joint">f₂₁</div>
-                  <div class="st-cell joint">f₂₂</div>
-                  <div class="st-cell joint dots">···</div>
-                  <div class="st-cell marg">f₂·</div>
+                  <div class="st-cell row-hdr">A₂</div><div class="st-cell joint">f₂₁</div><div class="st-cell joint">f₂₂</div><div class="st-cell joint dots">···</div><div class="st-cell marg">f₂·</div>
                 </div>
                 <div class="st-row">
-                  <div class="st-cell row-hdr marg-hdr">Total</div>
-                  <div class="st-cell marg">f·₁</div>
-                  <div class="st-cell marg">f·₂</div>
-                  <div class="st-cell marg dots">···</div>
-                  <div class="st-cell grand">N</div>
+                  <div class="st-cell row-hdr marg-hdr">Total</div><div class="st-cell marg">f·₁</div><div class="st-cell marg">f·₂</div><div class="st-cell marg dots">···</div><div class="st-cell grand">N</div>
                 </div>
               </div>
               <div class="legend-row">
@@ -149,8 +506,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Tarjeta lateral de objetivo -->
           <div class="intro-aside">
             <div class="obj-card">
               <div class="obj-icon">🎯</div>
@@ -163,396 +518,198 @@
             </div>
           </div>
         </div>
-
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(0)">← Portada</button>
-          <button class="btn-nav next" onclick="irAPagina(2)">Situación →</button>
+          <button class="btn-nav prev" onclick="irAPagina(5)">← Síntesis Cap. I</button>
+          <button class="btn-nav next" onclick="irAPagina(7)">Situación →</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 2: SITUACIÓN A-DIDÁCTICA + TUTOR ══════════ -->
-    <div class="page" id="page-2">
+    <!-- ── Página 7: Actividad Cap II (original page-2) ── -->
+    <div class="page" id="page-7">
       <div class="page-inner page-activity">
-
         <div class="page-header">
           <span class="chapter-tag">Capítulo II · Actividad</span>
           <span class="phase-indicator" id="phaseIndicator">
             <span class="phase-dot phase-a"></span>
             <span class="phase-label" id="phaseLabel">Exploración</span>
           </span>
-          <span class="page-num">02</span>
+          <span class="page-num">07</span>
         </div>
-
         <div class="activity-layout">
-
-          <!-- Panel izquierdo: visualización -->
           <div class="vis-panel">
-
             <div class="situation-header">
               <span class="sit-badge">Situación · Bucaramanga</span>
               <h3 class="sit-title">Actividades Extracurriculares en jóvenes</h3>
               <p class="sit-desc">Se encuestaron <strong>100 jóvenes</strong> de Bucaramanga sobre su actividad extracurricular preferida. Los datos se cruzaron con el género para construir la siguiente tabla.</p>
             </div>
-
-            <!-- Contenedor de visualización -->
             <div id="vis-wrapper">
               <div id="tabla-container" class="tabla-animada"></div>
-              <div id="grafico-container" class="grafico-animado" style="display:none;">
-                <canvas id="miGrafico"></canvas>
-              </div>
+              <div id="grafico-container" class="grafico-animado" style="display:none;"><canvas id="miGrafico"></canvas></div>
             </div>
-
-            <!-- Botón transnumeración — inicia oculto, aparece en Fase C -->
             <div class="transnum-zone" id="transnum-zone" style="display:none;">
-              <div class="transnum-hint">
-                <span class="hint-icon">💡</span>
-                <span class="hint-text">¿Cómo cambia lo que ves al cambiar la representación?</span>
-              </div>
+              <div class="transnum-hint"><span class="hint-icon">💡</span><span class="hint-text">¿Cómo cambia lo que ves al cambiar la representación?</span></div>
               <button id="btn-transnum" class="btn-transnum" onclick="toggleVisualizacion()">
                 <span class="transnum-icon" id="transnum-icon">⇄</span>
                 <span id="btn-transnum-label">Ver como Diagrama de Barras</span>
               </button>
-              <div class="rep-label">
-                <span class="rep-dot" id="rep-dot"></span>
-                <span id="rep-text">Representación tabular</span>
-              </div>
+              <div class="rep-label"><span class="rep-dot" id="rep-dot"></span><span id="rep-text">Representación tabular</span></div>
             </div>
-
           </div>
-
-          <!-- Panel derecho: tutor -->
           <div class="tutor-panel">
             <div class="tutor-header">
               <div class="tutor-avatar">🎓</div>
               <div class="tutor-info">
                 <div class="tutor-name">Tutor Virtual UIS</div>
-                <div class="tutor-status">
-                  <span class="status-dot"></span>
-                  <span id="tutor-status-text">Conectando…</span>
-                </div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-text">Conectando…</span></div>
               </div>
             </div>
-
             <div id="chat-box" class="chat-box"></div>
-
             <div class="chat-input-area">
-              <input type="text" id="user-input" class="chat-input"
-                     placeholder="Escribe tu respuesta aquí…"
-                     onkeydown="if(event.key==='Enter') enviarMensaje()">
-              <button class="btn-send" onclick="enviarMensaje()">
-                Enviar <span class="send-icon">↑</span>
-              </button>
+              <input type="text" id="user-input" class="chat-input" placeholder="Escribe tu respuesta aquí…" onkeydown="if(event.key==='Enter') enviarMensaje()">
+              <button class="btn-send" onclick="enviarMensaje()">Enviar <span class="send-icon">↑</span></button>
             </div>
           </div>
-
-        </div><!-- /activity-layout -->
-
+        </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(1)">← Presentación</button>
-          <button class="btn-nav next" onclick="irAPagina(3)">Síntesis →</button>
+          <button class="btn-nav prev" onclick="irAPagina(6)">← Presentación</button>
+          <button class="btn-nav next" onclick="irAPagina(8)">Síntesis →</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 3: SÍNTESIS / INSTITUCIONALIZACIÓN ══════════ -->
-    <div class="page" id="page-3">
+    <!-- ── Página 8: Síntesis Cap II (original page-3) ── -->
+    <div class="page" id="page-8">
       <div class="page-inner">
-        <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Síntesis</span>
-          <span class="page-num">03</span>
-        </div>
-
+        <div class="page-header"><span class="chapter-tag">Capítulo II · Síntesis</span><span class="page-num">08</span></div>
         <h2 class="page-title">Lo que construiste en esta sesión</h2>
         <p class="synthesis-intro">A través de la exploración con el tutor, llegaste a los siguientes conceptos de manera autónoma. Aquí quedan formalizados:</p>
-
         <div class="synthesis-grid">
-          <div class="syn-card">
-            <div class="syn-tag">Fase A</div>
-            <div class="syn-num">f<sub>ij</sub></div>
-            <h4>Frecuencia Conjunta</h4>
-            <p>El valor en la intersección de la fila <em>i</em> y la columna <em>j</em>. Indica cuántos individuos pertenecen simultáneamente a dos categorías.</p>
-            <div class="syn-example">Ej: 25 mujeres prefieren danza → f<sub>Muj,Dan</sub> = 25</div>
-          </div>
-
-          <div class="syn-card">
-            <div class="syn-tag">Fase B</div>
-            <div class="syn-num">f<sub>i·</sub></div>
-            <h4>Frecuencia Marginal</h4>
-            <p>Los totales ubicados en el borde (margen) de la tabla, por fila (f<sub>i·</sub>) o por columna (f<sub>·j</sub>). Dan el contexto de cada grupo.</p>
-            <div class="syn-example">Ej: Total de mujeres = 50 → f<sub>Muj·</sub> = 50</div>
-          </div>
-
-          <div class="syn-card">
-            <div class="syn-tag">Fase C</div>
-            <div class="syn-num">h<sub>i|j</sub></div>
-            <h4>Frecuencia Condicionada</h4>
-            <p>Analiza un subgrupo dado el total marginal elegido como base. Su valor cambia según la pregunta que se quiera responder.</p>
-            <div class="syn-example">Ej: 25/50 = 50% de mujeres bailan · 25/30 = 83% de bailarines son mujeres</div>
-          </div>
-
-          <div class="syn-card accent-syn">
-            <div class="syn-tag">Transversal</div>
-            <div class="syn-num">⇄</div>
-            <h4>Transnumeración</h4>
-            <p>Cambiar el sistema de representación (tabla → gráfico → proporción) no cambia el dato, cambia lo que el dato <em>comunica</em>. La elección depende de la pregunta.</p>
-            <div class="syn-example">Mismo dato, historias diferentes según el total marginal de referencia.</div>
-          </div>
+          <div class="syn-card"><div class="syn-tag">Fase A</div><div class="syn-num">f<sub>ij</sub></div><h4>Frecuencia Conjunta</h4><p>El valor en la intersección de la fila <em>i</em> y la columna <em>j</em>. Indica cuántos individuos pertenecen simultáneamente a dos categorías.</p><div class="syn-example">Ej: 25 mujeres prefieren danza → f<sub>Muj,Dan</sub> = 25</div></div>
+          <div class="syn-card"><div class="syn-tag">Fase B</div><div class="syn-num">f<sub>i·</sub></div><h4>Frecuencia Marginal</h4><p>Los totales ubicados en el borde (margen) de la tabla, por fila (f<sub>i·</sub>) o por columna (f<sub>·j</sub>). Dan el contexto de cada grupo.</p><div class="syn-example">Ej: Total de mujeres = 50 → f<sub>Muj·</sub> = 50</div></div>
+          <div class="syn-card"><div class="syn-tag">Fase C</div><div class="syn-num">h<sub>i|j</sub></div><h4>Frecuencia Condicionada</h4><p>Analiza un subgrupo dado el total marginal elegido como base. Su valor cambia según la pregunta que se quiera responder.</p><div class="syn-example">Ej: 25/50 = 50% de mujeres bailan · 25/30 = 83% de bailarines son mujeres</div></div>
+          <div class="syn-card accent-syn"><div class="syn-tag">Transversal</div><div class="syn-num">⇄</div><h4>Transnumeración</h4><p>Cambiar el sistema de representación (tabla → gráfico → proporción) no cambia el dato, cambia lo que el dato <em>comunica</em>. La elección depende de la pregunta.</p><div class="syn-example">Mismo dato, historias diferentes según el total marginal de referencia.</div></div>
         </div>
-
-        <!-- Progresión de niveles de lectura -->
         <div class="reading-strip">
           <div class="rs-title">Niveles de lectura que ejercitaste en esta sesión</div>
           <div class="rs-levels">
-            <div class="rs-level done">
-              <div class="rs-badge">N1</div>
-              <div class="rs-label">Leer <strong>los datos</strong></div>
-              <div class="rs-desc">Identificar el 25 en la celda</div>
-            </div>
+            <div class="rs-level done"><div class="rs-badge">N1</div><div class="rs-label">Leer <strong>los datos</strong></div><div class="rs-desc">Identificar el 25 en la celda</div></div>
             <div class="rs-arrow">→</div>
-            <div class="rs-level done">
-              <div class="rs-badge">N2</div>
-              <div class="rs-label">Leer <strong>entre</strong> los datos</div>
-              <div class="rs-desc">Cruzar filas y columnas</div>
-            </div>
+            <div class="rs-level done"><div class="rs-badge">N2</div><div class="rs-label">Leer <strong>entre</strong> los datos</div><div class="rs-desc">Cruzar filas y columnas</div></div>
             <div class="rs-arrow">→</div>
-            <div class="rs-level done">
-              <div class="rs-badge">N3</div>
-              <div class="rs-label">Leer <strong>más allá</strong></div>
-              <div class="rs-desc">Interpretar proporciones y comparar grupos</div>
-            </div>
+            <div class="rs-level done"><div class="rs-badge">N3</div><div class="rs-label">Leer <strong>más allá</strong></div><div class="rs-desc">Interpretar proporciones y comparar grupos</div></div>
             <div class="rs-arrow">→</div>
-            <div class="rs-level next-chapter">
-              <div class="rs-badge muted">N4</div>
-              <div class="rs-label">Leer <strong>detrás</strong></div>
-              <div class="rs-desc">Validación estadística · Próximo capítulo</div>
-            </div>
+            <div class="rs-level next-chapter"><div class="rs-badge muted">N4</div><div class="rs-label">Leer <strong>detrás</strong></div><div class="rs-desc">Validación estadística · Próximo capítulo</div></div>
           </div>
         </div>
-
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(2)">← Actividad</button>
-          <button class="btn-nav next" onclick="irAPagina(4)">Cap. II: Formas Parciales →</button>
+          <button class="btn-nav prev" onclick="irAPagina(7)">← Actividad</button>
+          <button class="btn-nav next" onclick="irAPagina(9)">Cap. III: Formas Parciales →</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 4: CAP II — FORMAS PARCIALES (expositivo + interactivo) ══════════
-         DÓNDE VA: Cuadrado 2 del esquema. Contenido estático — no llama al backend.
-         El JS de esta página está en la sección "CAP 2 — TABLA INTERACTIVA" de script.js.
-    ══════════ -->
-    <div class="page" id="page-4">
+    <!-- ── Página 9: Formas Parciales Cap III (original page-4) ── -->
+    <div class="page" id="page-9">
       <div class="page-inner">
-        <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Formas Parciales</span>
-          <span class="page-num">04</span>
-        </div>
-
+        <div class="page-header"><span class="chapter-tag">Capítulo III · Formas Parciales</span><span class="page-num">09</span></div>
         <h2 class="page-title">Formas de leer una tabla de contingencia</h2>
-
         <div class="fp-layout">
-          <!-- Columna izquierda: contexto + tabla base + selector -->
           <div class="fp-left">
             <div class="fp-context-box">
               <span class="sit-badge">Situación · UIS Bucaramanga</span>
               <p class="fp-context-text">Se encuestaron <strong>120 estudiantes</strong> de la UIS. Se cruzó su <strong>rendimiento académico</strong> (Bajo / Medio / Alto) con las <strong>horas de estudio individual</strong> semanales (Menos de 5h / Entre 5 y 10h / Más de 10h).</p>
             </div>
-
-            <!-- Selector de tipo de tabla -->
             <div class="fp-selector">
               <div class="fp-sel-label">Selecciona el tipo de representación:</div>
               <div class="fp-tabs">
-                <button class="fp-tab active" onclick="cambiarTipoTabla('absoluta')" id="tab-absoluta">
-                  Frecuencias absolutas
-                </button>
-                <button class="fp-tab" onclick="cambiarTipoTabla('total')" id="tab-total">
-                  % sobre el total
-                </button>
-                <button class="fp-tab" onclick="cambiarTipoTabla('fila')" id="tab-fila">
-                  % por fila
-                </button>
-                <button class="fp-tab" onclick="cambiarTipoTabla('columna')" id="tab-columna">
-                  % por columna
-                </button>
+                <button class="fp-tab active" onclick="cambiarTipoTabla('absoluta')" id="tab-absoluta">Frecuencias absolutas</button>
+                <button class="fp-tab" onclick="cambiarTipoTabla('total')" id="tab-total">% sobre el total</button>
+                <button class="fp-tab" onclick="cambiarTipoTabla('fila')" id="tab-fila">% por fila</button>
+                <button class="fp-tab" onclick="cambiarTipoTabla('columna')" id="tab-columna">% por columna</button>
               </div>
             </div>
-
-            <!-- Tabla dinámica -->
             <div id="fp-tabla-wrapper" class="fp-tabla-wrapper"></div>
-
-            <!-- Pregunta interpretativa que cambia con la tabla -->
             <div class="fp-question-box" id="fp-question-box">
               <span class="fq-icon">🔍</span>
               <span id="fp-question-text">¿Cuántos estudiantes con rendimiento Alto estudian más de 10h semanales?</span>
             </div>
           </div>
-
-          <!-- Columna derecha: explicación del tipo activo -->
           <div class="fp-right">
             <div class="fp-explain-card" id="fp-explain-card">
-
-              <!-- Contenido ABSOLUTA (visible por defecto) -->
-              <div class="fpe-content" id="fpe-absoluta">
-                <div class="fpe-tag">Tipo 1 de 3</div>
-                <h4 class="fpe-title">Frecuencias absolutas</h4>
-                <p class="fpe-text">Es la forma base de la tabla. Cada celda muestra el <strong>conteo directo</strong> de individuos que pertenecen a las dos categorías simultáneamente.</p>
-                <p class="fpe-text">Útil para saber cuántos hay, pero <em>no permite comparar grupos de distinto tamaño</em>. ¿Cómo sabes si 18 es mucho o poco sin saber el total de cada grupo?</p>
-                <div class="fpe-formula">
-                  <span class="fpe-f-label">Notación</span>
-                  <span class="fpe-f-expr">f<sub>ij</sub> = conteo de la celda (i, j)</span>
-                </div>
-                <div class="fpe-hint">👉 Cambia al tipo <strong>% sobre el total</strong> para ver la primera transformación.</div>
-              </div>
-
-              <!-- Contenido TOTAL -->
-              <div class="fpe-content hidden" id="fpe-total">
-                <div class="fpe-tag">Tipo 2 de 3 · Primera transnumeración</div>
-                <h4 class="fpe-title">Porcentaje sobre el total (distribución conjunta)</h4>
-                <p class="fpe-text">Cada celda se divide entre <strong>N = 120</strong> (el total general). El resultado indica qué proporción del total representa esa combinación.</p>
-                <p class="fpe-text">Permite responder: <em>¿Qué fracción de toda la muestra tiene rendimiento Alto y estudia más de 10h?</em></p>
-                <div class="fpe-formula">
-                  <span class="fpe-f-label">Fórmula</span>
-                  <span class="fpe-f-expr">h<sub>ij</sub> = f<sub>ij</sub> / N × 100</span>
-                </div>
-                <div class="fpe-alert">⚠️ La suma de todas las celdas da <strong>100%</strong>. Los márgenes dan los porcentajes marginales.</div>
-              </div>
-
-              <!-- Contenido FILA -->
-              <div class="fpe-content hidden" id="fpe-fila">
-                <div class="fpe-tag">Tipo 3a de 3 · Segunda transnumeración</div>
-                <h4 class="fpe-title">Porcentaje por fila (distribución condicional por rendimiento)</h4>
-                <p class="fpe-text">Cada celda se divide entre el <strong>total de su fila</strong>. Muestra cómo se distribuyen las horas de estudio <em>dentro de cada grupo de rendimiento</em>.</p>
-                <p class="fpe-text">Responde: <em>De los estudiantes con rendimiento Alto, ¿qué porcentaje estudia más de 10h?</em></p>
-                <div class="fpe-formula">
-                  <span class="fpe-f-label">Fórmula</span>
-                  <span class="fpe-f-expr">h<sub>i|·</sub> = f<sub>ij</sub> / f<sub>i·</sub> × 100</span>
-                </div>
-                <div class="fpe-alert">⚠️ Cada <strong>fila</strong> suma 100%. Las filas se pueden comparar entre sí.</div>
-              </div>
-
-              <!-- Contenido COLUMNA -->
-              <div class="fpe-content hidden" id="fpe-columna">
-                <div class="fpe-tag">Tipo 3b de 3 · Tercera transnumeración</div>
-                <h4 class="fpe-title">Porcentaje por columna (distribución condicional por horas)</h4>
-                <p class="fpe-text">Cada celda se divide entre el <strong>total de su columna</strong>. Muestra cómo se distribuye el rendimiento <em>dentro de cada grupo de horas de estudio</em>.</p>
-                <p class="fpe-text">Responde: <em>De quienes estudian más de 10h, ¿qué porcentaje tiene rendimiento Alto?</em></p>
-                <div class="fpe-formula">
-                  <span class="fpe-f-label">Fórmula</span>
-                  <span class="fpe-f-expr">h<sub>·|j</sub> = f<sub>ij</sub> / f<sub>·j</sub> × 100</span>
-                </div>
-                <div class="fpe-alert">⚠️ Cada <strong>columna</strong> suma 100%. Las columnas se pueden comparar entre sí.</div>
-              </div>
-
-            </div><!-- /fp-explain-card -->
-
-            <!-- Nota pedagógica fija -->
-            <div class="fp-note">
-              <div class="fp-note-title">💡 La clave de la transnumeración</div>
-              <p class="fp-note-text">Los datos no cambian — cambia la <em>pregunta que responden</em>. Elegir entre % fila, % columna o % total depende de lo que quieras comunicar, no del dato en sí.</p>
+              <div class="fpe-content" id="fpe-absoluta"><div class="fpe-tag">Tipo 1 de 3</div><h4 class="fpe-title">Frecuencias absolutas</h4><p class="fpe-text">Es la forma base de la tabla. Cada celda muestra el <strong>conteo directo</strong> de individuos que pertenecen a las dos categorías simultáneamente.</p><p class="fpe-text">Útil para saber cuántos hay, pero <em>no permite comparar grupos de distinto tamaño</em>.</p><div class="fpe-formula"><span class="fpe-f-label">Notación</span><span class="fpe-f-expr">f<sub>ij</sub> = conteo de la celda (i, j)</span></div><div class="fpe-hint">👉 Cambia al tipo <strong>% sobre el total</strong> para ver la primera transformación.</div></div>
+              <div class="fpe-content hidden" id="fpe-total"><div class="fpe-tag">Tipo 2 de 3 · Primera transnumeración</div><h4 class="fpe-title">Porcentaje sobre el total (distribución conjunta)</h4><p class="fpe-text">Cada celda se divide entre <strong>N = 120</strong>. El resultado indica qué proporción del total representa esa combinación.</p><div class="fpe-formula"><span class="fpe-f-label">Fórmula</span><span class="fpe-f-expr">h<sub>ij</sub> = f<sub>ij</sub> / N × 100</span></div><div class="fpe-alert">⚠️ La suma de todas las celdas da <strong>100%</strong>.</div></div>
+              <div class="fpe-content hidden" id="fpe-fila"><div class="fpe-tag">Tipo 3a de 3 · Segunda transnumeración</div><h4 class="fpe-title">Porcentaje por fila (distribución condicional por rendimiento)</h4><p class="fpe-text">Cada celda se divide entre el <strong>total de su fila</strong>. Muestra cómo se distribuyen las horas de estudio <em>dentro de cada grupo de rendimiento</em>.</p><div class="fpe-formula"><span class="fpe-f-label">Fórmula</span><span class="fpe-f-expr">h<sub>i|·</sub> = f<sub>ij</sub> / f<sub>i·</sub> × 100</span></div><div class="fpe-alert">⚠️ Cada <strong>fila</strong> suma 100%.</div></div>
+              <div class="fpe-content hidden" id="fpe-columna"><div class="fpe-tag">Tipo 3b de 3 · Tercera transnumeración</div><h4 class="fpe-title">Porcentaje por columna (distribución condicional por horas)</h4><p class="fpe-text">Cada celda se divide entre el <strong>total de su columna</strong>. Muestra cómo se distribuye el rendimiento <em>dentro de cada grupo de horas de estudio</em>.</p><div class="fpe-formula"><span class="fpe-f-label">Fórmula</span><span class="fpe-f-expr">h<sub>·|j</sub> = f<sub>ij</sub> / f<sub>·j</sub> × 100</span></div><div class="fpe-alert">⚠️ Cada <strong>columna</strong> suma 100%.</div></div>
             </div>
+            <div class="fp-note"><div class="fp-note-title">💡 La clave de la transnumeración</div><p class="fp-note-text">Los datos no cambian — cambia la <em>pregunta que responden</em>. Elegir entre % fila, % columna o % total depende de lo que quieras comunicar.</p></div>
           </div>
-        </div><!-- /fp-layout -->
-
+        </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(3)">← Síntesis Cap. II</button>
-          <button class="btn-nav next" onclick="irAPagina(5)">Actividad →</button>
+          <button class="btn-nav prev" onclick="irAPagina(8)">← Síntesis Cap. II</button>
+          <button class="btn-nav next" onclick="irAPagina(10)">Actividad →</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 5: CAP III — MINI-ACTIVIDAD CON IA ══════════
-         DÓNDE VA: Segunda parte del Cuadrado 2. Usa el backend con session_id="cap2_user"
-         para no mezclar la sesión con el Cap 1. El JS está en "CAP 2 — TUTOR" en script.js.
-    ══════════ -->
-    <div class="page" id="page-5">
+    <!-- ── Página 10: Actividad Cap III con IA (original page-5) ── -->
+    <div class="page" id="page-10">
       <div class="page-inner page-activity">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Actividad</span>
+          <span class="chapter-tag">Capítulo III · Actividad</span>
           <span class="phase-indicator" id="phaseIndicator2">
             <span class="phase-dot phase-a" id="phaseDot2"></span>
             <span class="phase-label" id="phaseLabel2">Exploración</span>
           </span>
-          <span class="page-num">05</span>
+          <span class="page-num">10</span>
         </div>
-
         <div class="activity-layout">
-
-          <!-- Panel izquierdo: tabla de referencia fija + recordatorio -->
           <div class="vis-panel">
             <div class="situation-header">
               <span class="sit-badge">Actividad · UIS Bucaramanga</span>
               <h3 class="sit-title">Rendimiento × Horas de estudio</h3>
               <p class="sit-desc">Usa la tabla que exploraste en la página anterior. El tutor te hará preguntas sobre las distintas formas de calcular proporciones.</p>
             </div>
-
-            <!-- Tabla fija de referencia (absoluta, siempre visible) -->
             <div class="fp-ref-table-wrapper">
               <div class="fp-ref-label">Tabla de referencia — frecuencias absolutas</div>
               <div id="fp-ref-table"></div>
             </div>
-
-            <!-- Mini recordatorio de fórmulas -->
             <div class="fp-formulas-strip">
               <div class="fps-title">Fórmulas clave</div>
               <div class="fps-row">
-                <div class="fps-item">
-                  <span class="fps-label">% total</span>
-                  <span class="fps-expr">f<sub>ij</sub> / N</span>
-                </div>
-                <div class="fps-item">
-                  <span class="fps-label">% fila</span>
-                  <span class="fps-expr">f<sub>ij</sub> / f<sub>i·</sub></span>
-                </div>
-                <div class="fps-item">
-                  <span class="fps-label">% columna</span>
-                  <span class="fps-expr">f<sub>ij</sub> / f<sub>·j</sub></span>
-                </div>
+                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">f<sub>ij</sub> / N</span></div>
+                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">f<sub>ij</sub> / f<sub>i·</sub></span></div>
+                <div class="fps-item"><span class="fps-label">% columna</span><span class="fps-expr">f<sub>ij</sub> / f<sub>·j</sub></span></div>
               </div>
             </div>
           </div>
-
-          <!-- Panel derecho: tutor Cap 2 -->
           <div class="tutor-panel">
             <div class="tutor-header">
               <div class="tutor-avatar">🎓</div>
               <div class="tutor-info">
                 <div class="tutor-name">Tutor Virtual UIS</div>
-                <div class="tutor-status">
-                  <span class="status-dot"></span>
-                  <span id="tutor-status-text2">Conectando…</span>
-                </div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-text2">Conectando…</span></div>
               </div>
             </div>
             <div id="chat-box2" class="chat-box"></div>
             <div class="chat-input-area">
-              <input type="text" id="user-input2" class="chat-input"
-                     placeholder="Escribe tu respuesta aquí…"
-                     onkeydown="if(event.key==='Enter') enviarMensaje2()">
-              <button class="btn-send" onclick="enviarMensaje2()">
-                Enviar <span class="send-icon">↑</span>
-              </button>
+              <input type="text" id="user-input2" class="chat-input" placeholder="Escribe tu respuesta aquí…" onkeydown="if(event.key==='Enter') enviarMensaje2()">
+              <button class="btn-send" onclick="enviarMensaje2()">Enviar <span class="send-icon">↑</span></button>
             </div>
           </div>
-
-        </div><!-- /activity-layout -->
-
+        </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(4)">← Formas parciales</button>
-          <button class="btn-nav next" onclick="irAPagina(6)">Ejemplos →</button>
+          <button class="btn-nav prev" onclick="irAPagina(9)">← Formas parciales</button>
+          <button class="btn-nav next" onclick="irAPagina(11)">Ejemplos →</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 6: EJEMPLOS DINÁMICOS ══════════ -->
-    <div class="page" id="page-6">
+    <!-- ── Página 11: Ejemplos dinámicos Cap IV (original page-6) ── -->
+    <div class="page" id="page-11">
       <div class="page-inner">
-        <div class="page-header">
-          <span class="chapter-tag">Capítulo IV · Ejemplos</span>
-          <span class="page-num">06</span>
-        </div>
+        <div class="page-header"><span class="chapter-tag">Capítulo IV · Ejemplos</span><span class="page-num">11</span></div>
         <h2 class="page-title">Ejemplos dinámicos</h2>
-
-        <!-- Selector de tipo (misma lógica que pág 4) -->
         <div class="fp-selector" style="margin-bottom:10px;">
           <div class="fp-sel-label">Cambia la representación y observa cómo cambia la tabla Y el gráfico simultáneamente:</div>
           <div class="fp-tabs">
@@ -562,9 +719,7 @@
             <button class="fp-tab" onclick="cambiarEjemplo('columna')"  id="etab-columna">% por columna</button>
           </div>
         </div>
-
         <div class="ej-layout">
-          <!-- Columna izquierda: tabla + pregunta -->
           <div class="ej-left">
             <div class="fp-context-box" style="margin-bottom:10px;">
               <span class="sit-badge">Contexto · 150 estudiantes UIS</span>
@@ -576,12 +731,8 @@
               <span id="ej-question-text">¿Cuántos estudiantes de Ingenierías prefieren la modalidad Presencial?</span>
             </div>
           </div>
-
-          <!-- Columna derecha: gráfico + explicación -->
           <div class="ej-right">
-            <div class="ej-chart-box">
-              <canvas id="ejGrafico"></canvas>
-            </div>
+            <div class="ej-chart-box"><canvas id="ejGrafico"></canvas></div>
             <div class="ej-explain-box" id="ej-explain-box">
               <div class="fpe-tag" id="ej-tag">Representación 1 de 4</div>
               <p class="fpe-text" id="ej-explain-text">Muestra los <strong>conteos directos</strong>. Útil para saber cuántos hay, pero no permite comparar grupos de distinto tamaño.</p>
@@ -589,40 +740,28 @@
             </div>
           </div>
         </div>
-
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(5)">← Actividad Cap. III</button>
-          <button class="btn-nav next" onclick="irAPagina(7)">Problemas →</button>
+          <button class="btn-nav prev" onclick="irAPagina(10)">← Actividad Cap. III</button>
+          <button class="btn-nav next" onclick="irAPagina(12)">Problemas →</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 7: FASE DE FORMULACIÓN (sin tutor) ══════════ -->
-    <div class="page" id="page-7">
+    <!-- ── Página 12: Formulación Cap IV (original page-7) ── -->
+    <div class="page" id="page-12">
       <div class="page-inner page-problems">
         <div class="page-header">
           <span class="chapter-tag">Capítulo IV · Fase de Formulación</span>
-          <span class="phase-indicator">
-            <span class="phase-dot phase-b"></span>
-            <span class="phase-label">Formula y conjetura</span>
-          </span>
-          <span class="page-num">07</span>
+          <span class="phase-indicator"><span class="phase-dot phase-b"></span><span class="phase-label">Formula y conjetura</span></span>
+          <span class="page-num">12</span>
         </div>
-
         <div class="prob-layout-full">
-
-          <!-- Fila superior: enunciado + selector lado a lado -->
           <div class="prob-top-row">
-
             <div class="prob-enunciado prob-enunciado-half">
               <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
               <p class="prob-enunciado-text" id="probA-enunciado"></p>
-              <div class="prob-pregunta-box">
-                <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
-                <p id="probA-pregunta" class="prob-pregunta-text"></p>
-              </div>
+              <div class="prob-pregunta-box"><span class="prob-pregunta-label">Pregunta que guía esta actividad:</span><p id="probA-pregunta" class="prob-pregunta-text"></p></div>
             </div>
-
             <div class="prob-tipo-selector prob-selector-half">
               <div class="pts-label">Escoge el sistema de representación que mejor responde la pregunta:</div>
               <div class="pts-options">
@@ -642,16 +781,10 @@
                 </div>
               </div>
             </div>
-
-          </div><!-- /prob-top-row -->
-
-          <!-- Tabla -->
+          </div>
           <div class="pts-step2-label">La tabla se actualiza según tu selección. Completa las celdas vacías:</div>
           <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
-
           <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
-
-          <!-- Fila inferior: verificar + nav -->
           <div class="prob-bottom-row">
             <button class="btn-verificar" onclick="verificarProblemaA()">🔍 Verificar escogencia y valores</button>
             <div class="prob-nav" style="margin-left:auto;">
@@ -660,44 +793,30 @@
               <button class="btn-prob-nav" onclick="cambiarProbA(1)">Siguiente →</button>
             </div>
           </div>
-
-        </div><!-- /prob-layout-full -->
-
+        </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(6)">← Ejemplos</button>
-          <button class="btn-nav next" onclick="irAPagina(8)">Fase de Validación →</button>
+          <button class="btn-nav prev" onclick="irAPagina(11)">← Ejemplos</button>
+          <button class="btn-nav next" onclick="irAPagina(13)">Fase de Validación →</button>
         </div>
       </div>
     </div>
 
-
-    <!-- ══════════ PÁGINA 8: FASE DE VALIDACIÓN (sin tutor) ══════════ -->
-    <div class="page" id="page-8">
+    <!-- ── Página 13: Validación Cap IV (original page-8) ── -->
+    <div class="page" id="page-13">
       <div class="page-inner page-problems">
         <div class="page-header">
           <span class="chapter-tag">Capítulo IV · Fase de Validación</span>
-          <span class="phase-indicator">
-            <span class="phase-dot phase-c"></span>
-            <span class="phase-label">Valida y construye</span>
-          </span>
-          <span class="page-num">08</span>
+          <span class="phase-indicator"><span class="phase-dot phase-c"></span><span class="phase-label">Valida y construye</span></span>
+          <span class="page-num">13</span>
         </div>
-
         <div class="prob-layout-full">
-
-          <!-- Fila superior: enunciado + selector lado a lado -->
           <div class="prob-top-row">
-
             <div class="prob-enunciado prob-enunciado-half">
               <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
               <p class="prob-enunciado-text" id="probB-enunciado"></p>
               <div class="prob-contexto-frases" id="probB-frases"></div>
-              <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
-                <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
-                <p id="probB-pregunta" class="prob-pregunta-text"></p>
-              </div>
+              <div class="prob-pregunta-box" style="border-left-color:var(--moss);"><span class="prob-pregunta-label">Construye la tabla que responda a:</span><p id="probB-pregunta" class="prob-pregunta-text"></p></div>
             </div>
-
             <div class="prob-tipo-selector prob-selector-half">
               <div class="pts-label">Escoge el sistema de representación adecuado:</div>
               <div class="pts-options">
@@ -717,16 +836,10 @@
                 </div>
               </div>
             </div>
-
-          </div><!-- /prob-top-row -->
-
-          <!-- Tabla -->
+          </div>
           <div class="pts-step2-label">Construye la tabla completa (todas las celdas vacías):</div>
           <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
-
           <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
-
-          <!-- Fila inferior: verificar + nav -->
           <div class="prob-bottom-row">
             <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">✅ Verificar construcción completa</button>
             <div class="prob-nav" style="margin-left:auto;">
@@ -735,47 +848,33 @@
               <button class="btn-prob-nav" onclick="cambiarProbB(1)">Siguiente →</button>
             </div>
           </div>
-
-        </div><!-- /prob-layout-full -->
-
+        </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(7)">← Formulación</button>
-          <button class="btn-nav next" onclick="irAPagina(9)">¿Se puede probar? →</button>
+          <button class="btn-nav prev" onclick="irAPagina(12)">← Formulación</button>
+          <button class="btn-nav next" onclick="irAPagina(14)">¿Se puede probar? →</button>
         </div>
       </div>
     </div>
 
-
-    <!-- ══════════ PÁGINA 9: ABREBOCAS CHI-CUADRADO ══════════
-         El estudiante distribuye libremente los datos y la IA
-         lo lleva a preguntarse si puede afirmar con certeza.
-         Sin introducir aún la prueba — solo generar la necesidad.
-    ══════════ -->
-    <div class="page" id="page-9">
+    <!-- ── Página 14: Abrebocas Chi-cuadrado (original page-9) ── -->
+    <div class="page" id="page-14">
       <div class="page-inner page-problems">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo IV · Exploración libre</span>
+          <span class="chapter-tag">Capítulo V · Exploración libre</span>
           <span class="phase-indicator">
             <span class="phase-dot phase-a" id="chiPhaseDot"></span>
             <span class="phase-label" id="chiPhaseLabel">¿Podemos estar seguros?</span>
           </span>
-          <span class="page-num">09</span>
+          <span class="page-num">14</span>
         </div>
-
-        <!-- Introducción pedagógica -->
         <div class="chi-intro">
           <p class="chi-intro-text">Hasta ahora has descrito los datos. Pero ¿qué pasa cuando la pregunta no tiene una respuesta única con los mismos datos? A continuación encontrarás dos situaciones donde <strong>tú decides cómo distribuir los datos</strong>. La IA te acompañará en el proceso.</p>
         </div>
-
-        <!-- Selector de problema -->
         <div class="chi-prob-tabs">
           <button class="chi-tab active" onclick="cambiarProbChi(0)" id="chitab-0">Situación 1</button>
           <button class="chi-tab"        onclick="cambiarProbChi(1)" id="chitab-1">Situación 2</button>
         </div>
-
         <div class="prob-two-col" style="flex:1;">
-
-          <!-- Izquierda: afirmación + tabla libre -->
           <div class="prob-col">
             <div class="prob-enunciado" id="chi-enunciado-box">
               <div class="prob-num-badge" id="chi-badge">Situación 1</div>
@@ -785,30 +884,21 @@
                 <p id="chi-afirmacion" class="prob-pregunta-text"></p>
               </div>
             </div>
-
-            <!-- Controles de la tabla libre -->
             <div class="chi-tabla-controls">
               <div class="pts-label">Distribuye los <strong id="chi-N-label">100</strong> encuestados como creas que refleja la afirmación. Arrastra o escribe en cada celda:</div>
               <div class="chi-totales-strip" id="chi-totales-strip"></div>
             </div>
-
             <div class="prob-tabla-wrapper" id="chi-tabla-wrapper"></div>
-
-            <!-- Contador de total ingresado -->
             <div class="chi-total-bar">
               <span>Total ingresado:</span>
               <span id="chi-total-contador" class="chi-contador-num">0</span>
               <span>/ <span id="chi-N-display">100</span></span>
               <div class="chi-total-progress"><div id="chi-progress-bar" class="chi-progress-fill"></div></div>
             </div>
-
             <div class="prob-feedback" id="chi-feedback" style="display:none;"></div>
-
             <button class="btn-verificar" style="background:var(--gold);color:var(--ink);" onclick="enviarTablaChiAlTutor()">
               💬 Enviar al tutor para discutir
             </button>
-
-            <!-- Fórmulas recordatorio -->
             <div class="prob-formulas-strip" style="margin-top:8px;">
               <div class="fps-title">Recuerda</div>
               <div class="fps-row">
@@ -818,18 +908,13 @@
               </div>
             </div>
           </div>
-
-          <!-- Derecha: tutor IA -->
           <div class="prob-col">
             <div class="tutor-panel prob-tutor-panel">
               <div class="tutor-header" style="background:#1a3a5a;">
                 <div class="tutor-avatar">🎓</div>
                 <div class="tutor-info">
                   <div class="tutor-name">Tutor Virtual UIS</div>
-                  <div class="tutor-status">
-                    <span class="status-dot"></span>
-                    <span id="tutor-status-chi">Conectando…</span>
-                  </div>
+                  <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-chi">Conectando…</span></div>
                 </div>
               </div>
               <div class="tutor-context-strip" style="border-left-color:var(--gold);">
@@ -837,42 +922,42 @@
               </div>
               <div id="chat-chi" class="chat-box"></div>
               <div class="chat-input-area">
-                <input type="text" id="input-chi" class="chat-input"
-                  placeholder="Escribe tu razonamiento o pregunta…"
-                  onkeydown="if(event.key==='Enter') enviarMensajeChi()">
+                <input type="text" id="input-chi" class="chat-input" placeholder="Escribe tu razonamiento o pregunta…" onkeydown="if(event.key==='Enter') enviarMensajeChi()">
                 <button class="btn-send" onclick="enviarMensajeChi()">Enviar <span class="send-icon">↑</span></button>
               </div>
             </div>
           </div>
-
         </div>
-
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(8)">← Validación</button>
-          <span class="footer-note">Capítulo V — Prueba Chi-cuadrado · Próximamente</span>
+          <button class="btn-nav prev" onclick="irAPagina(13)">← Validación</button>
+          <span class="footer-note">Capítulo VI — Prueba Chi-cuadrado · Próximamente</span>
         </div>
       </div>
     </div>
 
   </div><!-- /book-pages -->
 
-  <!-- Indicadores de página — 10 puntos (0–9) -->
+  <!-- Indicadores de página — 15 puntos (0–14) -->
   <div class="page-indicators">
-    <span class="pi-dot active" onclick="irAPagina(0)" title="Portada"></span>
-    <span class="pi-dot" onclick="irAPagina(1)" title="Presentación"></span>
-    <span class="pi-dot" onclick="irAPagina(2)" title="Cap II · Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(3)" title="Cap II · Síntesis"></span>
-    <span class="pi-dot" onclick="irAPagina(4)" title="Cap III · Formas Parciales"></span>
-    <span class="pi-dot" onclick="irAPagina(5)" title="Cap III · Actividad"></span>
-    <span class="pi-dot" onclick="irAPagina(6)" title="Cap IV · Ejemplos"></span>
-    <span class="pi-dot" onclick="irAPagina(7)" title="Cap IV · Formulación"></span>
-    <span class="pi-dot" onclick="irAPagina(8)" title="Cap IV · Validación"></span>
-    <span class="pi-dot" onclick="irAPagina(9)" title="Cap IV · ¿Se puede probar?"></span>
+    <span class="pi-dot active" onclick="irAPagina(0)"  title="Portada"></span>
+    <span class="pi-dot" onclick="irAPagina(1)"  title="Cap I · Presentación"></span>
+    <span class="pi-dot" onclick="irAPagina(2)"  title="Cap I · frec. abs. y rel."></span>
+    <span class="pi-dot" onclick="irAPagina(3)"  title="Cap I · Curcio N3/N4"></span>
+    <span class="pi-dot" onclick="irAPagina(4)"  title="Cap I · frec. acumuladas"></span>
+    <span class="pi-dot" onclick="irAPagina(5)"  title="Cap I · Síntesis"></span>
+    <span class="pi-dot" onclick="irAPagina(6)"  title="Cap II · Presentación"></span>
+    <span class="pi-dot" onclick="irAPagina(7)"  title="Cap II · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(8)"  title="Cap II · Síntesis"></span>
+    <span class="pi-dot" onclick="irAPagina(9)"  title="Cap III · Formas Parciales"></span>
+    <span class="pi-dot" onclick="irAPagina(10)" title="Cap III · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina(11)" title="Cap IV · Ejemplos"></span>
+    <span class="pi-dot" onclick="irAPagina(12)" title="Cap IV · Formulación"></span>
+    <span class="pi-dot" onclick="irAPagina(13)" title="Cap IV · Validación"></span>
+    <span class="pi-dot" onclick="irAPagina(14)" title="Cap V · ¿Se puede probar?"></span>
   </div>
 
 </div><!-- /book-shell -->
 
-<!-- Overlay de carga inicial -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-content">
     <div class="loading-spinner"></div>
