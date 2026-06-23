@@ -833,23 +833,36 @@ Tabla de frecuencia → Gráfico circular.</div>
       </div>
     </div>
 
-    <!-- ── Página 12: Formulación Cap IV (original page-7) ── -->
+    <!-- ── Página 12: Formulación Cap IV ── -->
     <div class="page" id="page-12">
       <div class="page-inner page-problems">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Fase de Formulación</span>
-          <span class="phase-indicator"><span class="phase-dot phase-b"></span><span class="phase-label">Formula y conjetura</span></span>
+          <span class="chapter-tag">Capítulo II · Formulación</span>
+          <span class="phase-indicator"><span class="phase-dot phase-b"></span><span class="phase-label">Elige, completa y justifica</span></span>
           <span class="page-num">11</span>
         </div>
-        <div class="prob-layout-full">
-          <div class="prob-top-row">
-            <div class="prob-enunciado prob-enunciado-half">
+
+        <!-- Tabs de problema -->
+        <div class="prob-tabs-row" id="probA-tabs">
+          <button class="p5c-tab active" onclick="cambiarProbA(0)">Problema 1</button>
+          <button class="p5c-tab"        onclick="cambiarProbA(1)">Problema 2</button>
+          <button class="p5c-tab"        onclick="cambiarProbA(2)">Problema 3</button>
+        </div>
+
+        <div class="pA-layout">
+          <!-- Columna izquierda: enunciado + tipo + tabla -->
+          <div class="pA-left">
+            <div class="prob-enunciado">
               <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
               <p class="prob-enunciado-text" id="probA-enunciado"></p>
-              <div class="prob-pregunta-box"><span class="prob-pregunta-label">Pregunta que guía esta actividad:</span><p id="probA-pregunta" class="prob-pregunta-text"></p></div>
+              <div class="prob-pregunta-box">
+                <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
+                <p id="probA-pregunta" class="prob-pregunta-text"></p>
+              </div>
             </div>
-            <div class="prob-tipo-selector prob-selector-half">
-              <div class="pts-label">Escoge el sistema de representación que mejor responde la pregunta:</div>
+
+            <div class="prob-tipo-selector">
+              <div class="pts-label">1. Escoge el sistema de representación que mejor responde la pregunta:</div>
               <div class="pts-options">
                 <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoA('absoluta')">Frecuencias absolutas</button>
                 <button class="pts-btn" data-tipo="total"    onclick="escogerTipoA('total')">% sobre el total</button>
@@ -857,7 +870,7 @@ Tabla de frecuencia → Gráfico circular.</div>
                 <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoA('columna')">% por columna</button>
               </div>
               <div id="probA-tipo-feedback" class="pts-feedback" style="display:none;"></div>
-              <div class="prob-formulas-strip" style="margin-top:10px;">
+              <div class="prob-formulas-strip" style="margin-top:8px;">
                 <div class="fps-title">Fórmulas clave</div>
                 <div class="fps-row">
                   <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
@@ -867,19 +880,58 @@ Tabla de frecuencia → Gráfico circular.</div>
                 </div>
               </div>
             </div>
+
+            <div class="pts-step2-label">2. La tabla se actualiza según tu selección. Completa las celdas vacías:</div>
+            <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
+            <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
+
+            <!-- Justificación escrita -->
+            <div class="pA-justif-section">
+              <div class="pts-step2-label">3. Justifica tu elección de sistema de representación:</div>
+              <textarea class="p5d-resp-input" id="probA-justif" rows="2"
+                        placeholder="Explica por qué escogiste ese sistema y qué revela sobre los datos…"></textarea>
+            </div>
+
+            <div class="prob-bottom-row">
+              <button class="btn-verificar" onclick="verificarProblemaA()">🔍 Verificar tabla</button>
+              <button class="btn-verificar" style="background:var(--navy);" onclick="pAEnviarAlTutor()">💬 Consultar tutor</button>
+            </div>
           </div>
-          <div class="pts-step2-label">La tabla se actualiza según tu selección. Completa las celdas vacías:</div>
-          <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
-          <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
-          <div class="prob-bottom-row">
-            <button class="btn-verificar" onclick="verificarProblemaA()">🔍 Verificar escogencia y valores</button>
-            <div class="prob-nav" style="margin-left:auto;">
-              <button class="btn-prob-nav" onclick="cambiarProbA(-1)">← Anterior</button>
-              <span id="probA-counter" class="prob-counter">1 / 3</span>
-              <button class="btn-prob-nav" onclick="cambiarProbA(1)">Siguiente →</button>
+
+          <!-- Columna derecha: tutor IA -->
+          <div class="pA-right">
+            <div class="tutor-panel pA-tutor-panel">
+              <div class="tutor-header" style="background:#2d4a6e;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status">
+                    <span class="status-dot"></span>
+                    <span id="tutor-status-pA">En espera…</span>
+                  </div>
+                </div>
+                <button class="audio-toggle-btn" id="audio-btn-contA"
+                        onclick="toggleAudio('contA')" title="Activar lectura en voz alta">
+                  <span class="audio-icon">🔇</span>
+                  <span class="audio-waves" id="audio-waves-contA">
+                    <span></span><span></span><span></span>
+                  </span>
+                </button>
+              </div>
+              <div class="tutor-context-strip" style="border-left-color:var(--moss);">
+                🧩 Completa la tabla y escribe tu justificación, luego pulsa <strong>"Consultar tutor"</strong>. El tutor cuestionará tu elección y te empujará a profundizar.
+              </div>
+              <div id="chat-contA" class="chat-box pA-chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-contA" class="chat-input"
+                       placeholder="Continúa el diálogo…"
+                       onkeydown="if(event.key==='Enter') pAEnviarMensajeLibre()">
+                <button class="btn-send" onclick="pAEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
+              </div>
             </div>
           </div>
         </div>
+
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(11)">← Ejemplos</button>
           <button class="btn-nav next" onclick="irAPagina(13)">Fase de Validación →</button>
@@ -887,24 +939,37 @@ Tabla de frecuencia → Gráfico circular.</div>
       </div>
     </div>
 
-    <!-- ── Página 13: Validación Cap IV (original page-8) ── -->
+    <!-- ── Página 13: Validación Cap IV ── -->
     <div class="page" id="page-13">
       <div class="page-inner page-problems">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo II · Fase de Validación</span>
-          <span class="phase-indicator"><span class="phase-dot phase-c"></span><span class="phase-label">Valida y construye</span></span>
+          <span class="chapter-tag">Capítulo II · Validación</span>
+          <span class="phase-indicator"><span class="phase-dot phase-c"></span><span class="phase-label">Construye, analiza y defiende</span></span>
           <span class="page-num">12</span>
         </div>
-        <div class="prob-layout-full">
-          <div class="prob-top-row">
-            <div class="prob-enunciado prob-enunciado-half">
+
+        <!-- Tabs -->
+        <div class="prob-tabs-row" id="probB-tabs">
+          <button class="p5c-tab active" onclick="cambiarProbB(0)">Reto 1</button>
+          <button class="p5c-tab"        onclick="cambiarProbB(1)">Reto 2</button>
+          <button class="p5c-tab"        onclick="cambiarProbB(2)">Reto 3</button>
+        </div>
+
+        <div class="pB-layout">
+          <!-- Columna izquierda: enunciado + pistas + tabla + tipo -->
+          <div class="pB-left">
+            <div class="prob-enunciado">
               <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
               <p class="prob-enunciado-text" id="probB-enunciado"></p>
               <div class="prob-contexto-frases" id="probB-frases"></div>
-              <div class="prob-pregunta-box" style="border-left-color:var(--moss);"><span class="prob-pregunta-label">Construye la tabla que responda a:</span><p id="probB-pregunta" class="prob-pregunta-text"></p></div>
+              <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
+                <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
+                <p id="probB-pregunta" class="prob-pregunta-text"></p>
+              </div>
             </div>
-            <div class="prob-tipo-selector prob-selector-half">
-              <div class="pts-label">Escoge el sistema de representación adecuado:</div>
+
+            <div class="prob-tipo-selector">
+              <div class="pts-label">1. Escoge el sistema de representación adecuado:</div>
               <div class="pts-options">
                 <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoB('absoluta')">Frecuencias absolutas</button>
                 <button class="pts-btn" data-tipo="total"    onclick="escogerTipoB('total')">% sobre el total</button>
@@ -912,7 +977,7 @@ Tabla de frecuencia → Gráfico circular.</div>
                 <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoB('columna')">% por columna</button>
               </div>
               <div id="probB-tipo-feedback" class="pts-feedback" style="display:none;"></div>
-              <div class="prob-formulas-strip" style="margin-top:10px;">
+              <div class="prob-formulas-strip" style="margin-top:8px;">
                 <div class="fps-title">Fórmulas clave</div>
                 <div class="fps-row">
                   <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
@@ -922,19 +987,57 @@ Tabla de frecuencia → Gráfico circular.</div>
                 </div>
               </div>
             </div>
+
+            <div class="pts-step2-label">2. Construye la tabla completa (todas las celdas vacías):</div>
+            <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
+            <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
+
+            <!-- Preguntas de análisis -->
+            <div class="pB-analysis-section">
+              <div class="pts-step2-label">3. Preguntas de análisis — requieren razonamiento, no solo un número:</div>
+              <div id="probB-preguntas-list"></div>
+            </div>
+
+            <div class="prob-bottom-row" style="flex-wrap:wrap;gap:8px;">
+              <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">✅ Verificar tabla</button>
+              <button class="btn-verificar" style="background:var(--navy);" onclick="pBEnviarAlTutor()">💬 Consultar tutor</button>
+            </div>
           </div>
-          <div class="pts-step2-label">Construye la tabla completa (todas las celdas vacías):</div>
-          <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
-          <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
-          <div class="prob-bottom-row">
-            <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">✅ Verificar construcción completa</button>
-            <div class="prob-nav" style="margin-left:auto;">
-              <button class="btn-prob-nav" onclick="cambiarProbB(-1)">← Anterior</button>
-              <span id="probB-counter" class="prob-counter">1 / 3</span>
-              <button class="btn-prob-nav" onclick="cambiarProbB(1)">Siguiente →</button>
+
+          <!-- Columna derecha: tutor IA -->
+          <div class="pB-right">
+            <div class="tutor-panel pB-tutor-panel">
+              <div class="tutor-header" style="background:#2d4a6e;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status">
+                    <span class="status-dot"></span>
+                    <span id="tutor-status-pB">En espera…</span>
+                  </div>
+                </div>
+                <button class="audio-toggle-btn" id="audio-btn-contB"
+                        onclick="toggleAudio('contB')" title="Activar lectura en voz alta">
+                  <span class="audio-icon">🔇</span>
+                  <span class="audio-waves" id="audio-waves-contB">
+                    <span></span><span></span><span></span>
+                  </span>
+                </button>
+              </div>
+              <div class="tutor-context-strip" style="border-left-color:var(--gold);">
+                🏗️ Construye la tabla, responde las preguntas y pulsa <strong>"Consultar tutor"</strong>. El tutor analizará tu razonamiento y lo cuestionará para que vayas más profundo.
+              </div>
+              <div id="chat-contB" class="chat-box pB-chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-contB" class="chat-input"
+                       placeholder="Continúa el diálogo…"
+                       onkeydown="if(event.key==='Enter') pBEnviarMensajeLibre()">
+                <button class="btn-send" onclick="pBEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
+              </div>
             </div>
           </div>
         </div>
+
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(12)">← Formulación</button>
           <button class="btn-nav next" onclick="irAPagina(14)">¿Se puede probar? →</button>
