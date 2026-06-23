@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════
    LID — script.js
    Conexión al backend: https://lid-uis.onrender.com/api/chat
-   No modificar URL_BACKEND sin actualizar el servidor.
+   No modificar URL_BACKEND sin actualizar el servidor
 
    MAPA DE PÁGINAS:
    0  → Portada 
