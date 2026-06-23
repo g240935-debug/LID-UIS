@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════════
    LID — script.js
-   Conexión al backend https://lid-uis.onrender.com/api/chat
+   Conexión al backend: https://lid-uis.onrender.com/api/chat
    No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINA:
+   MAPA DE PÁGINAS:
    0  → Portada 
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
@@ -113,8 +113,8 @@ function hablarTexto(texto, chatId) {
   const limpio = texto
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
-    .replace(/fᵢ/g, 'fi').replace(/hᵢ/g, 'hi')
-    .replace(/Fᵢ/g, 'Fi').replace(/Hᵢ/g, 'Hi')
+    .replace(/fᵢ/g, 'fi').replace(/fᵣ/g, 'hi')
+    .replace(/Fᵢ/g, 'Fi').replace(/Fᵣ/g, 'Hi')
     .replace(/[<>]/g, '').replace(/\n+/g, '. ')
     .trim();
 
@@ -291,12 +291,12 @@ function actualizarFaseFreqA(texto) {
   if (!dot || !label) return;
 
   const completado = texto.includes('A continuación se muestra la tabla de frecuencias con la frecuencia relativa');
-  const tieneRelativa = texto.includes('Frecuencia Relativa') || texto.includes('h_i') || texto.includes('hᵢ');
+  const tieneRelativa = texto.includes('Frecuencia Relativa') || texto.includes('h_i') || texto.includes('fᵣ');
 
   if (completado) {
     dot.className     = 'phase-dot phase-done';
     label.textContent = 'Completado';
-    // Mostrar tabla expandida con hᵢ
+    // Mostrar tabla expandida con fᵣ
     const tablaHi = document.getElementById('freq-tabla-hi');
     if (tablaHi) tablaHi.style.display = 'block';
     // Habilitar botón siguiente
@@ -553,7 +553,7 @@ async function enviarMensajeFreqB() {
 
 // ══════════════════════════════════════════════════════
 // TUTOR UNIFICADO — Página 3: construye la tabla completa
-// en un ÚNICO chat, columna por columna (fᵢ→hᵢ→Fᵢ→Hᵢ)
+// en un ÚNICO chat, columna por columna (fᵢ→fᵣ→Fᵢ→Fᵣ)
 // ══════════════════════════════════════════════════════
 
 // Seguimiento de fases del chat unificado
@@ -561,9 +561,9 @@ let p3FaseActual = 'fi'; // 'fi' | 'hi' | 'Fi' | 'Hi' | 'completa'
 
 const P3_FASES = {
   fi:      { titulo: 'Fase 1: Frecuencia Absoluta (fᵢ)',          desc: 'El tutor te guía para entender el conteo directo de cada categoría.' },
-  hi:      { titulo: 'Fase 2: Frecuencia Relativa (hᵢ)',           desc: 'Aprende a calcular la proporción de cada categoría respecto al total N.' },
+  hi:      { titulo: 'Fase 2: Frecuencia Relativa (fᵣ)',           desc: 'Aprende a calcular la proporción de cada categoría respecto al total N.' },
   Fi:      { titulo: 'Fase 3: Frec. Absoluta Acumulada (Fᵢ)',      desc: 'Suma progresiva de frecuencias absolutas: ¿cuántos hasta esta categoría?' },
-  Hi:      { titulo: 'Fase 4: Frec. Relativa Acumulada (Hᵢ)',      desc: 'Proporción acumulada: Hᵢ = Fᵢ/N. La tabla completa está casi lista.' },
+  Hi:      { titulo: 'Fase 4: Frec. Relativa Acumulada (Fᵣ)',      desc: 'Proporción acumulada: Fᵣ = Fᵢ/N. La tabla completa está casi lista.' },
   completa:{ titulo: '¡Tabla completa! 🎉',                         desc: 'Has construido las cuatro columnas de la tabla de frecuencias con el tutor.' },
 };
 
@@ -593,9 +593,9 @@ function _p3ActualizarFaseVisual(fase) {
 
   const mensajes = {
     fi:       '📊 Observa la tabla inicial con fᵢ. Responde las preguntas del tutor.',
-    hi:       '➗ Nueva columna: hᵢ = fᵢ / N. Calcula la proporción de cada bebida.',
+    hi:       '➗ Nueva columna: fᵣ = fᵢ / N. Calcula la proporción de cada bebida.',
     Fi:       '➕ Nueva columna: Fᵢ acumula las frecuencias. Suma paso a paso.',
-    Hi:       '📈 Última columna: Hᵢ = Fᵢ / N. ¡Ya casi terminas!',
+    Hi:       '📈 Última columna: Fᵣ = Fᵢ / N. ¡Ya casi terminas!',
     completa: '✅ ¡Tabla de 4 columnas construida! Puedes avanzar a la Síntesis.',
   };
   if (strip) { strip.style.opacity='0'; setTimeout(() => { strip.textContent = mensajes[fase] || ''; strip.style.opacity='1'; }, 300); }
@@ -607,15 +607,15 @@ function _p3ActualizarFaseVisual(fase) {
 }
 
 function _p3DetectarFaseEnRespuesta(texto) {
-  // Detectar y revelar hᵢ
+  // Detectar y revelar fᵣ
   if (!p3Columnas.hi && (
-    texto.includes('frecuencia relativa') || texto.includes('hᵢ') || texto.includes('h_i') ||
+    texto.includes('frecuencia relativa') || texto.includes('fᵣ') || texto.includes('h_i') ||
     texto.includes('dividir entre N') || texto.includes('dividir entre el total') ||
     texto.includes('proporción')
   )) {
     p3Columnas.hi = true;
     setTimeout(renderizarP3Tabla, 300);
-    _p3MostrarNotificacion('hᵢ — Frecuencia Relativa');
+    _p3MostrarNotificacion('fᵣ — Frecuencia Relativa');
     _p3ActualizarFaseVisual('hi');
   }
   // Detectar y revelar Fᵢ
@@ -628,14 +628,14 @@ function _p3DetectarFaseEnRespuesta(texto) {
     _p3MostrarNotificacion('Fᵢ — Frecuencia Absoluta Acumulada');
     _p3ActualizarFaseVisual('Fi');
   }
-  // Detectar y revelar Hᵢ
+  // Detectar y revelar Fᵣ
   if (!p3Columnas.Hi && (
-    texto.includes('relativa acumulada') || texto.includes('Hᵢ') || texto.includes('H_i') ||
+    texto.includes('relativa acumulada') || texto.includes('Fᵣ') || texto.includes('H_i') ||
     texto.includes('proporción acumulada') || texto.includes('fracción acumulada')
   )) {
     p3Columnas.Hi = true;
     setTimeout(renderizarP3Tabla, 900);
-    _p3MostrarNotificacion('Hᵢ — Frecuencia Relativa Acumulada');
+    _p3MostrarNotificacion('Fᵣ — Frecuencia Relativa Acumulada');
     _p3ActualizarFaseVisual('Hi');
   }
   // Detectar tabla completa / finalización
@@ -1783,9 +1783,9 @@ function renderizarP3Tabla() {
 
   let html = '<table><thead><tr><th>Bebida</th>';
   if (fi) html += '<th>fᵢ</th>';
-  if (hi) html += '<th class="col-nueva col-hi">hᵢ = fᵢ/N</th>';
+  if (hi) html += '<th class="col-nueva col-hi">fᵣ = fᵢ/N</th>';
   if (Fi) html += '<th class="col-nueva col-Fi">Fᵢ (acum.)</th>';
-  if (Hi) html += '<th class="col-nueva col-Hi">Hᵢ (acum.)</th>';
+  if (Hi) html += '<th class="col-nueva col-Hi">Fᵣ (acum.)</th>';
   html += '</tr></thead><tbody>';
 
   P3_DATA.forEach(row => {
@@ -1824,23 +1824,23 @@ function _p3ActualizarBadges() {
   if (!label) return;
   const cols = [];
   if (p3Columnas.fi) cols.push('fᵢ');
-  if (p3Columnas.hi) cols.push('hᵢ');
+  if (p3Columnas.hi) cols.push('fᵣ');
   if (p3Columnas.Fi) cols.push('Fᵢ');
-  if (p3Columnas.Hi) cols.push('Hᵢ');
+  if (p3Columnas.Hi) cols.push('Fᵣ');
   label.textContent = `Tabla con: ${cols.join(', ')} — Bebidas para estudiar (N = 40)`;
 }
 
 // Detectar institucionalización en respuestas del tutor de página 3
 function detectarInstitucionalizacionP3(texto) {
-  // hᵢ: frecuencia relativa institucionalizada
+  // fᵣ: frecuencia relativa institucionalizada
   if (!p3Columnas.hi && (
     texto.includes('frecuencia relativa') ||
-    texto.includes('hᵢ') || texto.includes('h_i') ||
+    texto.includes('fᵣ') || texto.includes('h_i') ||
     texto.includes('dividir entre N') || texto.includes('dividir entre el total')
   )) {
     p3Columnas.hi = true;
     setTimeout(renderizarP3Tabla, 300);
-    _p3MostrarNotificacion('hᵢ — Frecuencia Relativa');
+    _p3MostrarNotificacion('fᵣ — Frecuencia Relativa');
   }
   // Fᵢ: absoluta acumulada
   if (!p3Columnas.Fi && (
@@ -1851,14 +1851,14 @@ function detectarInstitucionalizacionP3(texto) {
     setTimeout(renderizarP3Tabla, 600);
     _p3MostrarNotificacion('Fᵢ — Frecuencia Absoluta Acumulada');
   }
-  // Hᵢ: relativa acumulada
+  // Fᵣ: relativa acumulada
   if (!p3Columnas.Hi && (
-    texto.includes('relativa acumulada') || texto.includes('Hᵢ') || texto.includes('H_i') ||
+    texto.includes('relativa acumulada') || texto.includes('Fᵣ') || texto.includes('H_i') ||
     texto.includes('proporción acumulada') || texto.includes('fracción acumulada')
   )) {
     p3Columnas.Hi = true;
     setTimeout(renderizarP3Tabla, 900);
-    _p3MostrarNotificacion('Hᵢ — Frecuencia Relativa Acumulada');
+    _p3MostrarNotificacion('Fᵣ — Frecuencia Relativa Acumulada');
   }
 }
 
@@ -1962,18 +1962,18 @@ function ejfRenderizarTabla() {
   // Titulo
   const colNames = [];
   if (cols.fi) colNames.push('fᵢ');
-  if (cols.hi) colNames.push('hᵢ');
+  if (cols.hi) colNames.push('fᵣ');
   if (cols.Fi) colNames.push('Fᵢ');
-  if (cols.Hi) colNames.push('Hᵢ');
+  if (cols.Hi) colNames.push('Fᵣ');
   if (titleEl) titleEl.textContent = ejfModoActual === 'completa'
     ? 'Tabla de frecuencias completa — Bebidas para estudiar (N = 40)'
     : `Vista personalizada: ${colNames.join(', ')} — ${filas.length} categoría(s)`;
 
   let html = '<table><thead><tr><th>Bebida</th>';
   if (cols.fi) html += '<th>fᵢ</th>';
-  if (cols.hi) html += '<th class="ejf-th-hi">hᵢ</th>';
+  if (cols.hi) html += '<th class="ejf-th-hi">fᵣ</th>';
   if (cols.Fi) html += '<th class="ejf-th-Fi">Fᵢ</th>';
-  if (cols.Hi) html += '<th class="ejf-th-Hi">Hᵢ</th>';
+  if (cols.Hi) html += '<th class="ejf-th-Hi">Fᵣ</th>';
   html += '</tr></thead><tbody>';
 
   filas.forEach(row => {
@@ -2012,9 +2012,9 @@ function ejfRenderizarTabla() {
     } else {
       const mensajes = {
         fi: 'fᵢ: conteo directo de observaciones en cada categoría.',
-        hi: 'hᵢ = fᵢ/N: proporción de cada categoría respecto al total.',
+        hi: 'fᵣ = fᵢ/N: proporción de cada categoría respecto al total.',
         Fi: 'Fᵢ: suma acumulada de frecuencias absolutas.',
-        Hi: 'Hᵢ = Fᵢ/N: proporción acumulada hasta la categoría i.',
+        Hi: 'Fᵣ = Fᵢ/N: proporción acumulada hasta la categoría i.',
       };
       info.textContent = Object.entries(mensajes).filter(([k]) => cols[k]).map(([,v]) => v).join('  |  ');
     }
@@ -2064,7 +2064,7 @@ function ejfRenderizarGrafico() {
       data: {
         labels,
         datasets: [{
-          label: 'hᵢ',
+          label: 'fᵣ',
           data: filas.map(r => r.hi),
           backgroundColor: filas.map((_,i) => COLORES[i % COLORES.length]),
           borderWidth: 2, borderColor: '#fff',
@@ -2074,7 +2074,7 @@ function ejfRenderizarGrafico() {
         responsive: true,
         plugins: {
           legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12 } },
-          title: { display: true, text: 'Frecuencia Relativa (hᵢ) — Pastel', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+          title: { display: true, text: 'Frecuencia Relativa (fᵣ) — Pastel', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
         },
         animation: { duration: 500 }
       }
@@ -2094,7 +2094,7 @@ function ejfRenderizarGrafico() {
             fill: true, tension: .3, pointRadius: 5,
           },
           {
-            label: 'Hᵢ×40 (rel. acumulada ×N)',
+            label: 'Fᵣ×40 (rel. acumulada ×N)',
             data: filas.map(r => +(r.Hi * 40).toFixed(1)),
             borderColor: 'rgba(200,168,75,1)',
             backgroundColor: 'rgba(200,168,75,.08)',
@@ -2125,8 +2125,8 @@ function ejfRenderizarGrafico() {
   if (info) {
     const msgs = {
       barras: 'Diagrama de barras: visualiza las frecuencias absolutas (fᵢ) de cada categoría.',
-      pie:    'Gráfico de pastel (doughnut): muestra la proporción relativa (hᵢ) de cada categoría. ',
-      acum:   'Gráfico de frecuencias acumuladas: Fᵢ crece de 0 a N=40; Hᵢ×40 superpone la misma curva normalizada.',
+      pie:    'Gráfico de pastel (doughnut): muestra la proporción relativa (fᵣ) de cada categoría. ',
+      acum:   'Gráfico de frecuencias acumuladas: Fᵢ crece de 0 a N=40; Fᵣ×40 superpone la misma curva normalizada.',
     };
     info.textContent = msgs[tipo];
   }
@@ -2176,7 +2176,7 @@ const P5C_PROBLEMAS = [
       { cat: 'Historia',          fi: 6  },
       { cat: 'Educación Física',  fi: 4  },
     ],
-    pista: 'Recuerda: hᵢ = fᵢ / N. Con N = 50, la primera fila da hᵢ = 18/50 = 0.36.',
+    pista: 'Recuerda: fᵣ = fᵢ / N. Con N = 50, la primera fila da fᵣ = 18/50 = 0.36.',
   },
   {
     titulo: 'Problema 2',
@@ -2202,7 +2202,7 @@ const P5C_PROBLEMAS = [
       { cat: 'Poesía',           fi: 7  },
       { cat: 'Cómic',            fi: 5  },
     ],
-    pista: 'Hᵢ = Fᵢ / N. La última fila siempre tendrá Hᵢ = 1.00 y Fᵢ = N.',
+    pista: 'Fᵣ = Fᵢ / N. La última fila siempre tendrá Fᵣ = 1.00 y Fᵢ = N.',
   },
 ];
 
@@ -2246,7 +2246,7 @@ function p5cCargarProblema(idx) {
 
   // Construir tabla
   const wrap = document.getElementById('p5c-tabla-wrap');
-  const cols = ['fᵢ','hᵢ','Fᵢ','Hᵢ'];
+  const cols = ['fᵢ','fᵣ','Fᵢ','Fᵣ'];
   const keys = ['fi','hi','Fi','Hi'];
   let html = `<table class="p5c-tabla"><thead><tr>
     <th>Categoría</th>
@@ -2344,7 +2344,7 @@ function p5cReset() {
 /* ════════════════════════════════════════════════════════════
    PÁGINA 5d — PROBLEMA LIBRE: EL ESTUDIANTE CONSTRUYE SU TABLA
    El estudiante elige el orden de las filas y llena los datos.
-   3 preguntas de análisis que exigen interpretar hᵢ, Fᵢ y Hᵢ.
+   3 preguntas de análisis que exigen interpretar fᵣ, Fᵢ y Fᵣ.
 ════════════════════════════════════════════════════════════ */
 
 let p5dSituacionActual = 0;
@@ -2368,7 +2368,7 @@ const P5D_SITUACIONES = [
         tipo: 'hi',
         texto: '¿Qué proporción del total de refrigerios representa la combinación de Sándwich y Yogur juntos? Explica por qué esta frecuencia relativa combinada es útil para el tendero al momento de planear su inventario.',
         respClave: ['0.35','35%','sándwich y yogur representan el 35','juntos representan el 35'],
-        retroalimentacion: 'hᵢ(Sándwich) = 30/120 = 0.25 y hᵢ(Yogur) = 12/120 = 0.10. Juntos suman 0.35 (35%). Esto le indica al tendero que más de 1 de cada 3 refrigerios vendidos pertenece a esas dos categorías, lo que orienta el inventario.',
+        retroalimentacion: 'fᵣ(Sándwich) = 30/120 = 0.25 y fᵣ(Yogur) = 12/120 = 0.10. Juntos suman 0.35 (35%). Esto le indica al tendero que más de 1 de cada 3 refrigerios vendidos pertenece a esas dos categorías, lo que orienta el inventario.',
       },
       {
         id: 'p5d-q2',
@@ -2380,9 +2380,9 @@ const P5D_SITUACIONES = [
       {
         id: 'p5d-q3',
         tipo: 'Hi',
-        texto: 'Construye la tabla ordenando las categorías de menor a mayor venta. ¿En qué posición acumulada se supera el 50% de los refrigerios vendidos (Hᵢ > 0.50)? ¿Cómo cambia esta interpretación respecto al orden de mayor a menor?',
+        texto: 'Construye la tabla ordenando las categorías de menor a mayor venta. ¿En qué posición acumulada se supera el 50% de los refrigerios vendidos (Fᵣ > 0.50)? ¿Cómo cambia esta interpretación respecto al orden de mayor a menor?',
         respClave: ['yogur','empanada','frutas','tercer','cuarta','0.5','50%','acumulada supera','supera el 50'],
-        retroalimentacion: 'Ordenando de menor a mayor: Yogur(12), Empanada(18), Frutas(22), Sándwich(30), Jugo(38). Hᵢ acumulado: 0.10 → 0.25 → 0.43 → 0.68. Se supera el 50% en la 4ª fila (Sándwich). En orden de mayor a menor, se superaba en la 2ª fila. El orden cambia la posición del "punto de mitad", lo cual es relevante para analizar cuáles productos son los de mayor impacto acumulado.',
+        retroalimentacion: 'Ordenando de menor a mayor: Yogur(12), Empanada(18), Frutas(22), Sándwich(30), Jugo(38). Fᵣ acumulado: 0.10 → 0.25 → 0.43 → 0.68. Se supera el 50% en la 4ª fila (Sándwich). En orden de mayor a menor, se superaba en la 2ª fila. El orden cambia la posición del "punto de mitad", lo cual es relevante para analizar cuáles productos son los de mayor impacto acumulado.',
       },
     ],
   },
@@ -2402,9 +2402,9 @@ const P5D_SITUACIONES = [
       {
         id: 'p5d-q1',
         tipo: 'hi',
-        texto: '¿Cuál es la frecuencia relativa (hᵢ) de las plataformas que NO son YouTube? ¿Por qué podría ser más informativo comunicar este dato como proporción en lugar de conteo absoluto?',
+        texto: '¿Cuál es la frecuencia relativa (fᵣ) de las plataformas que NO son YouTube? ¿Por qué podría ser más informativo comunicar este dato como proporción en lugar de conteo absoluto?',
         respClave: ['0.61','55','61%','no son youtube','resto','las demás'],
-        retroalimentacion: 'YouTube: hᵢ = 35/90 ≈ 0.39. El resto: 55/90 ≈ 0.61 (61%). Comunicarlo como proporción permite comparar con otros contextos sin importar el tamaño total de la muestra — si otro estudio tiene 200 estudiantes, los porcentajes son comparables pero los conteos no.',
+        retroalimentacion: 'YouTube: fᵣ = 35/90 ≈ 0.39. El resto: 55/90 ≈ 0.61 (61%). Comunicarlo como proporción permite comparar con otros contextos sin importar el tamaño total de la muestra — si otro estudio tiene 200 estudiantes, los porcentajes son comparables pero los conteos no.',
       },
       {
         id: 'p5d-q2',
@@ -2416,9 +2416,9 @@ const P5D_SITUACIONES = [
       {
         id: 'p5d-q3',
         tipo: 'Hi',
-        texto: 'Si ordenas de menor a mayor uso, ¿en qué categoría la frecuencia relativa acumulada (Hᵢ) supera por primera vez el 25%? Compara ese resultado con el orden de mayor a menor. ¿Qué nos revela esta diferencia sobre la concentración del uso?',
+        texto: 'Si ordenas de menor a mayor uso, ¿en qué categoría la frecuencia relativa acumulada (Fᵣ) supera por primera vez el 25%? Compara ese resultado con el orden de mayor a menor. ¿Qué nos revela esta diferencia sobre la concentración del uso?',
         respClave: ['blogs','podcasts y blogs','0.25','25%','tercera','segunda','segunda fila','concentración'],
-        retroalimentacion: 'Menor a mayor: Podcasts(5), Blogs(10), Apps(15), PDF(25), YouTube(35). Hᵢ: 0.056 → 0.167 → 0.333. Se supera 25% en la 3ª fila (Apps). De mayor a menor se supera en la 1ª fila (YouTube solo ya es 39%). Esto revela alta concentración: una sola plataforma domina casi el 40% del uso.',
+        retroalimentacion: 'Menor a mayor: Podcasts(5), Blogs(10), Apps(15), PDF(25), YouTube(35). Fᵣ: 0.056 → 0.167 → 0.333. Se supera 25% en la 3ª fila (Apps). De mayor a menor se supera en la 1ª fila (YouTube solo ya es 39%). Esto revela alta concentración: una sola plataforma domina casi el 40% del uso.',
       },
     ],
   },
@@ -2480,7 +2480,7 @@ function p5dRenderTabla(sit) {
   let html = `<table class="p5c-tabla p5d-tabla">
     <thead><tr>
       <th class="p5d-th-drag">☰</th>
-      <th>Categoría</th><th>fᵢ</th><th>hᵢ</th><th>Fᵢ</th><th>Hᵢ</th>
+      <th>Categoría</th><th>fᵢ</th><th>fᵣ</th><th>Fᵢ</th><th>Fᵣ</th>
     </tr></thead>
     <tbody id="p5d-tbody">`;
 
@@ -2507,9 +2507,9 @@ function p5dRenderTabla(sit) {
 function p5dRenderPreguntas(sit) {
   const list = document.getElementById('p5d-preguntas-list');
   list.innerHTML = sit.preguntas.map((p, i) => {
-    const badge = p.tipo === 'hi' ? 'hᵢ — Frecuencia Relativa'
+    const badge = p.tipo === 'hi' ? 'fᵣ — Frecuencia Relativa'
                 : p.tipo === 'Fi' ? 'Fᵢ — Acumulada Absoluta'
-                                  : 'Hᵢ — Acumulada Relativa';
+                                  : 'Fᵣ — Acumulada Relativa';
     const color = p.tipo === 'hi' ? 'var(--moss)'
                 : p.tipo === 'Fi' ? 'var(--sky)'
                                   : 'var(--gold)';
@@ -2597,7 +2597,7 @@ function p5dVerificarTabla() {
   fb.style.display = 'block';
   if (vacias > 0) {
     fb.className = 'prob-feedback parcial';
-    fb.textContent = `${vacias} celda(s) vacía(s). Completa todas las celdas hᵢ, Fᵢ y Hᵢ antes de verificar.`;
+    fb.textContent = `${vacias} celda(s) vacía(s). Completa todas las celdas fᵣ, Fᵢ y Fᵣ antes de verificar.`;
   } else if (correctas < total) {
     fb.className = 'prob-feedback error';
     fb.textContent = `${correctas}/${total} celdas correctas. Las celdas en rojo tienen errores. Recuerda que Fᵢ depende del orden de las filas que elegiste.`;
@@ -2677,7 +2677,7 @@ function p5dConstruirContexto() {
   const HiCells = document.querySelectorAll('.p5d-Hi-cell');
 
   let tablaTexto = 'Tabla construida por el estudiante (en el orden que eligió):\n';
-  tablaTexto += `Categoría | fᵢ | hᵢ (estudiante) | Fᵢ (estudiante) | Hᵢ (estudiante) | hᵢ correcto | Fᵢ correcto | Hᵢ correcto\n`;
+  tablaTexto += `Categoría | fᵢ | fᵣ (estudiante) | Fᵢ (estudiante) | Fᵣ (estudiante) | fᵣ correcto | Fᵢ correcto | Fᵣ correcto\n`;
 
   let acumF = 0;
   p5dOrdenActual.forEach((catIdx, pos) => {
