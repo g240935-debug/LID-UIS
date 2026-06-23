@@ -1695,3 +1695,91 @@ html, body {
   animation: p3Celebra 1s ease 2;
   border-radius: 4px;
 }
+
+/* ══════════════════════════════════════════════
+   AUDIO TOGGLE — botón de voz en tutor-header
+══════════════════════════════════════════════ */
+
+/* Empuja el botón al extremo derecho del header */
+.tutor-header {
+  position: relative;
+}
+.audio-toggle-btn {
+  margin-left: auto;
+  background: rgba(255,255,255,.13);
+  border: 1.5px solid rgba(255,255,255,.3);
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: white;
+  font-size: .78rem;
+  font-family: 'Inter', sans-serif;
+  transition: background .2s, border-color .2s, transform .1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.audio-toggle-btn:hover {
+  background: rgba(255,255,255,.25);
+  border-color: rgba(255,255,255,.6);
+  transform: scale(1.04);
+}
+.audio-toggle-btn.audio-on {
+  background: rgba(255,255,255,.28);
+  border-color: rgba(255,255,255,.85);
+}
+.audio-icon {
+  font-size: .85rem;
+  line-height: 1;
+}
+
+/* Ondas animadas — visibles solo cuando audio está ON y el tutor habla */
+.audio-waves {
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.audio-waves span {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: white;
+  animation: audioWave 0.9s ease-in-out infinite;
+}
+.audio-waves span:nth-child(1) { height: 5px;  animation-delay: 0s;    }
+.audio-waves span:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+.audio-waves span:nth-child(3) { height: 7px;  animation-delay: 0.3s;  }
+
+@keyframes audioWave {
+  0%, 100% { transform: scaleY(0.4); opacity: .6; }
+  50%       { transform: scaleY(1.0); opacity: 1;  }
+}
+
+/* Cuando el tutor está hablando activamente */
+.audio-toggle-btn.audio-speaking .audio-waves {
+  display: flex;
+}
+
+/* Tooltip label visible al hover */
+.audio-toggle-btn::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: rgba(0,0,0,.75);
+  color: white;
+  font-size: .68rem;
+  padding: 3px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 10;
+}
+.audio-toggle-btn:hover::after {
+  opacity: 1;
+}
