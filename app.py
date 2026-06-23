@@ -287,7 +287,7 @@ headers = ["Género \\ Actividad", "Deportes", "Danza", "Música", "Total Margin
 grafico_valores = [5, 25, 30]
 
 # ════════════════════════════════════════════════
-# SYSTEM PROMPTS — CAPÍTULO II
+# SYSTEM PROMPT — CAPÍTULO II
 # ════════════════════════════════════════════════
 system_prompt_cap2 = """Eres un mediador pedagógico (estudiante senior de la UIS). 
 Tu objetivo es guiar al usuario a través de la TSD (Brousseau) situacion a-didactica y el análisis bivariado (Niveles de Curcio) y por medio de la interacción hacerle ver al estudiante la importancia, a partir de problemas reales.
