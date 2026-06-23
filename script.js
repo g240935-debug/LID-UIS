@@ -38,9 +38,10 @@ let chatCap2Iniciado   = false;  // pág 7
 let chatCap3Iniciado   = false;  // pág 10
 let chatChiIniciado    = false;  // pág 14
 let chatFreqAIniciado  = false;  // pág 2
-let chatFreqBIniciado  = false;  // pág 3
+let chatFreqBIniciado  = false;  // pág 3 (legacy)
 let chatFreqCIniciado  = false;  // pág 4 (fase C: frec. abs. acumulada)
 let chatFreqDIniciado  = false;  // pág 4 (fase D: frec. rel. acumulada)
+let chatFreqUnifIniciado = false; // pág 3 unificada
 
 let freqCCompletado = false;     // true cuando la IA de fase C termina
 let chiActual       = 0;
@@ -97,16 +98,16 @@ function irAPagina(n) {
 
   // ── Inicialización de tutores al llegar a cada página ──
 
-  // Cap I — Fase A+B (frec. absoluta + relativa)
+  // Cap I — Fase A+B (frec. absoluta + relativa) — pág 2 legacy
   if (n === 2 && !chatFreqAIniciado) {
     chatFreqAIniciado = true;
     setTimeout(inicializarChatFreqA, 400);
   }
 
-  // Cap I — Fase B (Curcio N3/N4) — también inicializar tabla dinámica
-  if (n === 3 && !chatFreqBIniciado) {
-    chatFreqBIniciado = true;
-    setTimeout(() => { renderizarP3Tabla(); inicializarChatFreqB(); }, 400);
+  // Cap I — Actividad unificada (pág 3): construye tabla completa en un solo chat
+  if (n === 3 && !chatFreqUnifIniciado) {
+    chatFreqUnifIniciado = true;
+    setTimeout(() => { renderizarP3Tabla(); inicializarChatFreqUnif(); }, 400);
   }
 
   // Cap I — Fase C+D (frec. acumuladas)
@@ -445,6 +446,161 @@ async function enviarMensajeFreqB() {
 
 
 
+// ══════════════════════════════════════════════════════
+// TUTOR UNIFICADO — Página 3: construye la tabla completa
+// en un ÚNICO chat, columna por columna (fᵢ→hᵢ→Fᵢ→Hᵢ)
+// ══════════════════════════════════════════════════════
+
+// Seguimiento de fases del chat unificado
+let p3FaseActual = 'fi'; // 'fi' | 'hi' | 'Fi' | 'Hi' | 'completa'
+
+const P3_FASES = {
+  fi:      { titulo: 'Fase 1: Frecuencia Absoluta (fᵢ)',          desc: 'El tutor te guía para entender el conteo directo de cada categoría.' },
+  hi:      { titulo: 'Fase 2: Frecuencia Relativa (hᵢ)',           desc: 'Aprende a calcular la proporción de cada categoría respecto al total N.' },
+  Fi:      { titulo: 'Fase 3: Frec. Absoluta Acumulada (Fᵢ)',      desc: 'Suma progresiva de frecuencias absolutas: ¿cuántos hasta esta categoría?' },
+  Hi:      { titulo: 'Fase 4: Frec. Relativa Acumulada (Hᵢ)',      desc: 'Proporción acumulada: Hᵢ = Fᵢ/N. La tabla completa está casi lista.' },
+  completa:{ titulo: '¡Tabla completa! 🎉',                         desc: 'Has construido las cuatro columnas de la tabla de frecuencias con el tutor.' },
+};
+
+const P3_COLORES_FASE = { fi: 'phase-a', hi: 'phase-b', Fi: 'phase-c', Hi: 'phase-done', completa: 'phase-done' };
+
+function _p3ActualizarFaseVisual(fase) {
+  p3FaseActual = fase;
+  const dot   = document.getElementById('freqPhaseDotUnif');
+  const label = document.getElementById('freqPhaseLabelUnif');
+  const notaEl     = document.getElementById('p3-fase-nota');
+  const notaTitulo = document.getElementById('p3-fase-titulo');
+  const notaDesc   = document.getElementById('p3-fase-desc');
+  const strip      = document.getElementById('p3-context-strip');
+  const wrapper    = document.getElementById('p3-tabla-wrapper');
+  const info = P3_FASES[fase] || P3_FASES.fi;
+
+  if (dot)   { dot.className = 'phase-dot ' + (P3_COLORES_FASE[fase] || 'phase-a'); }
+  if (label) { label.textContent = fase === 'completa' ? 'Completa ✓' : fase + ' activa'; }
+
+  // Animar transición de nota
+  if (notaTitulo) { notaTitulo.style.opacity = '0'; setTimeout(() => { notaTitulo.textContent = '📌 ' + info.titulo; notaTitulo.style.opacity = '1'; }, 200); }
+  if (notaDesc)   { notaDesc.style.opacity   = '0'; setTimeout(() => { notaDesc.textContent   = info.desc;           notaDesc.style.opacity   = '1'; }, 250); }
+
+  // Clases de color para la nota y el strip
+  if (notaEl) { notaEl.className = `note-card fase-${fase}`; }
+  if (strip)  { strip.className  = `strip-${fase}`; }
+
+  const mensajes = {
+    fi:       '📊 Observa la tabla inicial con fᵢ. Responde las preguntas del tutor.',
+    hi:       '➗ Nueva columna: hᵢ = fᵢ / N. Calcula la proporción de cada bebida.',
+    Fi:       '➕ Nueva columna: Fᵢ acumula las frecuencias. Suma paso a paso.',
+    Hi:       '📈 Última columna: Hᵢ = Fᵢ / N. ¡Ya casi terminas!',
+    completa: '✅ ¡Tabla de 4 columnas construida! Puedes avanzar a la Síntesis.',
+  };
+  if (strip) { strip.style.opacity='0'; setTimeout(() => { strip.textContent = mensajes[fase] || ''; strip.style.opacity='1'; }, 300); }
+
+  // Pulso celebración al completar
+  if (fase === 'completa' && wrapper) {
+    wrapper.classList.add('completa');
+  }
+}
+
+function _p3DetectarFaseEnRespuesta(texto) {
+  // Detectar y revelar hᵢ
+  if (!p3Columnas.hi && (
+    texto.includes('frecuencia relativa') || texto.includes('hᵢ') || texto.includes('h_i') ||
+    texto.includes('dividir entre N') || texto.includes('dividir entre el total') ||
+    texto.includes('proporción')
+  )) {
+    p3Columnas.hi = true;
+    setTimeout(renderizarP3Tabla, 300);
+    _p3MostrarNotificacion('hᵢ — Frecuencia Relativa');
+    _p3ActualizarFaseVisual('hi');
+  }
+  // Detectar y revelar Fᵢ
+  if (!p3Columnas.Fi && (
+    texto.includes('absoluta acumulada') || texto.includes('Fᵢ') || texto.includes('F_i') ||
+    texto.includes('acumulando') || texto.includes('suma progresiva') || texto.includes('frecuencia acumulada')
+  )) {
+    p3Columnas.Fi = true;
+    setTimeout(renderizarP3Tabla, 600);
+    _p3MostrarNotificacion('Fᵢ — Frecuencia Absoluta Acumulada');
+    _p3ActualizarFaseVisual('Fi');
+  }
+  // Detectar y revelar Hᵢ
+  if (!p3Columnas.Hi && (
+    texto.includes('relativa acumulada') || texto.includes('Hᵢ') || texto.includes('H_i') ||
+    texto.includes('proporción acumulada') || texto.includes('fracción acumulada')
+  )) {
+    p3Columnas.Hi = true;
+    setTimeout(renderizarP3Tabla, 900);
+    _p3MostrarNotificacion('Hᵢ — Frecuencia Relativa Acumulada');
+    _p3ActualizarFaseVisual('Hi');
+  }
+  // Detectar tabla completa / finalización
+  const tablaCompleta = p3Columnas.fi && p3Columnas.hi && p3Columnas.Fi && p3Columnas.Hi;
+  if (tablaCompleta && p3FaseActual !== 'completa' && (
+    texto.includes('completa') || texto.includes('¡Excelente') || texto.includes('has construido') ||
+    texto.includes('tabla completa') || texto.includes('todas las columnas')
+  )) {
+    _p3ActualizarFaseVisual('completa');
+    const btn = document.getElementById('btn-freq-unif-next');
+    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+  }
+  // Si ya tenemos las 4 columnas, habilitar siempre el botón siguiente
+  if (tablaCompleta) {
+    const btn = document.getElementById('btn-freq-unif-next');
+    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+  }
+}
+
+async function inicializarChatFreqUnif() {
+  setStatusFreq('tutor-status-freq-unif', 'Conectando…');
+  _p3ActualizarFaseVisual('fi');
+  try {
+    const res  = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Hola, estoy listo para construir la tabla de frecuencias completa paso a paso. Empecemos desde la frecuencia absoluta.',
+        session_id: `freq_unif_${sessionId}`
+      })
+    });
+    const data = await res.json();
+    if (data.reply) {
+      agregarMensajeGen('chat-freq-unif', data.reply, 'tutor');
+      _p3DetectarFaseEnRespuesta(data.reply);
+    }
+    setStatusFreq('tutor-status-freq-unif', 'En línea');
+  } catch (err) {
+    agregarMensajeGen('chat-freq-unif', '¡Hola! Vamos a construir juntos la tabla de frecuencias completa. Observa la tabla: ¿cuántos jóvenes eligieron Café Negro?', 'tutor');
+    setStatusFreq('tutor-status-freq-unif', 'En línea');
+  }
+}
+
+async function enviarMensajeFreqUnif() {
+  const input = document.getElementById('input-freq-unif');
+  if (!input?.value.trim()) return;
+  const texto = input.value.trim(); input.value = '';
+  agregarMensajeGen('chat-freq-unif', texto, 'user');
+  const tid = agregarTypingGen('chat-freq-unif');
+  setStatusFreq('tutor-status-freq-unif', 'Escribiendo…');
+  try {
+    const res  = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: texto, session_id: `freq_unif_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    setStatusFreq('tutor-status-freq-unif', 'En línea');
+    if (data.reply) {
+      agregarMensajeGen('chat-freq-unif', data.reply, 'tutor');
+      _p3DetectarFaseEnRespuesta(data.reply);
+    }
+  } catch (err) {
+    quitarTypingGen(tid);
+    setStatusFreq('tutor-status-freq-unif', 'En línea');
+    agregarMensajeGen('chat-freq-unif', 'Problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
+
 // ── Fase C: frec. absoluta acumulada (pág 4) ──
 async function inicializarChatFreqC() {
   setStatusFreq('tutor-status-freq-c', 'Conectando…');
@@ -725,6 +881,13 @@ async function cargarHistorial(idSesion, contenedorId) {
         });
       }
       if (contenedorId === 'chat-freq-c') { actualizarFaseFreqC(ultimo); actualizarFaseFreqD(ultimo); }
+      if (contenedorId === 'chat-freq-unif') {
+        // Replay all AI messages to rebuild table columns and phase state
+        data.history.forEach(m => {
+          if (m.role === 'assistant') _p3DetectarFaseEnRespuesta(m.content);
+        });
+        renderizarP3Tabla();
+      }
     }
   } catch (err) { console.error(`Error al recuperar historial ${idSesion}:`, err); }
 }
@@ -1723,6 +1886,7 @@ document.addEventListener('DOMContentLoaded', () => {
   cargarHistorial(`freq_A_${sessionId}`, 'chat-freq-a');
   cargarHistorial(`freq_B_${sessionId}`, 'chat-freq-b');
   cargarHistorial(`freq_C_${sessionId}`, 'chat-freq-c');
+  cargarHistorial(`freq_unif_${sessionId}`, 'chat-freq-unif');
 
   // Renderizar tablas y gráficos estáticos
   renderizarFPTabla('absoluta');
