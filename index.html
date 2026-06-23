@@ -842,95 +842,88 @@ Tabla de frecuencia → Gráfico circular.</div>
           <span class="page-num">11</span>
         </div>
 
-        <!-- Tabs de problema -->
         <div class="prob-tabs-row" id="probA-tabs">
           <button class="p5c-tab active" onclick="cambiarProbA(0)">Problema 1</button>
           <button class="p5c-tab"        onclick="cambiarProbA(1)">Problema 2</button>
           <button class="p5c-tab"        onclick="cambiarProbA(2)">Problema 3</button>
         </div>
 
-        <div class="pA-layout">
-          <!-- Columna izquierda: enunciado + tipo + tabla -->
-          <div class="pA-left">
-            <div class="prob-enunciado">
-              <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
-              <p class="prob-enunciado-text" id="probA-enunciado"></p>
-              <div class="prob-pregunta-box">
-                <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
-                <p id="probA-pregunta" class="prob-pregunta-text"></p>
+        <!-- Layout de una sola columna (como 5c/5d) -->
+        <div class="pAB-single-col">
+
+          <!-- Enunciado -->
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">Problema <span id="probA-num-badge">1</span> de 3</div>
+            <p class="prob-enunciado-text" id="probA-enunciado"></p>
+            <div class="prob-pregunta-box">
+              <span class="prob-pregunta-label">Pregunta que guía esta actividad:</span>
+              <p id="probA-pregunta" class="prob-pregunta-text"></p>
+            </div>
+          </div>
+
+          <!-- Paso 1: elegir tipo -->
+          <div class="prob-tipo-selector">
+            <div class="pts-label">1. Escoge el sistema de representación que mejor responde la pregunta:</div>
+            <div class="pts-options">
+              <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoA('absoluta')">Frecuencias absolutas</button>
+              <button class="pts-btn" data-tipo="total"    onclick="escogerTipoA('total')">% sobre el total</button>
+              <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoA('fila')">% por fila</button>
+              <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoA('columna')">% por columna</button>
+            </div>
+            <div id="probA-tipo-feedback" class="pts-feedback" style="display:none;"></div>
+            <div class="prob-formulas-strip" style="margin-top:8px;">
+              <div class="fps-title">Fórmulas clave</div>
+              <div class="fps-row">
+                <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
+                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
+                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
+                <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
               </div>
             </div>
+          </div>
 
-            <div class="prob-tipo-selector">
-              <div class="pts-label">1. Escoge el sistema de representación que mejor responde la pregunta:</div>
-              <div class="pts-options">
-                <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoA('absoluta')">Frecuencias absolutas</button>
-                <button class="pts-btn" data-tipo="total"    onclick="escogerTipoA('total')">% sobre el total</button>
-                <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoA('fila')">% por fila</button>
-                <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoA('columna')">% por columna</button>
-              </div>
-              <div id="probA-tipo-feedback" class="pts-feedback" style="display:none;"></div>
-              <div class="prob-formulas-strip" style="margin-top:8px;">
-                <div class="fps-title">Fórmulas clave</div>
-                <div class="fps-row">
-                  <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
-                  <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
-                  <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
-                  <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="pts-step2-label">2. La tabla se actualiza según tu selección. Completa las celdas vacías:</div>
+          <!-- Paso 2: tabla (oculta hasta que elijan tipo) -->
+          <div id="probA-tabla-section" style="display:none;">
+            <div class="pts-step2-label">2. Completa las celdas vacías con el sistema que escogiste:</div>
             <div class="prob-tabla-wrapper" id="probA-tabla-wrapper"></div>
             <div class="prob-feedback" id="probA-feedback" style="display:none;"></div>
 
-            <!-- Justificación escrita -->
-            <div class="pA-justif-section">
-              <div class="pts-step2-label">3. Justifica tu elección de sistema de representación:</div>
-              <textarea class="p5d-resp-input" id="probA-justif" rows="2"
-                        placeholder="Explica por qué escogiste ese sistema y qué revela sobre los datos…"></textarea>
-            </div>
+            <!-- Paso 3: justificación -->
+            <div class="pts-step2-label" style="margin-top:10px;">3. Justifica tu elección:</div>
+            <textarea class="p5d-resp-input" id="probA-justif" rows="2"
+                      placeholder="Explica por qué escogiste ese sistema y qué revela sobre los datos…"></textarea>
 
-            <div class="prob-bottom-row">
+            <div class="prob-bottom-row" style="margin-top:8px;">
               <button class="btn-verificar" onclick="verificarProblemaA()">🔍 Verificar tabla</button>
               <button class="btn-verificar" style="background:var(--navy);" onclick="pAEnviarAlTutor()">💬 Consultar tutor</button>
             </div>
           </div>
 
-          <!-- Columna derecha: tutor IA -->
-          <div class="pA-right">
-            <div class="tutor-panel pA-tutor-panel">
-              <div class="tutor-header" style="background:#2d4a6e;">
-                <div class="tutor-avatar">🎓</div>
-                <div class="tutor-info">
-                  <div class="tutor-name">Tutor Virtual UIS</div>
-                  <div class="tutor-status">
-                    <span class="status-dot"></span>
-                    <span id="tutor-status-pA">En espera…</span>
-                  </div>
-                </div>
-                <button class="audio-toggle-btn" id="audio-btn-contA"
-                        onclick="toggleAudio('contA')" title="Activar lectura en voz alta">
-                  <span class="audio-icon">🔇</span>
-                  <span class="audio-waves" id="audio-waves-contA">
-                    <span></span><span></span><span></span>
-                  </span>
-                </button>
+          <!-- Tutor IA (oculto hasta "Consultar tutor") -->
+          <div class="tutor-panel p5d-tutor-panel" id="pA-tutor-panel" style="display:none;">
+            <div class="tutor-header" style="background:#2d4a6e;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-pA">Analizando…</span></div>
               </div>
-              <div class="tutor-context-strip" style="border-left-color:var(--moss);">
-                🧩 Completa la tabla y escribe tu justificación, luego pulsa <strong>"Consultar tutor"</strong>. El tutor cuestionará tu elección y te empujará a profundizar.
-              </div>
-              <div id="chat-contA" class="chat-box pA-chat-box"></div>
-              <div class="chat-input-area">
-                <input type="text" id="input-contA" class="chat-input"
-                       placeholder="Continúa el diálogo…"
-                       onkeydown="if(event.key==='Enter') pAEnviarMensajeLibre()">
-                <button class="btn-send" onclick="pAEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
-              </div>
+              <button class="audio-toggle-btn" id="audio-btn-contA" onclick="toggleAudio('contA')" title="Activar voz">
+                <span class="audio-icon">🔇</span>
+                <span class="audio-waves" id="audio-waves-contA"><span></span><span></span><span></span></span>
+              </button>
+            </div>
+            <div class="tutor-context-strip" style="border-left-color:var(--moss);">
+              🧩 El tutor cuestionará tu elección de sistema y te empujará a profundizar el análisis.
+            </div>
+            <div id="chat-contA" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-contA" class="chat-input" placeholder="Continúa el diálogo…"
+                     onkeydown="if(event.key==='Enter') pAEnviarMensajeLibre()">
+              <button class="btn-send" onclick="pAEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
             </div>
           </div>
-        </div>
+
+        </div><!-- /pAB-single-col -->
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(11)">← Ejemplos</button>
@@ -948,95 +941,87 @@ Tabla de frecuencia → Gráfico circular.</div>
           <span class="page-num">12</span>
         </div>
 
-        <!-- Tabs -->
         <div class="prob-tabs-row" id="probB-tabs">
           <button class="p5c-tab active" onclick="cambiarProbB(0)">Reto 1</button>
           <button class="p5c-tab"        onclick="cambiarProbB(1)">Reto 2</button>
           <button class="p5c-tab"        onclick="cambiarProbB(2)">Reto 3</button>
         </div>
 
-        <div class="pB-layout">
-          <!-- Columna izquierda: enunciado + pistas + tabla + tipo -->
-          <div class="pB-left">
-            <div class="prob-enunciado">
-              <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
-              <p class="prob-enunciado-text" id="probB-enunciado"></p>
-              <div class="prob-contexto-frases" id="probB-frases"></div>
-              <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
-                <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
-                <p id="probB-pregunta" class="prob-pregunta-text"></p>
+        <div class="pAB-single-col">
+
+          <!-- Enunciado + pistas -->
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">Reto <span id="probB-num">1</span> de 3</div>
+            <p class="prob-enunciado-text" id="probB-enunciado"></p>
+            <div class="prob-contexto-frases" id="probB-frases"></div>
+            <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
+              <span class="prob-pregunta-label">Construye la tabla que responda a:</span>
+              <p id="probB-pregunta" class="prob-pregunta-text"></p>
+            </div>
+          </div>
+
+          <!-- Paso 1: tipo -->
+          <div class="prob-tipo-selector">
+            <div class="pts-label">1. Escoge el sistema de representación adecuado:</div>
+            <div class="pts-options">
+              <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoB('absoluta')">Frecuencias absolutas</button>
+              <button class="pts-btn" data-tipo="total"    onclick="escogerTipoB('total')">% sobre el total</button>
+              <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoB('fila')">% por fila</button>
+              <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoB('columna')">% por columna</button>
+            </div>
+            <div id="probB-tipo-feedback" class="pts-feedback" style="display:none;"></div>
+            <div class="prob-formulas-strip" style="margin-top:8px;">
+              <div class="fps-title">Fórmulas clave</div>
+              <div class="fps-row">
+                <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
+                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
+                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
+                <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
               </div>
             </div>
+          </div>
 
-            <div class="prob-tipo-selector">
-              <div class="pts-label">1. Escoge el sistema de representación adecuado:</div>
-              <div class="pts-options">
-                <button class="pts-btn" data-tipo="absoluta" onclick="escogerTipoB('absoluta')">Frecuencias absolutas</button>
-                <button class="pts-btn" data-tipo="total"    onclick="escogerTipoB('total')">% sobre el total</button>
-                <button class="pts-btn" data-tipo="fila"     onclick="escogerTipoB('fila')">% por fila</button>
-                <button class="pts-btn" data-tipo="columna"  onclick="escogerTipoB('columna')">% por columna</button>
-              </div>
-              <div id="probB-tipo-feedback" class="pts-feedback" style="display:none;"></div>
-              <div class="prob-formulas-strip" style="margin-top:8px;">
-                <div class="fps-title">Fórmulas clave</div>
-                <div class="fps-row">
-                  <div class="fps-item"><span class="fps-label">Abs.</span><span class="fps-expr">fᵢⱼ</span></div>
-                  <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ/N</span></div>
-                  <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ/fᵢ·</span></div>
-                  <div class="fps-item"><span class="fps-label">% col</span><span class="fps-expr">fᵢⱼ/f·ⱼ</span></div>
-                </div>
-              </div>
-            </div>
-
+          <!-- Paso 2: tabla + preguntas (ocultos hasta elegir tipo) -->
+          <div id="probB-tabla-section" style="display:none;">
             <div class="pts-step2-label">2. Construye la tabla completa (todas las celdas vacías):</div>
             <div class="prob-tabla-wrapper prob-tabla-build" id="probB-tabla-wrapper"></div>
             <div class="prob-feedback" id="probB-feedback" style="display:none;"></div>
 
             <!-- Preguntas de análisis -->
-            <div class="pB-analysis-section">
-              <div class="pts-step2-label">3. Preguntas de análisis — requieren razonamiento, no solo un número:</div>
-              <div id="probB-preguntas-list"></div>
-            </div>
+            <div class="pts-step2-label" style="margin-top:10px;">3. Preguntas de análisis:</div>
+            <div id="probB-preguntas-list"></div>
 
-            <div class="prob-bottom-row" style="flex-wrap:wrap;gap:8px;">
+            <div class="prob-bottom-row" style="margin-top:8px;flex-wrap:wrap;gap:8px;">
               <button class="btn-verificar" style="background:var(--moss);" onclick="verificarProblemaB()">✅ Verificar tabla</button>
               <button class="btn-verificar" style="background:var(--navy);" onclick="pBEnviarAlTutor()">💬 Consultar tutor</button>
             </div>
           </div>
 
-          <!-- Columna derecha: tutor IA -->
-          <div class="pB-right">
-            <div class="tutor-panel pB-tutor-panel">
-              <div class="tutor-header" style="background:#2d4a6e;">
-                <div class="tutor-avatar">🎓</div>
-                <div class="tutor-info">
-                  <div class="tutor-name">Tutor Virtual UIS</div>
-                  <div class="tutor-status">
-                    <span class="status-dot"></span>
-                    <span id="tutor-status-pB">En espera…</span>
-                  </div>
-                </div>
-                <button class="audio-toggle-btn" id="audio-btn-contB"
-                        onclick="toggleAudio('contB')" title="Activar lectura en voz alta">
-                  <span class="audio-icon">🔇</span>
-                  <span class="audio-waves" id="audio-waves-contB">
-                    <span></span><span></span><span></span>
-                  </span>
-                </button>
+          <!-- Tutor IA (oculto hasta "Consultar tutor") -->
+          <div class="tutor-panel p5d-tutor-panel" id="pB-tutor-panel" style="display:none;">
+            <div class="tutor-header" style="background:#2d4a6e;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-pB">Analizando…</span></div>
               </div>
-              <div class="tutor-context-strip" style="border-left-color:var(--gold);">
-                🏗️ Construye la tabla, responde las preguntas y pulsa <strong>"Consultar tutor"</strong>. El tutor analizará tu razonamiento y lo cuestionará para que vayas más profundo.
-              </div>
-              <div id="chat-contB" class="chat-box pB-chat-box"></div>
-              <div class="chat-input-area">
-                <input type="text" id="input-contB" class="chat-input"
-                       placeholder="Continúa el diálogo…"
-                       onkeydown="if(event.key==='Enter') pBEnviarMensajeLibre()">
-                <button class="btn-send" onclick="pBEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
-              </div>
+              <button class="audio-toggle-btn" id="audio-btn-contB" onclick="toggleAudio('contB')" title="Activar voz">
+                <span class="audio-icon">🔇</span>
+                <span class="audio-waves" id="audio-waves-contB"><span></span><span></span><span></span></span>
+              </button>
+            </div>
+            <div class="tutor-context-strip" style="border-left-color:var(--gold);">
+              🏗️ El tutor analizará tu tabla y tus respuestas, clasificará tu razonamiento y te empujará hacia niveles más profundos.
+            </div>
+            <div id="chat-contB" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-contB" class="chat-input" placeholder="Continúa el diálogo…"
+                     onkeydown="if(event.key==='Enter') pBEnviarMensajeLibre()">
+              <button class="btn-send" onclick="pBEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
             </div>
           </div>
-        </div>
+
+        </div><!-- /pAB-single-col -->
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(12)">← Formulación</button>
