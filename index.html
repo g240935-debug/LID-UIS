@@ -161,7 +161,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(0)">← Portada</button>
-          <button class="btn-nav next" onclick="irAPagina(2)">Actividad: frec. absoluta y relativa →</button>
+          <button class="btn-nav next" onclick="irAPagina(3)">Actividad: construir tabla →</button>
         </div>
       </div>
     </div>
@@ -240,26 +240,26 @@
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 3: ACTIVIDAD IA — CURCIO N3/N4 (tendencias) ══════════ -->
+    <!-- ══════════ PÁGINA 3: ACTIVIDAD IA UNIFICADA — CONSTRUCCIÓN PROGRESIVA DE TABLA ══════════ -->
     <div class="page" id="page-3">
       <div class="page-inner page-activity">
         <div class="page-header">
-          <span class="chapter-tag">Capítulo I · Análisis</span>
-          <span class="phase-indicator">
-            <span class="phase-dot phase-c" id="freqPhaseDotB"></span>
-            <span class="phase-label" id="freqPhaseLabelB">Niveles de Curcio</span>
+          <span class="chapter-tag">Capítulo I · Construcción guiada</span>
+          <span class="phase-indicator" id="freqPhaseIndicatorUnif">
+            <span class="phase-dot phase-a" id="freqPhaseDotUnif"></span>
+            <span class="phase-label" id="freqPhaseLabelUnif">fᵢ — Exploración</span>
           </span>
           <span class="page-num">03</span>
         </div>
         <div class="activity-layout">
           <div class="vis-panel">
             <div class="situation-header">
-              <span class="sit-badge">Continuación · Curcio Niveles 3 y 4</span>
-              <h3 class="sit-title">¿Qué nos dicen los datos?</h3>
-              <p class="sit-desc">Ya conoces la frecuencia absoluta y relativa. Ahora el tutor te invitará a <strong>interpretar tendencias</strong> y a <strong>buscar causas</strong> detrás de los datos. La tabla se irá completando a medida que el tutor institucionalice cada concepto.</p>
+              <span class="sit-badge">Situación · Bucaramanga</span>
+              <h3 class="sit-title">Construyendo la tabla paso a paso</h3>
+              <p class="sit-desc">El tutor te guiará para construir la tabla de frecuencias completa. Cada columna aparecerá a medida que el tutor la introduzca: primero <strong>fᵢ</strong>, luego <strong>hᵢ</strong>, después <strong>Fᵢ</strong> y finalmente <strong>Hᵢ</strong>.</p>
             </div>
 
-            <!-- Tabla dinámica de página 3 — columnas aparecen progresivamente -->
+            <!-- Tabla dinámica unificada — columnas aparecen progresivamente -->
             <div class="freq-tabla-display" id="p3-tabla-wrapper">
               <div class="freq-tabla-label" id="p3-tabla-label">Tabla de referencia</div>
               <div class="p3-tabla-anim" id="p3-tabla-inner">
@@ -267,7 +267,7 @@
               </div>
             </div>
 
-            <!-- Leyenda de progreso de columnas -->
+            <!-- Barra de progreso de columnas -->
             <div class="p3-col-progress" id="p3-col-progress">
               <span class="p3-col-badge p3-col-fi active" title="Frecuencia absoluta">fᵢ ✓</span>
               <span class="p3-col-badge p3-col-hi" id="p3-badge-hi" title="Frecuencia relativa">hᵢ</span>
@@ -275,9 +275,10 @@
               <span class="p3-col-badge p3-col-hi-acum" id="p3-badge-Hi" title="Frecuencia relativa acumulada">Hᵢ</span>
             </div>
 
-            <div class="note-card" style="margin-top:10px;">
-              <div class="note-title">📌 Niveles de Curcio</div>
-              <p class="note-text"><strong>Nivel 3</strong>: leer más allá de los datos (tendencias, predicciones).<br><strong>Nivel 4</strong>: leer detrás de los datos (causas, explicaciones).</p>
+            <!-- Leyenda de fases -->
+            <div class="note-card" style="margin-top:10px;" id="p3-fase-nota">
+              <div class="note-title" id="p3-fase-titulo">📌 Fase actual: Frecuencia Absoluta (fᵢ)</div>
+              <p class="note-text" id="p3-fase-desc">Observa cuántas veces aparece cada categoría. El tutor te preguntará sobre los datos antes de avanzar a la siguiente columna.</p>
             </div>
           </div>
           <div class="tutor-panel">
@@ -287,22 +288,25 @@
                 <div class="tutor-name">Tutor Virtual UIS</div>
                 <div class="tutor-status">
                   <span class="status-dot"></span>
-                  <span id="tutor-status-freq-b">Esperando…</span>
+                  <span id="tutor-status-freq-unif">Conectando…</span>
                 </div>
               </div>
             </div>
-            <div id="chat-freq-b" class="chat-box"></div>
+            <div class="tutor-context-strip" id="p3-context-strip">
+              📊 El tutor introducirá cada tipo de frecuencia uno a uno. Responde sus preguntas y observa cómo la tabla crece.
+            </div>
+            <div id="chat-freq-unif" class="chat-box"></div>
             <div class="chat-input-area">
-              <input type="text" id="input-freq-b" class="chat-input"
+              <input type="text" id="input-freq-unif" class="chat-input"
                      placeholder="Escribe tu respuesta aquí…"
-                     onkeydown="if(event.key==='Enter') enviarMensajeFreqB()">
-              <button class="btn-send" onclick="enviarMensajeFreqB()">Enviar <span class="send-icon">↑</span></button>
+                     onkeydown="if(event.key==='Enter') enviarMensajeFreqUnif()">
+              <button class="btn-send" onclick="enviarMensajeFreqUnif()">Enviar <span class="send-icon">↑</span></button>
             </div>
           </div>
         </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(2)">← Frec. absoluta y relativa</button>
-          <button class="btn-nav next" id="btn-freq-b-next" onclick="irAPagina(4)" style="opacity:0.4;pointer-events:none;">Frecuencias acumuladas →</button>
+          <button class="btn-nav prev" onclick="irAPagina(1)">← Presentación</button>
+          <button class="btn-nav next" id="btn-freq-unif-next" onclick="irAPagina(5)" style="opacity:0.4;pointer-events:none;">Síntesis Cap. I →</button>
         </div>
       </div>
     </div>
@@ -1014,7 +1018,7 @@
     <span class="pi-dot active" onclick="irAPagina(0)"   title="Portada"></span>
     <span class="pi-dot" onclick="irAPagina(1)"   title="Cap I · Presentación"></span>
     <span class="pi-dot" onclick="irAPagina(2)"   title="Cap I · frec. abs. y rel."></span>
-    <span class="pi-dot" onclick="irAPagina(3)"   title="Cap I · Curcio N3/N4"></span>
+    <span class="pi-dot" onclick="irAPagina(3)"   title="Cap I · Construcción guiada"></span>
     <span class="pi-dot" onclick="irAPagina(4)"   title="Cap I · frec. acumuladas"></span>
     <span class="pi-dot" onclick="irAPagina(5)"   title="Cap I · Síntesis"></span>
     <span class="pi-dot pi-dot-5b" onclick="irAPagina('5b')" title="Cap I · Ejemplos Dinámicos"></span>
