@@ -58,7 +58,7 @@ let datosGrafico = {
 ════════════════════════════════ */
 
 // Orden lógico de páginas para determinar dirección de animación
-const ORDEN_PAGINAS = [0,1,2,3,4,5,'5b',6,7,8,9,10,11,12,13,14];
+const ORDEN_PAGINAS = [0,1,3,5,'5b',6,7,8,9,10,11,12,13,14];
 
 function irAPagina(n) {
   if (n === paginaActual) return;
@@ -98,22 +98,10 @@ function irAPagina(n) {
 
   // ── Inicialización de tutores al llegar a cada página ──
 
-  // Cap I — Fase A+B (frec. absoluta + relativa) — pág 2 legacy
-  if (n === 2 && !chatFreqAIniciado) {
-    chatFreqAIniciado = true;
-    setTimeout(inicializarChatFreqA, 400);
-  }
-
   // Cap I — Actividad unificada (pág 3): construye tabla completa en un solo chat
   if (n === 3 && !chatFreqUnifIniciado) {
     chatFreqUnifIniciado = true;
     setTimeout(() => { renderizarP3Tabla(); inicializarChatFreqUnif(); }, 400);
-  }
-
-  // Cap I — Fase C+D (frec. acumuladas)
-  if (n === 4 && !chatFreqCIniciado) {
-    chatFreqCIniciado = true;
-    setTimeout(inicializarChatFreqC, 400);
   }
 
   // Cap I — Ejemplos Dinámicos (pág 5b)
@@ -1883,9 +1871,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Recuperar historiales de sesiones previas
   cargarHistorial(sessionId,             'chat-box');
   cargarHistorial(`cap3_${sessionId}`,   'chat-box2');
-  cargarHistorial(`freq_A_${sessionId}`, 'chat-freq-a');
-  cargarHistorial(`freq_B_${sessionId}`, 'chat-freq-b');
-  cargarHistorial(`freq_C_${sessionId}`, 'chat-freq-c');
   cargarHistorial(`freq_unif_${sessionId}`, 'chat-freq-unif');
 
   // Renderizar tablas y gráficos estáticos
