@@ -1368,12 +1368,12 @@ html, body {
   color: white;
   font-weight: 700;
 }
-/* Columna de frec. relativa (hᵢ) — tono suave */
+/* Columna de frec. relativa (fᵣ) — tono suave */
 .freq-tabla-display td:nth-child(3) {
   color: var(--moss);
   font-weight: 600;
 }
-/* Columna de acumuladas (Fᵢ, Hᵢ) */
+/* Columna de acumuladas (Fᵢ, Fᵣ) */
 .freq-tabla-display td:nth-child(4),
 .freq-tabla-display td:nth-child(5) {
   color: var(--slate);
