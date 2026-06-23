@@ -673,10 +673,11 @@ def chat():
             "completed": completed
         }
         
-        # Datos de tabla solo para sesiones de contingencia (Cap 2)
+        # Datos de tabla solo para sesiones de contingencia Cap 2 (tutor principal)
         is_freq = session_id.startswith("freq_")
         is_cap3 = session_id == "cap3_user" or session_id.startswith("cap3_")
-        if not is_freq and not is_cap3:
+        is_cont_prob = session_id.startswith("cont_A_") or session_id.startswith("cont_B_")
+        if not is_freq and not is_cap3 and not is_cont_prob:
             response_data["table"] = matriz_data
             response_data["headers"] = headers
             response_data["grafico_data"] = grafico_valores
