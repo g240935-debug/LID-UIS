@@ -25,7 +25,7 @@ freq_data = {
 
 # ────────────────────────────────────────────────
 # SYSTEM PROMPTS — CAP I (4 fases progresivas)
-# session_id prefix: "freq_"
+# session_id prefix "freq_"
 # ────────────────────────────────────────────────
 
 system_prompt_freq_A = f"""Eres un mediador pedagógico (estudiante senior de la UIS). 
