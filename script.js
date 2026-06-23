@@ -59,6 +59,8 @@ const AUDIO_MAP = {
   'cap3':      { btn: 'audio-btn-cap3',      waves: 'audio-waves-cap3'      },
   'chi':       { btn: 'audio-btn-chi',       waves: 'audio-waves-chi'       },
   '5d':        { btn: 'audio-btn-5d',        waves: 'audio-waves-5d'        },
+  'contA':     { btn: 'audio-btn-contA',     waves: 'audio-waves-contA'     },
+  'contB':     { btn: 'audio-btn-contB',     waves: 'audio-waves-contB'     },
 };
 
 // Estado ON/OFF por tutor
@@ -72,6 +74,8 @@ const BOX_TO_AUDIO = {
   'chat-box2':      'cap3',
   'chat-chi':       'chi',
   'chat-5d':        '5d',
+  'chat-contA':     'contA',
+  'chat-contB':     'contB',
 };
 
 function toggleAudio(chatId) {
@@ -1204,25 +1208,40 @@ function renderizarEjGrafico(tipo) {
 ════════════════════════════════════════════════ */
 const PROBLEMAS_A = [
   {
-    enunciado: 'La siguiente tabla registra la preferencia de <strong>80 estudiantes UIS</strong> según su <strong>semestre</strong> (Primeros / Medios / Últimos) y el <strong>tipo de evaluación preferida</strong> (Oral / Escrita / Proyecto). Algunas celdas están ocultas.',
-    pregunta: '¿Qué sistema de representación usarías para saber, <em>dentro del grupo de últimos semestres</em>, qué tipo de evaluación prefieren más? Completa las celdas vacías.',
-    filas: ['Primeros', 'Medios', 'Últimos'], columnas: ['Oral', 'Escrita', 'Proyecto'],
-    matriz: [[8,14,8],[6,12,12],[4,8,8]], ocultas: [[1,0],[1,2],[2,1]],
-    respuestaCorrecta: 'fila', N: 80
+    enunciado: 'Se encuestaron <strong>90 estudiantes de la UIS</strong> sobre su <strong>facultad</strong> (Ciencias / Ingenierías / Humanidades) y su <strong>modalidad de estudio preferida</strong> (Individual / Grupal / Mixta). La tabla tiene algunas celdas ocultas.',
+    pregunta: '¿Dentro de los estudiantes de Ingenierías, cuál es la modalidad más frecuente? ¿Ese porcentaje cambia si lo calculas respecto al total general?',
+    filas: ['Ciencias', 'Ingenierías', 'Humanidades'],
+    columnas: ['Individual', 'Grupal', 'Mixta'],
+    matriz: [[14, 8, 8], [10, 18, 12], [6, 10, 4]],
+    ocultas: [[0,2],[1,0],[1,2],[2,1]],
+    respuestaCorrecta: 'fila',
+    N: 90,
+    justifCorrecta: 'fila',
+    analisis: '¿Qué diferencia hay entre decir que "el 45% de Ingenierías prefiere grupal" y decir que "los de Ingenierías representan el 20% de los que prefieren grupal"? ¿Por qué importa ese matiz?'
   },
   {
-    enunciado: 'Tabla de <strong>100 estudiantes UIS</strong> cruzando <strong>tipo de vivienda</strong> (Propia / Arrendada / Residencia) con <strong>satisfacción académica</strong> (Alta / Media / Baja). Algunas celdas están ocultas.',
-    pregunta: '¿Qué porcentaje del <em>total de encuestados</em> vive en arriendo y tiene satisfacción alta? Completa las celdas vacías.',
-    filas: ['Propia', 'Arrendada', 'Residencia'], columnas: ['Alta', 'Media', 'Baja'],
-    matriz: [[15,10,5],[12,18,10],[8,14,8]], ocultas: [[0,2],[1,0],[2,2]],
-    respuestaCorrecta: 'total', N: 100
+    enunciado: 'Tabla de <strong>120 jóvenes de Bucaramanga</strong> cruzando <strong>nivel educativo del padre</strong> (Primaria / Bachillerato / Universidad) con <strong>acceso a internet en casa</strong> (Sí / No). Algunas celdas están ocultas.',
+    pregunta: 'De todos los jóvenes encuestados, ¿qué proporción tiene padre con nivel universitario Y tiene acceso a internet?',
+    filas: ['Primaria', 'Bachillerato', 'Universidad'],
+    columnas: ['Sí', 'No'],
+    matriz: [[18, 22], [24, 16], [32, 8]],
+    ocultas: [[0,1],[1,0],[2,0]],
+    respuestaCorrecta: 'total',
+    N: 120,
+    justifCorrecta: 'total',
+    analisis: 'Con esa proporción, ¿puedes afirmar que el nivel educativo del padre determina el acceso a internet? ¿Qué información adicional necesitarías para hacer una afirmación más sólida?'
   },
   {
-    enunciado: 'Tabla de <strong>120 estudiantes</strong> cruzando <strong>área de conocimiento</strong> (Exactas / Sociales / Artes) y <strong>medio de acceso a internet</strong> (Móvil / Fijo / Universidad). Algunas celdas están ocultas.',
-    pregunta: 'De quienes acceden por <em>red universitaria</em>, ¿qué porcentaje es de Exactas? Completa las celdas vacías.',
-    filas: ['Exactas', 'Sociales', 'Artes'], columnas: ['Móvil', 'Fijo', 'Universidad'],
-    matriz: [[20,12,18],[15,10,15],[14,8,8]], ocultas: [[0,0],[1,2],[2,1]],
-    respuestaCorrecta: 'columna', N: 120
+    enunciado: 'Encuesta a <strong>80 trabajadores</strong> de una empresa en Bucaramanga cruzando <strong>turno laboral</strong> (Mañana / Tarde / Noche) con <strong>nivel de estrés auto-reportado</strong> (Bajo / Medio / Alto). Algunas celdas están ocultas.',
+    pregunta: 'De quienes trabajan en el turno de noche, ¿qué porcentaje reporta estrés alto? ¿Ese dato por sí solo te permite concluir que el turno nocturno causa más estrés?',
+    filas: ['Mañana', 'Tarde', 'Noche'],
+    columnas: ['Bajo', 'Medio', 'Alto'],
+    matriz: [[12, 10, 8], [10, 12, 8], [4, 8, 8]],
+    ocultas: [[0,0],[1,2],[2,1],[2,2]],
+    respuestaCorrecta: 'fila',
+    N: 80,
+    justifCorrecta: 'fila',
+    analisis: '¿Cambiaría tu interpretación si supieras que el turno nocturno tiene menos trabajadores? ¿Por qué comparar porcentajes por fila es más justo que comparar frecuencias absolutas cuando los grupos tienen distinto tamaño?'
   }
 ];
 
@@ -1243,12 +1262,17 @@ function renderizarProbA() {
   const p = PROBLEMAS_A[probAActual];
   document.getElementById('probA-enunciado').innerHTML   = p.enunciado;
   document.getElementById('probA-pregunta').innerHTML    = p.pregunta;
-  document.getElementById('probA-counter').textContent   = `${probAActual+1} / ${PROBLEMAS_A.length}`;
   document.getElementById('probA-num-badge').textContent = probAActual + 1;
   document.getElementById('probA-feedback').style.display = 'none';
   tipoEscogidoA = null;
   document.querySelectorAll('#page-12 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
   document.getElementById('probA-tipo-feedback').style.display = 'none';
+  const justif = document.getElementById('probA-justif');
+  if (justif) justif.value = '';
+  // Resetear tutor
+  const box = document.getElementById('chat-contA');
+  if (box) box.innerHTML = '';
+  setStatusGen('tutor-status-pA', 'En espera…');
   _renderizarTablaA();
 }
 
@@ -1259,7 +1283,7 @@ function _renderizarTablaA() {
   const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
   const totalesFila = matriz.map(r => r.reduce((s, v) => s + v, 0));
 
-  let html = '<table><thead><tr><th>Categoría</th>';
+  let html = '<table><thead><tr><th>↓ / →</th>';
   columnas.forEach(c => { html += `<th>${c}</th>`; });
   html += '<th>Total</th></tr></thead><tbody>';
   matriz.forEach((fila, i) => {
@@ -1281,19 +1305,12 @@ function _renderizarTablaA() {
   if (w) w.innerHTML = html;
 }
 
-function calcularCeldaNum(tipo, val, totalFila, totalCol, N) {
-  if (tipo === 'absoluta') return val;
-  if (tipo === 'total')    return parseFloat((val / N * 100).toFixed(1));
-  if (tipo === 'fila')     return parseFloat((val / totalFila * 100).toFixed(1));
-  if (tipo === 'columna')  return parseFloat((val / totalCol * 100).toFixed(1));
-  return val;
-}
-
 function verificarProblemaA() {
   const p      = PROBLEMAS_A[probAActual];
   const fbTipo = document.getElementById('probA-tipo-feedback');
   if (!tipoEscogidoA) {
-    fbTipo.style.display='block'; fbTipo.className='pts-feedback error'; fbTipo.textContent='⚠️ Primero selecciona el sistema de representación adecuado.'; return;
+    fbTipo.style.display='block'; fbTipo.className='pts-feedback error';
+    fbTipo.textContent='⚠️ Primero selecciona el sistema de representación adecuado.'; return;
   }
   const tipoOk = tipoEscogidoA === p.respuestaCorrecta;
   document.querySelectorAll('#page-12 .pts-btn').forEach(b => {
@@ -1303,8 +1320,8 @@ function verificarProblemaA() {
   fbTipo.style.display='block';
   fbTipo.className = tipoOk ? 'pts-feedback ok' : 'pts-feedback error';
   fbTipo.innerHTML = tipoOk
-    ? `✅ ¡Correcto! El <strong>% por ${p.respuestaCorrecta}</strong> es el sistema adecuado.`
-    : `❌ El sistema <strong>${tipoEscogidoA}</strong> no es el más adecuado. ¿Qué grupo es el "universo" de la pregunta?`;
+    ? `✅ ¡Correcto! El <strong>% por ${p.respuestaCorrecta}</strong> es el sistema adecuado para esta pregunta.`
+    : `❌ El sistema <strong>${tipoEscogidoA}</strong> no es el más adecuado. Piensa: ¿quién es el "universo" de referencia de la pregunta?`;
 
   const inputs = document.querySelectorAll('#probA-tabla-wrapper .cell-input');
   let correctas=0, total=inputs.length;
@@ -1316,15 +1333,17 @@ function verificarProblemaA() {
   });
   const fb = document.getElementById('probA-feedback');
   fb.style.display='block';
-  if (correctas===total && tipoOk) { fb.className='prob-feedback ok'; fb.innerHTML='✅ ¡Perfecto! Escogiste el sistema correcto y completaste todas las celdas.'; }
-  else if (correctas===total && !tipoOk) { fb.className='prob-feedback parcial'; fb.innerHTML='⚠️ Las celdas son correctas para el tipo escogido, pero el sistema no responde la pregunta.'; }
-  else { fb.className='prob-feedback parcial'; fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas.`; }
+  if (correctas===total && tipoOk)       { fb.className='prob-feedback ok';     fb.innerHTML='✅ ¡Perfecto! Sistema correcto y todas las celdas completadas. Ahora consulta al tutor para profundizar.'; }
+  else if (correctas===total && !tipoOk) { fb.className='prob-feedback parcial'; fb.innerHTML='⚠️ Las celdas son correctas para el tipo que escogiste, pero ese sistema no responde la pregunta.'; }
+  else                                   { fb.className='prob-feedback parcial'; fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas. Las rojas tienen error.`; }
 }
 
-function cambiarProbA(dir) {
-  const nuevo = probAActual + dir;
-  if (nuevo < 0 || nuevo >= PROBLEMAS_A.length) return;
-  probAActual = nuevo; tipoEscogidoA = null; renderizarProbA();
+function cambiarProbA(idx) {
+  if (idx < 0 || idx >= PROBLEMAS_A.length) return;
+  probAActual = idx;
+  document.querySelectorAll('#probA-tabs .p5c-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  tipoEscogidoA = null;
+  renderizarProbA();
 }
 
 /* ════════════════════════════════════════════════
@@ -1333,24 +1352,111 @@ function cambiarProbA(dir) {
 const PROBLEMAS_B = [
   {
     enunciado: 'Se encuestaron <strong>90 estudiantes</strong> de la UIS sobre su <strong>medio de transporte</strong> (Bus / Bicicleta / A pie) y su <strong>puntualidad</strong> (Siempre / A veces / Nunca).',
-    frases: ['30 estudiantes usan Bus.','De quienes usan Bicicleta, la mitad llega Siempre.','10 estudiantes van A pie y llegan A veces.','Solo 3 estudiantes van A pie y Nunca llegan.','En total, 24 estudiantes llegan Siempre a tiempo.'],
+    frases: [
+      '30 estudiantes usan Bus.',
+      'De quienes usan Bicicleta, la mitad llega Siempre a tiempo.',
+      '10 estudiantes van A pie y llegan A veces.',
+      'Solo 3 estudiantes van A pie y Nunca llegan a tiempo.',
+      'En total, 24 estudiantes llegan Siempre a tiempo.'
+    ],
     pregunta: '¿Qué medio de transporte se asocia con mejor puntualidad?',
     filas: ['Bus','Bicicleta','A pie'], columnas: ['Siempre','A veces','Nunca'],
-    solucion: [[10,14,6],[12,8,5],[2,10,3]], respuestaCorrecta: 'absoluta', N: 90
+    solucion: [[10,14,6],[12,8,5],[2,10,3]], respuestaCorrecta: 'fila', N: 90,
+    preguntas: [
+      {
+        id: 'pB0-q1', tipo: 'condicional',
+        badge: '% por fila', color: 'var(--moss)',
+        texto: 'Calcula el porcentaje de puntualidad "Siempre" dentro de cada medio de transporte. ¿Cuál tiene la proporción más alta? ¿Por qué no es suficiente comparar los conteos absolutos?',
+        claves: ['bicicleta','40%','48%','33%','proporciones','grupos de distinto tamaño','base distinta'],
+        retro: 'Bicicleta: 12/25 = 48%, Bus: 10/30 = 33%, A pie: 2/35 ≈ 6%. Los absolutos engañan si los grupos tienen distinto tamaño. Bicicleta tiene menor cantidad total pero mejor proporción de puntualidad.'
+      },
+      {
+        id: 'pB0-q2', tipo: 'conjunta',
+        badge: '% total', color: 'var(--navy)',
+        texto: 'Del total de 90 estudiantes, ¿qué porcentaje va en Bus Y llega Siempre? ¿Ese dato por sí solo te permite concluir que el bus es el mejor medio para ser puntual?',
+        claves: ['11%','11.1','no es suficiente','no permite','contexto','comparar dentro','base'],
+        retro: '10/90 ≈ 11.1%. Ese dato aislado no permite comparar: no sabes qué proporción del total de usuarios de bus llega siempre. Necesitas el % condicional por fila para una comparación justa.'
+      },
+      {
+        id: 'pB0-q3', tipo: 'N4',
+        badge: 'N4 · Causalidad', color: 'var(--gold)',
+        texto: '¿Podría haber una variable que explique tanto la elección del transporte como la puntualidad, sin que una cause la otra directamente? Propón al menos una.',
+        claves: ['distancia','zona','horario','disciplina','hábito','compromiso','otro factor','tercera variable','confusión'],
+        retro: 'Posibles variables ocultas: distancia al campus (quien vive cerca va a pie y llega tarde porque subestima el tiempo), disciplina personal, horario de clase, etc. La asociación estadística no implica causalidad — ese es el núcleo del N4 de Curcio.'
+      }
+    ]
   },
   {
     enunciado: 'Se encuestaron <strong>60 estudiantes</strong> sobre su <strong>programa</strong> (Matemáticas / Física / Estadística) y el <strong>software estadístico</strong> que más usan (R / Python / SPSS).',
-    frases: ['25 estudiantes son de Matemáticas.','El 40% de los estudiantes de Física usa R.','8 estudiantes de Estadística usan Python.','Solo 2 estudiantes de Matemáticas usan SPSS.','En total, 22 estudiantes usan Python.'],
+    frases: [
+      '25 estudiantes son de Matemáticas.',
+      'El 40% de los estudiantes de Física usa R.',
+      '8 estudiantes de Estadística usan Python.',
+      'Solo 2 estudiantes de Matemáticas usan SPSS.',
+      'En total, 22 estudiantes usan Python.'
+    ],
     pregunta: 'Dentro de cada programa, ¿cuál es el software más usado?',
     filas: ['Matemáticas','Física','Estadística'], columnas: ['R','Python','SPSS'],
-    solucion: [[12,11,2],[6,6,3],[4,8,8]], respuestaCorrecta: 'fila', N: 60
+    solucion: [[12,11,2],[6,6,3],[4,8,8]], respuestaCorrecta: 'fila', N: 60,
+    preguntas: [
+      {
+        id: 'pB1-q1', tipo: 'condicional',
+        badge: '% por fila', color: 'var(--moss)',
+        texto: 'Compara el perfil de software de Matemáticas versus Estadística usando % por fila. ¿En qué son más diferentes? ¿Qué podría explicar esa diferencia desde el contexto de cada disciplina?',
+        claves: ['estadística usa más python','estadística spss','matemáticas prefiere r','disciplina','currículum','contexto','herramientas del área'],
+        retro: 'Matemáticas: R 48%, Python 44%, SPSS 8%. Estadística: R 20%, Python 40%, SPSS 40%. La diferencia en SPSS es enorme — Estadística lo usa más quizás porque su currículo lo incluye explícitamente. El contexto disciplinar explica el patrón.'
+      },
+      {
+        id: 'pB1-q2', tipo: 'marginal',
+        badge: 'Marginal', color: 'var(--navy)',
+        texto: 'Python lo usan 22 de 60 estudiantes (37%). ¿Eso significa que es el software más popular entre los tres programas? Usa las frecuencias marginales de columna para justificar tu respuesta.',
+        claves: ['r tiene más','r es el más','marginal','total columna','37%','r 22','r tiene 22','no es el más popular'],
+        retro: 'Marginal R: 12+6+4 = 22, Python: 11+6+8 = 25, SPSS: 2+3+8 = 13. Python (25) supera a R (22) en el total, pero la diferencia es mínima. La marginal de columna revela el uso global, independiente del programa.'
+      },
+      {
+        id: 'pB1-q3', tipo: 'N3',
+        badge: 'N3 · Predicción', color: 'var(--gold)',
+        texto: 'Si la UIS abriera un nuevo programa de Ciencia de Datos, ¿qué distribución de software esperarías? Justifica tu predicción con base en los patrones que observas en la tabla.',
+        claves: ['python','datos','tendencia','similar a estadística','predominaría python','predicción','patrón','basado en'],
+        retro: 'Es razonable predecir un perfil similar a Estadística o con mayor peso en Python, dado que la Ciencia de Datos tiene fuerte orientación a programación. Esta es una lectura N3: usar los datos para extrapolar más allá de lo observado.'
+      }
+    ]
   },
   {
-    enunciado: 'Se encuestaron <strong>75 estudiantes</strong> sobre su <strong>nivel de inglés</strong> (Básico / Intermedio / Avanzado) y su <strong>participación en intercambios</strong> (Sí / No).',
-    frases: ['30 estudiantes tienen nivel Básico.','20 estudiantes tienen nivel Avanzado.','El 60% de los de nivel Avanzado participó en intercambio.','Solo 3 estudiantes de nivel Básico participaron.','En total, 22 estudiantes participaron en intercambio.'],
-    pregunta: 'De quienes participaron en intercambio, ¿de qué nivel son?',
+    enunciado: 'Se encuestaron <strong>75 estudiantes</strong> sobre su <strong>nivel de inglés</strong> (Básico / Intermedio / Avanzado) y su <strong>participación en intercambios internacionales</strong> (Sí / No).',
+    frases: [
+      '30 estudiantes tienen nivel Básico.',
+      '20 estudiantes tienen nivel Avanzado.',
+      'El 60% de los de nivel Avanzado participó en intercambio.',
+      'Solo 3 estudiantes de nivel Básico participaron.',
+      'En total, 22 estudiantes participaron en intercambio.'
+    ],
+    pregunta: 'De quienes participaron en intercambio, ¿de qué nivel son principalmente?',
     filas: ['Básico','Intermedio','Avanzado'], columnas: ['Sí','No'],
-    solucion: [[3,27],[7,18],[12,8]], respuestaCorrecta: 'columna', N: 75
+    solucion: [[3,27],[7,18],[12,8]], respuestaCorrecta: 'columna', N: 75,
+    preguntas: [
+      {
+        id: 'pB2-q1', tipo: 'condicional-col',
+        badge: '% por columna', color: 'var(--moss)',
+        texto: 'Calcula qué porcentaje de los que SÍ participaron en intercambio tiene nivel Avanzado. ¿Por qué el % por columna es más útil aquí que el % por fila para responder la pregunta del enunciado?',
+        claves: ['54%','avanzado','columna','universo','quienes participaron','base es el total de sí'],
+        retro: 'Avanzado: 12/22 ≈ 54.5%. El % por columna tiene como base el total de quienes Sí participaron (22), que es el "universo" de la pregunta. El % por fila respondería otra pregunta: qué proporción de avanzados participó.'
+      },
+      {
+        id: 'pB2-q2', tipo: 'doble-condicional',
+        badge: 'Doble lectura', color: 'var(--navy)',
+        texto: 'Calcula también el % por fila para el nivel Avanzado. Tendrás dos datos: "el 60% de los Avanzados participó" y "el 54% de quienes participaron son Avanzados". ¿Son la misma afirmación? ¿Cuándo usarías cada una?',
+        claves: ['no son lo mismo','distintas preguntas','base diferente','distinto universo','60% de avanzados','54% de quienes participaron','complementarias'],
+        retro: 'No son la misma. "60% de Avanzados participó" (fila) responde: ¿cuán propensos son los avanzados a participar? "54% de quienes participaron son Avanzados" (columna) responde: ¿quiénes conforman el grupo de participantes? Cada una responde una pregunta distinta.'
+      },
+      {
+        id: 'pB2-q3', tipo: 'N4',
+        badge: 'N4 · Causalidad', color: 'var(--gold)',
+        texto: '¿El nivel de inglés determina la participación en intercambios, o podría haber otras variables que expliquen el patrón? Propón al menos dos factores alternativos y explica cómo podrían afectar los datos.',
+        claves: ['recursos económicos','beca','acceso','motivación','programa','carrera','factor','variable','no necesariamente causa','asociación no es causalidad'],
+        retro: 'Factores alternativos: recursos económicos (quien tiene nivel avanzado puede venir de contextos con más acceso), motivación (estudiantes con mayor interés académico estudian más inglés Y buscan intercambios), o exigencia del programa. La asociación entre nivel de inglés e intercambio puede ser espuria — ambas podrían ser consecuencia de un tercer factor.'
+      }
+    ]
   }
 ];
 
@@ -1372,7 +1478,6 @@ function renderizarProbB() {
   document.getElementById('probB-enunciado').innerHTML  = p.enunciado;
   document.getElementById('probB-pregunta').innerHTML   = p.pregunta;
   document.getElementById('probB-num').textContent      = probBActual + 1;
-  document.getElementById('probB-counter').textContent  = `${probBActual+1} / ${PROBLEMAS_B.length}`;
   document.getElementById('probB-feedback').style.display = 'none';
   const frasesEl = document.getElementById('probB-frases');
   if (frasesEl) frasesEl.innerHTML = p.frases.map(f => `<div class="prob-frase">• ${f}</div>`).join('');
@@ -1380,6 +1485,24 @@ function renderizarProbB() {
   document.querySelectorAll('#page-13 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
   document.getElementById('probB-tipo-feedback').style.display = 'none';
   _renderizarTablaB();
+  _renderizarPreguntasB(p);
+  // Resetear tutor
+  const box = document.getElementById('chat-contB');
+  if (box) box.innerHTML = '';
+  setStatusGen('tutor-status-pB', 'En espera…');
+}
+
+function _renderizarPreguntasB(p) {
+  const list = document.getElementById('probB-preguntas-list');
+  if (!list) return;
+  list.innerHTML = p.preguntas.map((q, i) => `
+    <div class="p5d-pregunta-card">
+      <div class="p5d-preg-badge" style="background:${q.color}">${q.badge}</div>
+      <p class="p5d-preg-texto"><strong>Pregunta ${i+1}:</strong> ${q.texto}</p>
+      <textarea class="p5d-resp-input" id="${q.id}" rows="3"
+                placeholder="Escribe aquí tu análisis…"></textarea>
+      <div class="p5d-retro" id="${q.id}-retro" style="display:none;"></div>
+    </div>`).join('');
 }
 
 function _renderizarTablaB() {
@@ -1411,7 +1534,8 @@ function verificarProblemaB() {
   const p      = PROBLEMAS_B[probBActual];
   const fbTipo = document.getElementById('probB-tipo-feedback');
   if (!tipoEscogidoB) {
-    fbTipo.style.display='block'; fbTipo.className='pts-feedback error'; fbTipo.textContent='⚠️ Primero selecciona el sistema de representación.'; return;
+    fbTipo.style.display='block'; fbTipo.className='pts-feedback error';
+    fbTipo.textContent='⚠️ Primero selecciona el sistema de representación.'; return;
   }
   const tipoOk = tipoEscogidoB === p.respuestaCorrecta;
   document.querySelectorAll('#page-13 .pts-btn').forEach(b => {
@@ -1422,7 +1546,7 @@ function verificarProblemaB() {
   fbTipo.className = tipoOk ? 'pts-feedback ok' : 'pts-feedback error';
   fbTipo.innerHTML = tipoOk
     ? `✅ ¡Correcto! <strong>${p.respuestaCorrecta}</strong> es el sistema adecuado.`
-    : `❌ El sistema <strong>${tipoEscogidoB}</strong> no es el adecuado. ¿Quién es el "universo" de comparación?`;
+    : `❌ El sistema <strong>${tipoEscogidoB}</strong> no es el adecuado. ¿Quién es el "universo" de comparación de la pregunta?`;
 
   const inputs = document.querySelectorAll('#probB-tabla-wrapper .cell-input');
   let correctas=0, total=inputs.length;
@@ -1432,17 +1556,32 @@ function verificarProblemaB() {
     if (!isNaN(val) && Math.abs(val-correcto)<0.2) { inp.classList.add('correcto'); correctas++; }
     else if (inp.value!=='') inp.classList.add('incorrecto');
   });
+
+  // Verificar preguntas localmente
+  p.preguntas.forEach(q => {
+    const inp  = document.getElementById(q.id);
+    const retro = document.getElementById(`${q.id}-retro`);
+    if (!inp || !retro || !inp.value.trim()) return;
+    const resp  = inp.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const ok = q.claves.map(c=>c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')).some(c=>resp.includes(c));
+    retro.style.display='block';
+    retro.className = ok ? 'p5d-retro p5d-retro-ok' : 'p5d-retro p5d-retro-err';
+    retro.innerHTML = ok ? `✅ <strong>Bien encaminado.</strong> ${q.retro}` : `💡 <strong>Revisa:</strong> ${q.retro}`;
+  });
+
   const fb = document.getElementById('probB-feedback');
   fb.style.display='block';
-  if (correctas===total && tipoOk)       { fb.className='prob-feedback ok';     fb.innerHTML='✅ ¡Excelente! Escogiste el sistema correcto y construiste la tabla completa.'; }
+  if (correctas===total && tipoOk)       { fb.className='prob-feedback ok';     fb.innerHTML='✅ ¡Excelente! Sistema correcto y tabla completa. Ahora consulta al tutor para profundizar las preguntas.'; }
   else if (correctas===total && !tipoOk) { fb.className='prob-feedback parcial'; fb.innerHTML='⚠️ Los valores son correctos pero el sistema no responde la pregunta planteada.'; }
   else                                   { fb.className='prob-feedback parcial'; fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas.`; }
 }
 
-function cambiarProbB(dir) {
-  const nuevo = probBActual + dir;
-  if (nuevo < 0 || nuevo >= PROBLEMAS_B.length) return;
-  probBActual = nuevo; tipoEscogidoB = null; renderizarProbB();
+function cambiarProbB(idx) {
+  if (idx < 0 || idx >= PROBLEMAS_B.length) return;
+  probBActual = idx;
+  document.querySelectorAll('#probB-tabs .p5c-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  tipoEscogidoB = null;
+  renderizarProbB();
 }
 
 /* ════════════════════════════════════════════════
@@ -2612,3 +2751,147 @@ p5dCargarSituacion = function(idx) {
   const panel = document.getElementById('p5d-tutor-panel');
   if (panel) panel.style.display = 'none';
 };
+
+/* ════════════════════════════════════════════════════════════
+   PÁGINAS 12 y 13 — TUTORES IA TABLAS DE CONTINGENCIA
+   contA: pág 12 Formulación  → session: cont_A_<idx>_<sessionId>
+   contB: pág 13 Validación   → session: cont_B_<idx>_<sessionId>
+════════════════════════════════════════════════════════════ */
+
+// ── Tutor A (pág 12: Formulación) ──
+function pAConstruirContexto() {
+  const p   = PROBLEMAS_A[probAActual];
+  const tipo = tipoEscogidoA || '(no seleccionado)';
+  const justif = document.getElementById('probA-justif')?.value?.trim() || '(sin justificación)';
+
+  // Extraer valores ingresados en celdas
+  const inputs = document.querySelectorAll('#probA-tabla-wrapper .cell-input');
+  let celdasTexto = '';
+  inputs.forEach(inp => {
+    celdasTexto += `  Celda [fila ${inp.dataset.fila}, col ${inp.dataset.col}]: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correcto}\n`;
+  });
+
+  return `[CONTEXTO — Problema de Formulación ${probAActual+1}]
+Enunciado: ${p.enunciado.replace(/<[^>]+>/g,'')}
+Pregunta: ${p.pregunta.replace(/<[^>]+>/g,'')}
+N = ${p.N}
+Variables fila: ${p.filas.join(', ')}
+Variables columna: ${p.columnas.join(', ')}
+Sistema de representación correcto: ${p.respuestaCorrecta}
+
+Sistema escogido por el estudiante: ${tipo}
+Justificación del estudiante: ${justif}
+
+Celdas ocultas (ingresado vs correcto):
+${celdasTexto}
+Pregunta de reflexión del problema: ${p.analisis}
+
+Analiza la elección de sistema, la justificación y los valores. Cuestiona el razonamiento usando TSD y Curcio. No des la respuesta directa.`;
+}
+
+async function pAEnviarAlTutor() {
+  const contexto = pAConstruirContexto();
+  const sid = `cont_A_${probAActual}_${sessionId}`;
+  agregarMensajeGen('chat-contA', '📋 Enviando mi trabajo al tutor…', 'user');
+  const tid = agregarTypingGen('chat-contA');
+  setStatusGen('tutor-status-pA', 'Analizando…');
+  try {
+    const res  = await fetch(URL_BACKEND, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: contexto, session_id: sid }) });
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen('tutor-status-pA', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-contA', data.reply, 'tutor');
+  } catch(e) {
+    quitarTypingGen(tid); setStatusGen('tutor-status-pA', 'En línea');
+    agregarMensajeGen('chat-contA', 'Problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
+
+async function pAEnviarMensajeLibre() {
+  const input = document.getElementById('input-contA');
+  if (!input?.value.trim()) return;
+  const texto = input.value.trim(); input.value = '';
+  agregarMensajeGen('chat-contA', texto, 'user');
+  const tid = agregarTypingGen('chat-contA');
+  setStatusGen('tutor-status-pA', 'Escribiendo…');
+  const sid = `cont_A_${probAActual}_${sessionId}`;
+  try {
+    const res  = await fetch(URL_BACKEND, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: texto, session_id: sid }) });
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen('tutor-status-pA', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-contA', data.reply, 'tutor');
+  } catch(e) {
+    quitarTypingGen(tid); setStatusGen('tutor-status-pA', 'En línea');
+    agregarMensajeGen('chat-contA', 'Problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
+
+// ── Tutor B (pág 13: Validación) ──
+function pBConstruirContexto() {
+  const p   = PROBLEMAS_B[probBActual];
+  const tipo = tipoEscogidoB || '(no seleccionado)';
+
+  const inputs = document.querySelectorAll('#probB-tabla-wrapper .cell-input');
+  let celdasTexto = '';
+  inputs.forEach(inp => {
+    celdasTexto += `  Celda [${inp.dataset.fila},${inp.dataset.col}]: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correcto}\n`;
+  });
+
+  let respuestasTexto = '';
+  p.preguntas.forEach((q,i) => {
+    const r = document.getElementById(q.id)?.value?.trim() || '(sin responder)';
+    respuestasTexto += `\nPregunta ${i+1} [${q.tipo}]: ${q.texto}\nRespuesta: ${r}\n`;
+  });
+
+  return `[CONTEXTO — Reto de Validación ${probBActual+1}]
+Enunciado: ${p.enunciado.replace(/<[^>]+>/g,'')}
+Pistas dadas: ${p.frases.join(' | ')}
+Pregunta guía: ${p.pregunta}
+N = ${p.N}, Filas: ${p.filas.join(', ')}, Columnas: ${p.columnas.join(', ')}
+Sistema correcto: ${p.respuestaCorrecta}
+Sistema escogido: ${tipo}
+
+Celdas construidas (ingresado vs correcto):
+${celdasTexto}
+Respuestas a preguntas de análisis:${respuestasTexto}
+Analiza todo lo anterior: la construcción de la tabla, la elección de sistema y las respuestas de análisis. Clasifica cada respuesta por nivel de Curcio (N1–N4) y cuestiona para empujar hacia N3/N4. No des respuestas directas.`;
+}
+
+async function pBEnviarAlTutor() {
+  const contexto = pBConstruirContexto();
+  const sid = `cont_B_${probBActual}_${sessionId}`;
+  agregarMensajeGen('chat-contB', '📋 Enviando mi trabajo al tutor…', 'user');
+  const tid = agregarTypingGen('chat-contB');
+  setStatusGen('tutor-status-pB', 'Analizando…');
+  try {
+    const res  = await fetch(URL_BACKEND, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: contexto, session_id: sid }) });
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen('tutor-status-pB', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-contB', data.reply, 'tutor');
+  } catch(e) {
+    quitarTypingGen(tid); setStatusGen('tutor-status-pB', 'En línea');
+    agregarMensajeGen('chat-contB', 'Problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
+
+async function pBEnviarMensajeLibre() {
+  const input = document.getElementById('input-contB');
+  if (!input?.value.trim()) return;
+  const texto = input.value.trim(); input.value = '';
+  agregarMensajeGen('chat-contB', texto, 'user');
+  const tid = agregarTypingGen('chat-contB');
+  setStatusGen('tutor-status-pB', 'Escribiendo…');
+  const sid = `cont_B_${probBActual}_${sessionId}`;
+  try {
+    const res  = await fetch(URL_BACKEND, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: texto, session_id: sid }) });
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen('tutor-status-pB', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-contB', data.reply, 'tutor');
+  } catch(e) {
+    quitarTypingGen(tid); setStatusGen('tutor-status-pB', 'En línea');
+    agregarMensajeGen('chat-contB', 'Problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
