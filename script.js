@@ -1946,7 +1946,7 @@ function ejfRenderizarGrafico() {
   if (info) {
     const msgs = {
       barras: 'Diagrama de barras: visualiza las frecuencias absolutas (fᵢ) de cada categoría.',
-      pie:    'Gráfico de pastel (doughnut): muestra la proporción relativa (hᵢ) de cada categoría.',
+      pie:    'Gráfico de pastel (doughnut): muestra la proporción relativa (hᵢ) de cada categoría. ',
       acum:   'Gráfico de frecuencias acumuladas: Fᵢ crece de 0 a N=40; Hᵢ×40 superpone la misma curva normalizada.',
     };
     info.textContent = msgs[tipo];
