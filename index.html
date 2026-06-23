@@ -377,7 +377,156 @@ Tabla de frecuencia → Gráfico circular.</div>
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(5)">← Síntesis Cap. I</button>
-          <button class="btn-nav next" onclick="irAPagina(6)">Capítulo II: Tablas de Contingencia →</button>
+          <button class="btn-nav next" onclick="irAPagina('5c')">Problemas: completar tabla →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 5c: PROBLEMAS — COMPLETAR TABLA DE FRECUENCIAS ══════════ -->
+    <div class="page" id="page-5c">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Problemas</span>
+          <span class="page-num">5</span>
+        </div>
+        <h2 class="page-title" style="font-size:1.4rem;margin-bottom:8px;">Completa la tabla de frecuencias</h2>
+
+        <!-- Selector de problema -->
+        <div class="prob-tabs-row" id="p5c-tabs">
+          <button class="p5c-tab active" onclick="p5cCargarProblema(0)">Problema 1</button>
+          <button class="p5c-tab"        onclick="p5cCargarProblema(1)">Problema 2</button>
+          <button class="p5c-tab"        onclick="p5cCargarProblema(2)">Problema 3</button>
+        </div>
+
+        <div class="p5c-layout">
+          <!-- Enunciado -->
+          <div class="p5c-enunciado-col">
+            <div class="prob-enunciado">
+              <div class="prob-num-badge" id="p5c-badge">Problema 1</div>
+              <p class="prob-enunciado-text" id="p5c-enunciado"></p>
+            </div>
+            <!-- Tabla con celdas editables -->
+            <div class="p5c-tabla-wrap" id="p5c-tabla-wrap"></div>
+            <!-- Feedback -->
+            <div class="prob-feedback" id="p5c-feedback" style="display:none;"></div>
+            <div class="p5c-bottom-row">
+              <button class="btn-verificar" onclick="p5cVerificar()">✅ Verificar tabla</button>
+              <button class="btn-prob-nav p5c-reset" onclick="p5cReset()">↺ Limpiar</button>
+            </div>
+          </div>
+          <!-- Panel de referencia / ayuda -->
+          <div class="p5c-help-col">
+            <div class="p5c-formula-card">
+              <div class="p5c-formula-title">📐 Fórmulas clave</div>
+              <div class="p5c-formula-row"><span class="p5c-f-label">hᵢ</span><span class="p5c-f-expr">= fᵢ / N</span></div>
+              <div class="p5c-formula-row"><span class="p5c-f-label">Fᵢ</span><span class="p5c-f-expr">= F₍ᵢ₋₁₎ + fᵢ</span></div>
+              <div class="p5c-formula-row"><span class="p5c-f-label">Hᵢ</span><span class="p5c-f-expr">= Fᵢ / N</span></div>
+              <div class="p5c-formula-row"><span class="p5c-f-label">ΣN</span><span class="p5c-f-expr">= Σfᵢ</span></div>
+            </div>
+            <div class="p5c-hint-card" id="p5c-hint-card">
+              <div class="p5c-formula-title">💡 Pista</div>
+              <p id="p5c-hint-text">Comienza calculando hᵢ para la primera fila: divide fᵢ entre N.</p>
+            </div>
+            <div class="p5c-progress-card">
+              <div class="p5c-formula-title">📊 Progreso</div>
+              <div class="p5c-progress-bar-wrap">
+                <div class="p5c-progress-bar" id="p5c-progress-bar"></div>
+              </div>
+              <span class="p5c-progress-label" id="p5c-progress-label">0 / 0 celdas correctas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina('5b')">← Ejemplos Dinámicos</button>
+          <button class="btn-nav next" onclick="irAPagina('5d')">Problema libre →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 5d: PROBLEMA LIBRE — EL ESTUDIANTE CONSTRUYE SU TABLA ══════════ -->
+    <div class="page" id="page-5d">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo I · Análisis</span>
+          <span class="page-num">6</span>
+        </div>
+        <h2 class="page-title" style="font-size:1.4rem;margin-bottom:6px;">Construye y analiza tu propia tabla</h2>
+
+        <!-- Selector de situación -->
+        <div class="prob-tabs-row" id="p5d-tabs">
+          <button class="p5c-tab active" onclick="p5dCargarSituacion(0)">Situación 1</button>
+          <button class="p5c-tab"        onclick="p5dCargarSituacion(1)">Situación 2</button>
+        </div>
+
+        <div class="p5d-layout">
+          <!-- Columna izquierda: enunciado + tabla libre -->
+          <div class="p5d-left">
+            <div class="prob-enunciado">
+              <div class="prob-num-badge" id="p5d-badge">Situación 1</div>
+              <p class="prob-enunciado-text" id="p5d-enunciado"></p>
+              <div class="p5d-datos-ref" id="p5d-datos-ref"></div>
+            </div>
+
+            <!-- Tabla editable libre: el estudiante decide el orden de filas -->
+            <div class="p5d-tabla-header">
+              <span class="p5d-th-label">Construye la tabla — arrastra las filas o escríbelas en el orden que consideres necesario:</span>
+            </div>
+            <div class="p5d-tabla-wrap" id="p5d-tabla-wrap"></div>
+            <div class="p5d-tabla-acciones">
+              <button class="btn-verificar" style="background:var(--moss);" onclick="p5dVerificarTabla()">✅ Verificar tabla completa</button>
+              <button class="btn-prob-nav p5c-reset" onclick="p5dReset()">↺ Reiniciar</button>
+            </div>
+            <div class="prob-feedback" id="p5d-feedback-tabla" style="display:none;"></div>
+          </div>
+
+          <!-- Columna derecha: preguntas + tutor IA -->
+          <div class="p5d-right">
+            <div class="p5d-preguntas-header">🔍 Preguntas de análisis</div>
+            <p class="p5d-preguntas-intro">Responde después de completar tu tabla. Cada pregunta requiere interpretar los datos — no basta con leer un número.</p>
+            <div id="p5d-preguntas-list"></div>
+            <div class="p5d-resp-acciones">
+              <button class="btn-verificar" style="background:var(--navy);" onclick="p5dEnviarAlTutor()">💬 Enviar al tutor</button>
+              <button class="btn-verificar" style="background:var(--moss);" onclick="p5dVerificarRespuestas()">📋 Auto-verificar</button>
+            </div>
+            <div class="prob-feedback" id="p5d-feedback-resp" style="display:none;"></div>
+
+            <!-- Panel del tutor IA -->
+            <div class="tutor-panel p5d-tutor-panel" id="p5d-tutor-panel">
+              <div class="tutor-header" style="background:#2d4a6e;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status">
+                    <span class="status-dot"></span>
+                    <span id="tutor-status-5d">En espera…</span>
+                  </div>
+                </div>
+                <button class="audio-toggle-btn" id="audio-btn-5d"
+                        onclick="toggleAudio('5d')" title="Activar lectura en voz alta">
+                  <span class="audio-icon">🔇</span>
+                  <span class="audio-waves" id="audio-waves-5d">
+                    <span></span><span></span><span></span>
+                  </span>
+                </button>
+              </div>
+              <div class="tutor-context-strip" style="border-left-color:var(--gold);">
+                📝 Escribe tus respuestas arriba y pulsa <strong>"Enviar al tutor"</strong>. El tutor analizará tu razonamiento y te hará preguntas para profundizar.
+              </div>
+              <div id="chat-5d" class="chat-box p5d-chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-5d" class="chat-input"
+                       placeholder="Continúa el diálogo con el tutor…"
+                       onkeydown="if(event.key==='Enter') p5dEnviarMensajeLibre()">
+                <button class="btn-send" onclick="p5dEnviarMensajeLibre()">Enviar <span class="send-icon">↑</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina('5c')">← Completar tabla</button>
+          <button class="btn-nav next" onclick="irAPagina(6)">Capítulo II: Contingencia →</button>
         </div>
       </div>
     </div>
@@ -888,6 +1037,8 @@ Tabla de frecuencia → Gráfico circular.</div>
     <span class="pi-dot" onclick="irAPagina(3)"   title="Cap I · Construcción guiada"></span>
     <span class="pi-dot" onclick="irAPagina(5)"   title="Cap I · Síntesis"></span>
     <span class="pi-dot pi-dot-5b" onclick="irAPagina('5b')" title="Cap I · Ejemplo Dinámico"></span>
+    <span class="pi-dot" onclick="irAPagina('5c')" title="Cap I · Completar tabla"></span>
+    <span class="pi-dot" onclick="irAPagina('5d')" title="Cap I · Análisis libre"></span>
     <span class="pi-dot" onclick="irAPagina(6)"   title="Cap II · Presentación"></span>
     <span class="pi-dot" onclick="irAPagina(7)"   title="Cap II · Actividad"></span>
     <span class="pi-dot" onclick="irAPagina(8)"   title="Cap II · Síntesis"></span>
