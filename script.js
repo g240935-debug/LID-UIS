@@ -3,7 +3,7 @@
    Conexión al backend: https://lid-uis.onrender.com/api/chat
    No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINAS
+   MAPA DE PÁGINAS:
    0  → Portada 
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
@@ -220,6 +220,16 @@ function irAPagina(n) {
   if (n === 7 && !chatCap2Iniciado) {
     chatCap2Iniciado = true;
     setTimeout(inicializarChatCap2, 400);
+  }
+
+  // Cap II — Formulación (pág 12): re-renderizar tabla al entrar
+  if (n === 12) {
+    setTimeout(() => { renderizarProbA(); }, 300);
+  }
+
+  // Cap II — Validación (pág 13): re-renderizar tabla al entrar
+  if (n === 13) {
+    setTimeout(() => { renderizarProbB(); }, 300);
   }
 
   // Cap III — Formas parciales con IA
@@ -2126,8 +2136,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderizarFPRefTable();
   renderizarEjTabla('absoluta');
   renderizarEjGrafico('absoluta');
-  renderizarProbA();
-  renderizarProbB();
   renderizarChi();
 });
 
