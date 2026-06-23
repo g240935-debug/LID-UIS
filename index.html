@@ -21,7 +21,7 @@
   <!-- Páginas -->
   <div class="book-pages" id="bookPages">
 
-    <!-- ══════════ PÁGINA0: PORTADA GENERAL ══════════ -->
+    <!-- ══════════ PÁGINA 0: PORTADA GENERAL ══════════ -->
     <div class="page active" id="page-0">
       <div class="cover-page">
         <div class="cover-grid-bg">
@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <!-- ══════════ PÁGINA 1 PRESENTACIÓN CAP I — TABLA DE FRECUENCIA ══════════ -->
+    <!-- ══════════ PÁGINA 1: PRESENTACIÓN CAP I — TABLA DE FRECUENCIA ══════════ -->
     <div class="page" id="page-1">
       <div class="page-inner">
         <div class="page-header">
@@ -116,9 +116,9 @@ Tabla de frecuencia → Gráfico circular.</div>
                 <div class="st-row">
                   <div class="st-cell corner">Categoría</div>
                   <div class="st-cell col-hdr">fᵢ</div>
-                  <div class="st-cell col-hdr">hᵢ</div>
+                  <div class="st-cell col-hdr">fᵣ</div>
                   <div class="st-cell col-hdr marg-hdr">Fᵢ</div>
-                  <div class="st-cell col-hdr marg-hdr">Hᵢ</div>
+                  <div class="st-cell col-hdr marg-hdr">Fᵣ</div>
                 </div>
                 <div class="st-row">
                   <div class="st-cell row-hdr">Categoría 1</div>
@@ -144,8 +144,8 @@ Tabla de frecuencia → Gráfico circular.</div>
               </div>
               <div class="legend-row">
                 <span class="leg-item"><span class="leg-dot joint-dot"></span>fᵢ frecuencia absoluta</span>
-                <span class="leg-item"><span class="leg-dot marg-dot"></span>hᵢ frecuencia relativa</span>
-                <span class="leg-item"><span class="leg-dot grand-dot"></span>Fᵢ / Hᵢ acumuladas</span>
+                <span class="leg-item"><span class="leg-dot marg-dot"></span>fᵣ frecuencia relativa</span>
+                <span class="leg-item"><span class="leg-dot grand-dot"></span>Fᵢ / Fᵣ acumuladas</span>
               </div>
             </div>
           </div>
@@ -184,7 +184,7 @@ Tabla de frecuencia → Gráfico circular.</div>
             <div class="situation-header">
               <span class="sit-badge">Situación · Bucaramanga</span>
               <h3 class="sit-title">Construyendo la tabla paso a paso</h3>
-              <p class="sit-desc">El tutor te guiará para construir la tabla de frecuencias completa. Cada columna aparecerá a medida que el tutor la introduzca: primero <strong>fᵢ</strong>, luego <strong>hᵢ</strong>, después <strong>Fᵢ</strong> y finalmente <strong>Hᵢ</strong>.</p>
+              <p class="sit-desc">El tutor te guiará para construir la tabla de frecuencias completa. Cada columna aparecerá a medida que el tutor la introduzca: primero <strong>fᵢ</strong>, luego <strong>fᵣ</strong>, después <strong>Fᵢ</strong> y finalmente <strong>Fᵣ</strong>.</p>
             </div>
 
             <!-- Tabla dinámica unificada — columnas aparecen progresivamente -->
@@ -198,9 +198,9 @@ Tabla de frecuencia → Gráfico circular.</div>
             <!-- Barra de progreso de columnas -->
             <div class="p3-col-progress" id="p3-col-progress">
               <span class="p3-col-badge p3-col-fi active" title="Frecuencia absoluta">fᵢ ✓</span>
-              <span class="p3-col-badge p3-col-hi" id="p3-badge-hi" title="Frecuencia relativa">hᵢ</span>
+              <span class="p3-col-badge p3-col-hi" id="p3-badge-hi" title="Frecuencia relativa">fᵣ</span>
               <span class="p3-col-badge p3-col-fi-acum" id="p3-badge-Fi" title="Frecuencia absoluta acumulada">Fᵢ</span>
-              <span class="p3-col-badge p3-col-hi-acum" id="p3-badge-Hi" title="Frecuencia relativa acumulada">Hᵢ</span>
+              <span class="p3-col-badge p3-col-hi-acum" id="p3-badge-Hi" title="Frecuencia relativa acumulada">Fᵣ</span>
             </div>
 
             <!-- Leyenda de fases -->
@@ -265,10 +265,10 @@ Tabla de frecuencia → Gráfico circular.</div>
           </div>
           <div class="syn-card">
             <div class="syn-tag">Fase B</div>
-            <div class="syn-num">hᵢ</div>
+            <div class="syn-num">fᵣ</div>
             <h4>Frecuencia Relativa</h4>
-            <p>Proporción que representa cada categoría respecto al total N. Se calcula como hᵢ = fᵢ / N.</p>
-            <div class="syn-example">Ej: Café Negro → hᵢ = 18/40 = 0.45</div>
+            <p>Proporción que representa cada categoría respecto al total N. Se calcula como fᵣ = fᵢ / N.</p>
+            <div class="syn-example">Ej: Café Negro → fᵣ = 18/40 = 0.45</div>
           </div>
           <div class="syn-card">
             <div class="syn-tag">Fase E</div>
@@ -279,10 +279,10 @@ Tabla de frecuencia → Gráfico circular.</div>
           </div>
           <div class="syn-card accent-syn">
             <div class="syn-tag">Fase F–H</div>
-            <div class="syn-num">Hᵢ</div>
+            <div class="syn-num">Fᵣ</div>
             <h4>Frecuencia Relativa Acumulada</h4>
-            <p>Proporción acumulada. Hᵢ = Fᵢ / N = Σhᵢ. Permite saber qué fracción del total se ha contabilizado hasta la categoría i.</p>
-            <div class="syn-example">Ej: Hasta Té → Hᵢ = 28/40 = 0.70</div>
+            <p>Proporción acumulada. Fᵣ = Fᵢ / N = Σfᵣ. Permite saber qué fracción del total se ha contabilizado hasta la categoría i.</p>
+            <div class="syn-example">Ej: Hasta Té → Fᵣ = 28/40 = 0.70</div>
           </div>
         </div>
         <!-- Tabla final completa -->
@@ -293,9 +293,9 @@ Tabla de frecuencia → Gráfico circular.</div>
               <tr style="background:var(--navy);color:white;">
                 <th style="padding:6px 10px;text-align:left;">Bebida</th>
                 <th style="padding:6px 10px;">fᵢ</th>
-                <th style="padding:6px 10px;">hᵢ</th>
+                <th style="padding:6px 10px;">fᵣ</th>
                 <th style="padding:6px 10px;">Fᵢ</th>
-                <th style="padding:6px 10px;">Hᵢ</th>
+                <th style="padding:6px 10px;">Fᵣ</th>
               </tr>
             </thead>
             <tbody>
@@ -342,9 +342,9 @@ Tabla de frecuencia → Gráfico circular.</div>
           <div class="ejf-custom-label">Elige qué columnas mostrar:</div>
           <div class="ejf-col-checks">
             <label class="ejf-check"><input type="checkbox" id="ejf-chk-fi" checked onchange="ejfActualizarVista()"><span>fᵢ (absoluta)</span></label>
-            <label class="ejf-check"><input type="checkbox" id="ejf-chk-hi" onchange="ejfActualizarVista()"><span>hᵢ (relativa)</span></label>
+            <label class="ejf-check"><input type="checkbox" id="ejf-chk-hi" onchange="ejfActualizarVista()"><span>fᵣ (relativa)</span></label>
             <label class="ejf-check"><input type="checkbox" id="ejf-chk-Fi" onchange="ejfActualizarVista()"><span>Fᵢ (abs. acumulada)</span></label>
-            <label class="ejf-check"><input type="checkbox" id="ejf-chk-Hi" onchange="ejfActualizarVista()"><span>Hᵢ (rel. acumulada)</span></label>
+            <label class="ejf-check"><input type="checkbox" id="ejf-chk-Hi" onchange="ejfActualizarVista()"><span>Fᵣ (rel. acumulada)</span></label>
           </div>
           <div class="ejf-cat-row">
             <div class="ejf-custom-label">Filtrar categorías (opcional):</div>
@@ -418,14 +418,14 @@ Tabla de frecuencia → Gráfico circular.</div>
           <div class="p5c-help-col">
             <div class="p5c-formula-card">
               <div class="p5c-formula-title">📐 Fórmulas clave</div>
-              <div class="p5c-formula-row"><span class="p5c-f-label">hᵢ</span><span class="p5c-f-expr">= fᵢ / N</span></div>
+              <div class="p5c-formula-row"><span class="p5c-f-label">fᵣ</span><span class="p5c-f-expr">= fᵢ / N</span></div>
               <div class="p5c-formula-row"><span class="p5c-f-label">Fᵢ</span><span class="p5c-f-expr">= F₍ᵢ₋₁₎ + fᵢ</span></div>
-              <div class="p5c-formula-row"><span class="p5c-f-label">Hᵢ</span><span class="p5c-f-expr">= Fᵢ / N</span></div>
+              <div class="p5c-formula-row"><span class="p5c-f-label">Fᵣ</span><span class="p5c-f-expr">= Fᵢ / N</span></div>
               <div class="p5c-formula-row"><span class="p5c-f-label">ΣN</span><span class="p5c-f-expr">= Σfᵢ</span></div>
             </div>
             <div class="p5c-hint-card" id="p5c-hint-card">
               <div class="p5c-formula-title">💡 Pista</div>
-              <p id="p5c-hint-text">Comienza calculando hᵢ para la primera fila: divide fᵢ entre N.</p>
+              <p id="p5c-hint-text">Comienza calculando fᵣ para la primera fila: divide fᵢ entre N.</p>
             </div>
             <div class="p5c-progress-card">
               <div class="p5c-formula-title">📊 Progreso</div>
