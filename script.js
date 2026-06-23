@@ -46,6 +46,97 @@ let chatFreqUnifIniciado = false; // pág 3 unificada
 let freqCCompletado = false;     // true cuando la IA de fase C termina
 let chiActual       = 0;
 
+/* ════════════════════════════════
+   SISTEMA DE AUDIO — Web Speech API
+   Cada tutor tiene su propio toggle independiente.
+   audioState[chatId] = { on: bool, speaking: bool }
+════════════════════════════════ */
+
+// Mapa: chatId → { btnId, wavesId }
+const AUDIO_MAP = {
+  'freq-unif': { btn: 'audio-btn-freq-unif', waves: 'audio-waves-freq-unif' },
+  'cap2':      { btn: 'audio-btn-cap2',      waves: 'audio-waves-cap2'      },
+  'cap3':      { btn: 'audio-btn-cap3',      waves: 'audio-waves-cap3'      },
+  'chi':       { btn: 'audio-btn-chi',       waves: 'audio-waves-chi'       },
+};
+
+// Estado ON/OFF por tutor
+const audioState = {};
+Object.keys(AUDIO_MAP).forEach(k => { audioState[k] = false; });
+
+// Mapeo chatBox → chatId para hablarTexto desde agregarMensajeGen
+const BOX_TO_AUDIO = {
+  'chat-freq-unif': 'freq-unif',
+  'chat-box':       'cap2',
+  'chat-box2':      'cap3',
+  'chat-chi':       'chi',
+};
+
+function toggleAudio(chatId) {
+  const cfg = AUDIO_MAP[chatId];
+  if (!cfg) return;
+  const isOn = !audioState[chatId];
+  audioState[chatId] = isOn;
+
+  const btn   = document.getElementById(cfg.btn);
+  const icon  = btn?.querySelector('.audio-icon');
+
+  if (isOn) {
+    btn?.classList.add('audio-on');
+    if (icon) icon.textContent = '🔊';
+    btn?.setAttribute('title', 'Desactivar lectura en voz alta');
+    btn?.setAttribute('data-label', 'Voz activada');
+  } else {
+    btn?.classList.remove('audio-on', 'audio-speaking');
+    if (icon) icon.textContent = '🔇';
+    btn?.setAttribute('title', 'Activar lectura en voz alta');
+    btn?.setAttribute('data-label', 'Voz desactivada');
+    // Detener cualquier lectura en curso de este tutor
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+}
+
+function hablarTexto(texto, chatId) {
+  if (!audioState[chatId]) return;
+  if (!window.speechSynthesis) return;
+
+  // Cancelar lectura previa del mismo tutor
+  window.speechSynthesis.cancel();
+
+  // Limpiar el texto de markdown y símbolos especiales
+  const limpio = texto
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/fᵢ/g, 'fi').replace(/hᵢ/g, 'hi')
+    .replace(/Fᵢ/g, 'Fi').replace(/Hᵢ/g, 'Hi')
+    .replace(/[<>]/g, '').replace(/\n+/g, '. ')
+    .trim();
+
+  const utterance = new SpeechSynthesisUtterance(limpio);
+  utterance.lang  = 'es-CO'; // español colombiano; fallback a es-ES
+  utterance.rate  = 0.95;
+  utterance.pitch = 1.0;
+
+  // Intentar seleccionar una voz en español
+  const voices = window.speechSynthesis.getVoices();
+  const vozEs  = voices.find(v => v.lang.startsWith('es'));
+  if (vozEs) utterance.voice = vozEs;
+
+  const cfg = AUDIO_MAP[chatId];
+  const btn = cfg ? document.getElementById(cfg.btn) : null;
+
+  utterance.onstart = () => { btn?.classList.add('audio-speaking'); };
+  utterance.onend   = () => { btn?.classList.remove('audio-speaking'); };
+  utterance.onerror = () => { btn?.classList.remove('audio-speaking'); };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// Las voces pueden cargar de forma asíncrona en algunos navegadores
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => { /* voces listas */ };
+}
+
 // Datos por defecto para el gráfico de contingencia Cap II
 let datosGrafico = {
   labels:  ['Deportes', 'Danza', 'Música'],
@@ -811,6 +902,12 @@ function agregarMensajeGen(boxId, texto, tipo) {
     .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
+
+  // Audio: leer en voz alta si el tutor lo tiene activado
+  if (tipo === 'tutor') {
+    const chatId = BOX_TO_AUDIO[boxId];
+    if (chatId) hablarTexto(texto, chatId);
+  }
 }
 
 function agregarTypingGen(boxId) {
