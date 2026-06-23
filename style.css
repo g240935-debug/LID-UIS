@@ -2068,3 +2068,12 @@ html, body {
   .pB-layout { grid-template-columns: 1fr; }
   .pA-tutor-panel, .pB-tutor-panel { min-height: 320px; }
 }
+
+/* ── pAB-single-col: layout una columna para págs 12 y 13 ── */
+.pAB-single-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
