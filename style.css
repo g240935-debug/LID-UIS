@@ -1649,3 +1649,85 @@ html, body {
 /* Dot especial para página 5b */
 .pi-dot-5b { background: var(--gold) !important; opacity: .45; }
 .pi-dot-5b.active { opacity: 1; }
+
+/* ══════════════════════════════════════════════
+   PÁGINA 3 — ACTIVIDAD UNIFICADA
+   Tabla progresiva + chat único
+══════════════════════════════════════════════ */
+
+/* Nota de fase dinámica: fondo animado al cambiar */
+#p3-fase-nota {
+  transition: border-left-color .4s ease, background .4s ease;
+}
+#p3-fase-nota.fase-hi  { border-left-color: var(--moss);  background: #f0f7f3; }
+#p3-fase-nota.fase-Fi  { border-left-color: var(--sky);   background: #eaf2fb; }
+#p3-fase-nota.fase-Hi  { border-left-color: var(--gold);  background: #fdf6e3; }
+#p3-fase-nota.fase-completa {
+  border-left-color: #4caf50;
+  background: #f0faf2;
+}
+
+/* Título y descripción de fase con transición */
+#p3-fase-titulo,
+#p3-fase-desc {
+  transition: opacity .25s ease;
+}
+
+/* Franja de contexto del chat — versión pág 3 */
+#p3-context-strip {
+  font-size: .8rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--slate);
+  background: linear-gradient(90deg, #f0f7f3, #eaf2fb);
+  border-left: 3px solid var(--moss);
+  padding: 8px 12px;
+  margin: 0 0 8px 0;
+  border-radius: 0 3px 3px 0;
+  transition: border-left-color .4s ease, background .4s ease;
+}
+#p3-context-strip.strip-hi  { border-left-color: var(--moss); }
+#p3-context-strip.strip-Fi  { border-left-color: var(--sky); }
+#p3-context-strip.strip-Hi  { border-left-color: var(--gold); }
+#p3-context-strip.strip-completa { border-left-color: #4caf50; background: linear-gradient(90deg, #f0faf2, #f0faf2); }
+
+/* Barra de progreso de columnas — ligera mejora de legibilidad */
+.p3-col-progress {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.p3-col-badge {
+  font-size: .73rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1.5px solid var(--rule);
+  color: var(--slate);
+  background: var(--cream);
+  transition: background .4s ease, color .3s ease, border-color .4s ease, transform .2s ease;
+}
+.p3-col-badge.active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+
+/* Columnas de tabla con colores diferenciados también en header */
+.p3-tabla-anim th.col-hi  { background: rgba(46,107,79,.15); color: var(--moss); }
+.p3-tabla-anim th.col-Fi  { background: rgba(91,141,184,.15); color: var(--slate); }
+.p3-tabla-anim th.col-Hi  { background: rgba(200,168,75,.18); color: #7a6010; }
+.p3-tabla-anim td.col-hi  { background: rgba(46,107,79,.06); }
+.p3-tabla-anim td.col-Fi  { background: rgba(91,141,184,.07); }
+.p3-tabla-anim td.col-Hi  { background: rgba(200,168,75,.07); }
+
+/* Pulso de celebración cuando la tabla se completa */
+@keyframes p3Celebra {
+  0%   { box-shadow: 0 0 0 0 rgba(76,175,80,.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(76,175,80,0); }
+  100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+}
+#p3-tabla-wrapper.completa {
+  animation: p3Celebra 1s ease 2;
+  border-radius: 4px;
+}
