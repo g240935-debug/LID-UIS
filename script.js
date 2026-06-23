@@ -1048,6 +1048,14 @@ function calcularCelda(tipo, valor, totalFila, totalCol, N) {
   return valor;
 }
 
+function calcularCeldaNum(tipo, val, totalFila, totalCol, N) {
+  if (tipo === 'absoluta') return val;
+  if (tipo === 'total')    return parseFloat((val / N * 100).toFixed(1));
+  if (tipo === 'fila')     return parseFloat((val / totalFila * 100).toFixed(1));
+  if (tipo === 'columna')  return parseFloat((val / totalCol * 100).toFixed(1));
+  return val;
+}
+
 function calcularMarginalFila(tipo, totalFila, N) {
   if (tipo === 'absoluta') return totalFila;
   if (tipo === 'total')    return (totalFila / N * 100).toFixed(1) + '%';
@@ -1265,6 +1273,9 @@ function escogerTipoA(tipo) {
     if (b.dataset.tipo === tipo) b.classList.add('selected');
   });
   document.getElementById('probA-tipo-feedback').style.display = 'none';
+  // Mostrar sección de tabla la primera vez que eligen tipo
+  const sec = document.getElementById('probA-tabla-section');
+  if (sec) sec.style.display = 'block';
   _renderizarTablaA();
 }
 
@@ -1279,11 +1290,13 @@ function renderizarProbA() {
   document.getElementById('probA-tipo-feedback').style.display = 'none';
   const justif = document.getElementById('probA-justif');
   if (justif) justif.value = '';
-  // Resetear tutor
+  // Ocultar tabla y tutor hasta nueva selección
+  const sec = document.getElementById('probA-tabla-section');
+  if (sec) sec.style.display = 'none';
+  const panel = document.getElementById('pA-tutor-panel');
+  if (panel) panel.style.display = 'none';
   const box = document.getElementById('chat-contA');
   if (box) box.innerHTML = '';
-  setStatusGen('tutor-status-pA', 'En espera…');
-  _renderizarTablaA();
 }
 
 function _renderizarTablaA() {
@@ -1480,6 +1493,9 @@ function escogerTipoB(tipo) {
     if (b.dataset.tipo === tipo) b.classList.add('selected');
   });
   document.getElementById('probB-tipo-feedback').style.display = 'none';
+  // Mostrar sección de tabla la primera vez que eligen tipo
+  const sec = document.getElementById('probB-tabla-section');
+  if (sec) sec.style.display = 'block';
   _renderizarTablaB();
 }
 
@@ -1494,12 +1510,14 @@ function renderizarProbB() {
   tipoEscogidoB = null;
   document.querySelectorAll('#page-13 .pts-btn').forEach(b => b.classList.remove('selected','correcto','incorrecto'));
   document.getElementById('probB-tipo-feedback').style.display = 'none';
-  _renderizarTablaB();
-  _renderizarPreguntasB(p);
-  // Resetear tutor
+  // Ocultar tabla y tutor hasta nueva selección
+  const sec = document.getElementById('probB-tabla-section');
+  if (sec) sec.style.display = 'none';
+  const panel = document.getElementById('pB-tutor-panel');
+  if (panel) panel.style.display = 'none';
   const box = document.getElementById('chat-contB');
   if (box) box.innerHTML = '';
-  setStatusGen('tutor-status-pB', 'En espera…');
+  _renderizarPreguntasB(p);
 }
 
 function _renderizarPreguntasB(p) {
@@ -2798,11 +2816,14 @@ Analiza la elección de sistema, la justificación y los valores. Cuestiona el r
 }
 
 async function pAEnviarAlTutor() {
+  const panel = document.getElementById('pA-tutor-panel');
+  if (panel) panel.style.display = 'flex';
   const contexto = pAConstruirContexto();
   const sid = `cont_A_${probAActual}_${sessionId}`;
   agregarMensajeGen('chat-contA', '📋 Enviando mi trabajo al tutor…', 'user');
   const tid = agregarTypingGen('chat-contA');
   setStatusGen('tutor-status-pA', 'Analizando…');
+  setTimeout(() => panel?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
   try {
     const res  = await fetch(URL_BACKEND, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ message: contexto, session_id: sid }) });
@@ -2867,11 +2888,14 @@ Analiza todo lo anterior: la construcción de la tabla, la elección de sistema 
 }
 
 async function pBEnviarAlTutor() {
+  const panel = document.getElementById('pB-tutor-panel');
+  if (panel) panel.style.display = 'flex';
   const contexto = pBConstruirContexto();
   const sid = `cont_B_${probBActual}_${sessionId}`;
   agregarMensajeGen('chat-contB', '📋 Enviando mi trabajo al tutor…', 'user');
   const tid = agregarTypingGen('chat-contB');
   setStatusGen('tutor-status-pB', 'Analizando…');
+  setTimeout(() => panel?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
   try {
     const res  = await fetch(URL_BACKEND, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ message: contexto, session_id: sid }) });
