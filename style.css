@@ -1381,8 +1381,7 @@ html, body {
 }
 
 /* ── Botón siguiente deshabilitado → habilitado ── */
-#btn-freq-a-next,
-#btn-freq-b-next {
+#btn-freq-unif-next {
   transition: opacity .4s ease, pointer-events 0s;
 }
 
@@ -1401,47 +1400,12 @@ html, body {
 }
 
 /* ══════════════════════════════════════════════
-   CAP I — PÁGINA 4: frec. acumuladas
-   Las tablas Fi y Hi aparecen progresivamente.
-══════════════════════════════════════════════ */
-
-/* Apilado vertical de tablas en la vis-panel */
-#page-4 .vis-panel { gap: 10px; }
-
-/* Tabla de referencia inicial — discreta */
-#freq-tabla-ref-acum { opacity: .75; }
-
-/* Tabla Fi — borde izquierdo accent color slate */
-#freq-tabla-Fi {
-  border-left: 3px solid var(--slate);
-}
-#freq-tabla-Fi .freq-tabla-label {
-  background: rgba(61,90,122,.1);
-  color: var(--slate);
-  border-bottom-color: rgba(61,90,122,.2);
-}
-
-/* Tabla Hi — borde izquierdo accent moss (completo) */
-#freq-tabla-Hi {
-  border-left: 3px solid var(--moss);
-}
-#freq-tabla-Hi .freq-tabla-label {
-  background: #E8F5ED;
-  color: var(--moss);
-  border-bottom-color: rgba(46,107,79,.2);
-}
-
-/* ══════════════════════════════════════════════
-   CAP I — RESPONSIVE para actividad (pág 2-4)
+   CAP I — RESPONSIVE para actividad (pág 3)
 ══════════════════════════════════════════════ */
 @media (max-width: 880px) {
-  #page-2 .activity-layout,
-  #page-3 .activity-layout,
-  #page-4 .activity-layout {
+  #page-3 .activity-layout {
     grid-template-columns: 1fr;
   }
-  #page-4 .vis-panel { order: 2; }
-  #page-4 .tutor-panel { order: 1; }
 }
 
 /* ── RESPONSIVE ── */
