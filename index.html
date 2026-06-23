@@ -92,15 +92,19 @@
             <div class="moment-list">
               <div class="moment-item">
                 <div class="moment-num">1</div>
-                <div class="moment-body"><strong>Exploración</strong> — Interactúas con una situación real y descubres los elementos de una tabla de frecuencia con la guía del tutor virtual.</div>
+                <div class="moment-body"><strong>Frecuencia Absoluta (fᵢ)</strong> — Conteo directo de cada categoría.</div>
               </div>
               <div class="moment-item">
                 <div class="moment-num">2</div>
-                <div class="moment-body"><strong>Transnumeración</strong> — Cambias la forma de representar los mismos datos para descubrir nueva información.</div>
+                <div class="moment-body"><strong>Frecuencia Relativa (hᵢ)</strong> — Proporción de cada categoría respecto al total N.</div>
               </div>
               <div class="moment-item">
                 <div class="moment-num">3</div>
-                <div class="moment-body"><strong>Institucionalización</strong> — El tutor formaliza los conceptos construidos durante la exploración.</div>
+                <div class="moment-body"><strong>Frecuencia Absoluta Acumulada (Fᵢ)</strong> — Suma progresiva de las frecuencias absolutas.</div>
+              </div>
+              <div class="moment-item">
+                <div class="moment-num">4</div>
+                <div class="moment-body"><strong>Frecuencia Relativa Acumulada (Hᵢ)</strong> — Proporción acumulada desde la primera hasta la i-ésima categoría.</div>
               </div>
             </div>
             <!-- Tabla estructural -->
@@ -213,6 +217,13 @@
                   <span id="tutor-status-freq-unif">Conectando…</span>
                 </div>
               </div>
+              <button class="audio-toggle-btn" id="audio-btn-freq-unif"
+                      onclick="toggleAudio('freq-unif')" title="Activar lectura en voz alta">
+                <span class="audio-icon">🔇</span>
+                <span class="audio-waves" id="audio-waves-freq-unif">
+                  <span></span><span></span><span></span>
+                </span>
+              </button>
             </div>
             <div class="tutor-context-strip" id="p3-context-strip">
               📊 El tutor introducirá cada tipo de frecuencia uno a uno. Responde sus preguntas y observa cómo la tabla crece.
@@ -228,7 +239,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(1)">← Presentación</button>
-         <button class="btn-nav next" onclick="irAPagina(5)">Síntesis →</button>
+          <button class="btn-nav next" id="btn-freq-unif-next" onclick="irAPagina(5)" style="opacity:0.4;pointer-events:none;">Síntesis Cap. I →</button>
         </div>
       </div>
     </div>
@@ -295,7 +306,7 @@
           </table>
         </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(4)">← Síntesis</button>
+          <button class="btn-nav prev" onclick="irAPagina(4)">← Frecuencias acumuladas</button>
           <button class="btn-nav next" onclick="irAPagina('5b')">Ejemplos Dinámicos →</button>
         </div>
       </div>
@@ -363,7 +374,7 @@
         </div>
 
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(5)">← Ejemplos Dinámicos</button>
+          <button class="btn-nav prev" onclick="irAPagina(5)">← Síntesis Cap. I</button>
           <button class="btn-nav next" onclick="irAPagina(6)">Capítulo II: Tablas de Contingencia →</button>
         </div>
       </div>
@@ -473,6 +484,13 @@
                 <div class="tutor-name">Tutor Virtual UIS</div>
                 <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-text">Conectando…</span></div>
               </div>
+              <button class="audio-toggle-btn" id="audio-btn-cap2"
+                      onclick="toggleAudio('cap2')" title="Activar lectura en voz alta">
+                <span class="audio-icon">🔇</span>
+                <span class="audio-waves" id="audio-waves-cap2">
+                  <span></span><span></span><span></span>
+                </span>
+              </button>
             </div>
             <div id="chat-box" class="chat-box"></div>
             <div class="chat-input-area">
@@ -600,6 +618,13 @@
                 <div class="tutor-name">Tutor Virtual UIS</div>
                 <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-text2">Conectando…</span></div>
               </div>
+              <button class="audio-toggle-btn" id="audio-btn-cap3"
+                      onclick="toggleAudio('cap3')" title="Activar lectura en voz alta">
+                <span class="audio-icon">🔇</span>
+                <span class="audio-waves" id="audio-waves-cap3">
+                  <span></span><span></span><span></span>
+                </span>
+              </button>
             </div>
             <div id="chat-box2" class="chat-box"></div>
             <div class="chat-input-area">
@@ -826,6 +851,13 @@
                   <div class="tutor-name">Tutor Virtual UIS</div>
                   <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-chi">Conectando…</span></div>
                 </div>
+                <button class="audio-toggle-btn" id="audio-btn-chi"
+                        onclick="toggleAudio('chi')" title="Activar lectura en voz alta">
+                  <span class="audio-icon">🔇</span>
+                  <span class="audio-waves" id="audio-waves-chi">
+                    <span></span><span></span><span></span>
+                  </span>
+                </button>
               </div>
               <div class="tutor-context-strip" style="border-left-color:var(--gold);">
                 🤔 Distribuye los datos y envíalos al tutor. Él te hará preguntas para que descubras si tu distribución realmente prueba la afirmación.
