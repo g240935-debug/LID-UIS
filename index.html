@@ -1224,6 +1224,11 @@ Tabla de frecuencia → Gráfico circular.</div>
           </div>
           <div id="chi3-p16-tabla-wrap"></div>
           <div class="chi3-p16-validacion" id="chi3-p16-validacion"></div>
+          <div class="chi3-preg-card chi3-inline-preg" style="margin-top:10px;">
+            <p class="chi3-preg-num" style="color:var(--sky);">Pregunta de interpretación (N3)</p>
+            <p class="chi3-preg-text">Imagina que en la realidad los datos observados se parecieran mucho a esta tabla "sin relación" que construiste. ¿Qué dirías sobre la conexión entre el medio de transporte y la puntualidad? ¿Y si fueran muy distintos?</p>
+            <textarea class="p5d-resp-input" id="chi3-p16-n3" rows="2" placeholder="Tu interpretación…"></textarea>
+          </div>
           <div class="prob-bottom-row">
             <button class="btn-verificar" style="background:var(--gold);color:var(--ink);" onclick="chi3P16Verificar()">🔍 Verificar que respetan los marginales</button>
             <button class="btn-verificar" style="background:var(--navy);" onclick="chi3P16EnviarAlTutor()">💬 Enviar al tutor</button>
@@ -1281,6 +1286,11 @@ Tabla de frecuencia → Gráfico circular.</div>
               <button class="chi3-tg-btn" onclick="chi3P17Toggle('dif')">Diferencia</button>
             </div>
             <div id="chi3-p17-tabla-display"></div>
+            <div class="chi3-preg-card chi3-inline-preg" style="margin-top:8px;">
+              <p class="chi3-preg-num" style="color:var(--sky);">Interpretación (N3)</p>
+              <p class="chi3-preg-text">Activa la vista "Diferencia". ¿En qué celda hay más estudiantes de los esperados? ¿Qué te dice eso sobre la relación entre el programa y el software preferido?</p>
+              <textarea class="p5d-resp-input" id="chi3-p17-n3" rows="2" placeholder="Tu interpretación de las diferencias…"></textarea>
+            </div>
             <div class="chi3-ej-tutor-wrap">
               <button class="btn-verificar" style="background:var(--navy);width:100%;margin-top:10px;" onclick="chi3P17PreguntarTutor()">💬 Preguntarle al tutor sobre este paso</button>
               <div class="tutor-panel p5d-tutor-panel" id="chi3-p17-tutor" style="display:none;margin-top:8px;">
@@ -1342,6 +1352,11 @@ Tabla de frecuencia → Gráfico circular.</div>
               <p class="chi3-preg-num">Pregunta 2</p>
               <p class="chi3-preg-text">¿Qué significaría obtener χ² = 0? ¿Es posible en la práctica?</p>
               <textarea class="p5d-resp-input" id="chi3-p18-q2" rows="2" placeholder="Tu razonamiento…"></textarea>
+            </div>
+            <div class="chi3-preg-card">
+              <p class="chi3-preg-num" style="color:var(--sky);">Pregunta 3 (N3)</p>
+              <p class="chi3-preg-text">Mira la columna de contribuciones. La celda que más aporta al χ² es la "firma" de la asociación. ¿Cuál es, y qué historia cuenta sobre qué programa prefiere qué software?</p>
+              <textarea class="p5d-resp-input" id="chi3-p18-q3" rows="2" placeholder="Identifica la celda y explica qué revela…"></textarea>
             </div>
           </div>
           <div class="prob-bottom-row">
