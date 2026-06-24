@@ -2077,3 +2077,198 @@ html, body {
   flex: 1;
   overflow-y: auto;
 }
+
+/* ══════════════════════════════════════════════
+   CAPÍTULO III — CHI-CUADRADO (págs 15–24)
+══════════════════════════════════════════════ */
+
+/* ── Tabla genérica chi3 ── */
+.chi3-tbl {
+  width: 100%; border-collapse: collapse;
+  font-size: .8rem; margin: 8px 0;
+}
+.chi3-tbl th {
+  background: #1a3a5a; color: white;
+  padding: 7px 10px; text-align: center; font-size: .73rem;
+}
+.chi3-tbl th:first-child { text-align: left; }
+.chi3-tbl td {
+  padding: 6px 9px; border-bottom: 1px solid var(--rule);
+  text-align: center;
+}
+.chi3-tbl td:first-child { font-weight: 600; text-align: left; }
+.chi3-tbl-total td { background: #1a3a5a; color: white; font-weight: 700; }
+
+/* ── Pág 15 ── */
+.chi3-pres-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1;
+}
+.chi3-pres-title { font-size: 1.3rem; color: var(--navy); margin-bottom: 8px; }
+.chi3-pres-intro { font-size: .83rem; line-height: 1.55; margin-bottom: 12px; }
+.chi3-conflicto-box {
+  background: #f0f7f3; border: 1px solid #c0d8c8;
+  border-radius: 4px; padding: 14px; margin-bottom: 12px;
+}
+.chi3-conflicto-escena { display: flex; gap: 12px; margin-bottom: 10px; }
+.chi3-persona {
+  flex: 1; background: white; border-radius: 3px;
+  padding: 10px; font-size: .78rem; line-height: 1.45;
+}
+.chi3-avatar { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+.chi3-conflicto-preg {
+  font-size: .82rem; font-weight: 600; color: var(--navy);
+  text-align: center; margin: 0;
+}
+.chi3-tabla-ejemplo { margin-top: 10px; }
+.chi3-tabla-label { font-size: .72rem; font-weight: 600; color: var(--slate); margin-bottom: 4px; }
+.chi3-reflexion-panel {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 14px; display: flex; flex-direction: column; gap: 8px;
+}
+.chi3-ref-title { font-size: .75rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.chi3-preg-card {
+  background: white; border: 1px solid var(--rule); border-radius: 3px; padding: 10px;
+}
+.chi3-preg-num {
+  font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--slate); margin-bottom: 4px;
+}
+.chi3-preg-text { font-size: .8rem; line-height: 1.45; margin-bottom: 6px; }
+
+/* ── Pág 16 ── */
+.chi3-marginales-ref { margin: 8px 0; }
+.chi3-marg-label { font-size: .72rem; font-weight: 600; color: var(--slate); margin-bottom: 5px; }
+.chi3-marg-strip { display: flex; flex-wrap: wrap; gap: 5px; }
+.chi3-marg-chip {
+  background: #eaf2fb; border: 1px solid #c0d8ef;
+  border-radius: 3px; padding: 3px 9px; font-size: .76rem; color: var(--navy);
+}
+.chi3-marg-col  { background: #f0f7f3; border-color: #c0d8c8; color: var(--moss); }
+.chi3-marg-total{ background: #fdf6e3; border-color: #e0c870; color: #7a6010; }
+.chi3-p16-validacion { margin-top: 8px; }
+
+/* ── Págs 17, 21 — ejemplos guiados ── */
+.chi3-ej-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; flex: 1; }
+.chi3-ej-left { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.chi3-ej-right { display: flex; flex-direction: column; gap: 10px; }
+.chi3-ej-enunciado { background: var(--cream); border: 1px solid var(--rule); border-radius: 3px; padding: 12px; }
+.chi3-pasos-nav {
+  display: flex; align-items: center; gap: 10px;
+  background: #1a3a5a; border-radius: 3px; padding: 8px 12px;
+}
+.chi3-paso-btn {
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+  color: white; padding: 5px 12px; border-radius: 3px;
+  font-size: .75rem; cursor: pointer; transition: background .15s;
+}
+.chi3-paso-btn:hover:not(:disabled) { background: rgba(255,255,255,.3); }
+.chi3-paso-btn:disabled { opacity: .4; cursor: default; }
+.chi3-paso-counter { color: white; font-size: .78rem; flex: 1; text-align: center; }
+.chi3-paso-card {
+  background: var(--cream); border: 1px solid var(--rule); border-radius: 3px; padding: 14px;
+}
+.chi3-paso-titulo { font-size: .85rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.chi3-paso-desc { font-size: .8rem; line-height: 1.55; }
+.chi3-toggle-group { display: flex; flex-direction: column; gap: 6px; }
+.chi3-tg-label { font-size: .72rem; font-weight: 600; color: var(--slate); }
+.chi3-tg-btn {
+  background: var(--cream); border: 1.5px solid var(--rule);
+  color: var(--slate); padding: 6px 10px; border-radius: 3px;
+  font-size: .75rem; cursor: pointer; text-align: left; transition: all .15s;
+}
+.chi3-tg-btn.active { background: var(--navy); border-color: var(--navy); color: white; }
+.chi3-ej-tutor-wrap { display: flex; flex-direction: column; }
+
+/* ── Pág 18 ── */
+.chi3-p18-acum {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 10px 14px; margin: 8px 0;
+}
+.chi3-acum-label { font-size: .78rem; font-weight: 600; color: var(--slate); }
+.chi3-acum-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--navy); font-weight: 700; }
+.chi3-acum-bar-wrap { flex: 1; background: #e0ddd6; border-radius: 4px; height: 8px; overflow: hidden; }
+.chi3-acum-bar { height: 100%; background: var(--moss); border-radius: 4px; width: 0%; transition: width .3s ease; }
+.chi3-p18-preguntas { display: flex; flex-direction: column; gap: 8px; }
+
+/* ── Pág 19, 23 — síntesis ── */
+.chi3-syn-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; }
+.chi3-syn-left { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+.chi3-syn-right { display: flex; flex-direction: column; gap: 10px; }
+.chi3-syn-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.chi3-syn-cards { display: flex; flex-direction: column; gap: 10px; }
+.chi3-syn-card {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-left: 4px solid var(--navy); border-radius: 3px; padding: 12px;
+}
+.chi3-syn-card-title { font-size: .78rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.chi3-syn-formula {
+  font-family: 'JetBrains Mono', monospace; font-size: .88rem;
+  color: var(--ink); background: white; border-radius: 3px;
+  padding: 5px 9px; margin-bottom: 6px; display: inline-block;
+}
+.chi3-syn-desc { font-size: .77rem; line-height: 1.5; margin: 4px 0; }
+.chi3-syn-cond {
+  font-size: .72rem; background: #fff3cd; border: 1px solid #ffc107;
+  border-radius: 3px; padding: 4px 8px; margin-top: 6px; color: #856404;
+}
+.chi3-syn-resumen { margin-top: 6px; }
+.chi3-syn-resumen-title { font-size: .75rem; font-weight: 600; color: var(--slate); margin-bottom: 4px; }
+.chi3-syn-tutor-label { font-size: .82rem; font-weight: 700; color: var(--navy); }
+
+/* ── Pág 20 ── */
+.chi3-p20-casos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 8px 0; }
+.chi3-caso-card {
+  border: 2px solid var(--rule); border-radius: 4px; padding: 12px;
+  display: flex; flex-direction: column; gap: 5px; background: white;
+}
+.chi3-caso-rechaza    { border-color: var(--moss); background: #f0f7f3; }
+.chi3-caso-no-rechaza { border-color: #e0a030;    background: #fdf6e3; }
+.chi3-caso-num  { font-size: .7rem; font-weight: 700; text-transform: uppercase; color: var(--slate); }
+.chi3-caso-desc { font-size: .75rem; color: var(--ink); }
+.chi3-caso-dato { font-size: .78rem; font-family: 'JetBrains Mono', monospace; }
+.chi3-caso-resultado { font-size: .78rem; font-weight: 700; margin-top: 4px; }
+.chi3-vc-section { background: var(--cream); border: 1px solid var(--rule); border-radius: 3px; padding: 12px; margin-top: 8px; }
+.chi3-vc-title { font-size: .75rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.chi3-vc-tabla { font-size: .75rem; }
+.chi3-vc-tabla th { background: #1a3a5a; }
+
+/* ── Pág 22 ── */
+.chi3-casos-causales { display: flex; flex-direction: column; gap: 10px; }
+.chi3-causa-card {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-left: 4px solid var(--gold); border-radius: 3px; padding: 12px;
+}
+.chi3-causa-titulo { font-size: .82rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+.chi3-causa-desc   { font-size: .78rem; line-height: 1.45; margin-bottom: 6px; }
+.chi3-causa-q      { font-size: .75rem; font-weight: 600; color: var(--slate); margin-bottom: 4px; }
+.chi3-causa-retro  { font-size: .75rem; color: #856404; background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; padding: 6px 9px; margin-top: 5px; }
+
+/* ── Pág 23 — flujo ── */
+.chi3-flujo-steps { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.chi3-flujo-step {
+  display: flex; align-items: center; gap: 10px;
+  background: white; border: 1px solid var(--rule); border-radius: 3px;
+  padding: 7px 12px; width: 100%; font-size: .78rem;
+  transition: background .15s;
+}
+.chi3-flujo-step:hover { background: #eaf2fb; }
+.chi3-flujo-ico  { font-size: 1.1rem; width: 28px; text-align: center; }
+.chi3-flujo-txt  { color: var(--ink); }
+.chi3-flujo-arrow { color: var(--slate); font-size: .9rem; padding-left: 18px; }
+
+/* ── Pág 24 ── */
+.chi3-p24-etapas { display: flex; flex-direction: column; gap: 14px; }
+.chi3-p24-etapa {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 3px; padding: 12px;
+}
+.chi3-etapa-titulo { font-size: .82rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .chi3-pres-layout  { grid-template-columns: 1fr; }
+  .chi3-ej-layout    { grid-template-columns: 1fr; }
+  .chi3-syn-layout   { grid-template-columns: 1fr; }
+  .chi3-p20-casos-grid { grid-template-columns: 1fr; }
+}
