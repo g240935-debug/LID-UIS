@@ -2272,3 +2272,27 @@ html, body {
   .chi3-syn-layout   { grid-template-columns: 1fr; }
   .chi3-p20-casos-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Pág 20: situación de formulación (conjetura antes de revelar) ── */
+.chi3-p20-conjetura-aviso {
+  background: #fdf6e3; border: 1px solid #e0c870;
+  border-radius: 4px; padding: 10px 13px; margin-bottom: 10px;
+  font-size: .8rem; line-height: 1.5; color: #6a5410;
+}
+.chi3-caso-oculto {
+  border-color: var(--rule); background: #f4f1eb;
+}
+.chi3-caso-tapado {
+  color: #b0a890 !important; font-style: italic;
+}
+.chi3-p20-revelado-nota {
+  background: #f0f7f3; border-left: 3px solid var(--moss);
+  border-radius: 0 3px 3px 0; padding: 10px 13px; margin-top: 10px;
+  font-size: .8rem; line-height: 1.55;
+}
+
+/* ── Preguntas N3/N4 intercaladas en páginas de cálculo ── */
+.chi3-inline-preg {
+  border-left: 3px solid var(--sky);
+  background: #eef5fb;
+}
