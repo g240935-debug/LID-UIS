@@ -754,9 +754,9 @@ Tabla de frecuencia → Gráfico circular.</div>
             <div class="fp-formulas-strip">
               <div class="fps-title">Fórmulas clave</div>
               <div class="fps-row">
-                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">f<sub>ij</sub> / N</span></div>
-                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">f<sub>ij</sub> / f<sub>i·</sub></span></div>
-                <div class="fps-item"><span class="fps-label">% columna</span><span class="fps-expr">f<sub>ij</sub> / f<sub>·j</sub></span></div>
+                <div class="fps-item"><span class="fps-label">% total</span><span class="fps-expr">fᵢⱼ / N</span></div>
+                <div class="fps-item"><span class="fps-label">% fila</span><span class="fps-expr">fᵢⱼ / fᵢ·</span></div>
+                <div class="fps-item"><span class="fps-label">% columna</span><span class="fps-expr">fᵢⱼ / f·ⱼ</span></div>
               </div>
             </div>
           </div>
@@ -1109,12 +1109,54 @@ Tabla de frecuencia → Gráfico circular.</div>
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(13)">← Validación</button>
-          <button class="btn-nav next" onclick="irAPagina(15)">Cap. III: Chi-cuadrado →</button>
+          <button class="btn-nav next" onclick="irAPagina('14b')">Cap. III: Chi-cuadrado →</button>
         </div>
       </div>
     </div>
 
     <!-- ══════════ CAP III · CHI-CUADRADO ══════════ -->
+
+    <!-- PÁGINA 14b — PRESENTACIÓN DEL CAPÍTULO III (umbral, sin institucionalizar) -->
+    <div class="page" id="page-14b">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Presentación</span>
+          <span class="page-num">14</span>
+        </div>
+        <h2 class="page-title">La Prueba Chi-cuadrado</h2>
+        <div class="intro-layout">
+          <div class="intro-main">
+            <p class="lead-text">Ya sabes <strong>describir</strong> cómo se relacionan dos variables en una tabla de contingencia: porcentajes por fila, por columna, sobre el total. Pero hay una pregunta que esas herramientas no pueden responder por sí solas.</p>
+            <p class="body-text">Cuando observas una diferencia entre grupos en una tabla, ¿cómo sabes si esa diferencia es <em>real</em> en la población, o si apareció <em>solo por azar</em> al haber encuestado a ese grupo particular? Este capítulo construye, paso a paso, una forma de responder esa pregunta. El recorrido está organizado en cuatro momentos:</p>
+            <div class="moment-list">
+              <div class="moment-item"><div class="moment-num">1</div><div class="moment-body"><strong>El problema</strong> — Te enfrentas a una tabla donde dos personas razonables llegan a conclusiones opuestas. ¿Quién tiene razón?</div></div>
+              <div class="moment-item"><div class="moment-num">2</div><div class="moment-body"><strong>Construcción</strong> — Descubres, por tu cuenta, qué esperaríamos ver si <em>no</em> hubiera ninguna relación, y cómo medir qué tan lejos están los datos reales de esa expectativa.</div></div>
+              <div class="moment-item"><div class="moment-num">3</div><div class="moment-body"><strong>Decisión</strong> — Aprendes a decidir, con un criterio claro, cuándo una diferencia es suficientemente grande para no ser obra del azar.</div></div>
+              <div class="moment-item"><div class="moment-num">4</div><div class="moment-body"><strong>Pensamiento crítico</strong> — Cuestionas los límites del método: ¿una asociación significa siempre una causa?</div></div>
+            </div>
+            <div class="note-card" style="margin-top:14px;">
+              <div class="note-title">🔗 Conexión con el Capítulo II</div>
+              <p class="note-text">En el capítulo anterior aprendiste a <strong>leer y representar</strong> asociaciones entre variables. Aquí darás el siguiente paso: pasar de <em>"se ve una diferencia"</em> a <em>"esta diferencia es estadísticamente confiable"</em>. La tabla de contingencia sigue siendo tu punto de partida.</p>
+            </div>
+          </div>
+          <div class="intro-aside">
+            <div class="obj-card">
+              <div class="obj-icon">🎯</div>
+              <div class="obj-title">Objetivo del capítulo</div>
+              <p class="obj-text">Desarrollar la capacidad de distinguir una asociación real de una variación producto del azar, construyendo el razonamiento de la prueba chi-cuadrado a partir de situaciones contextualizadas, y reflexionar críticamente sobre la diferencia entre asociación y causalidad.</p>
+            </div>
+            <div class="note-card">
+              <div class="note-title">📌 Antes de continuar</div>
+              <p class="note-text">En las siguientes páginas no recibirás fórmulas de entrada. <strong>Las irás construyendo tú</strong>, con la guía del tutor virtual. Responde con tus propias palabras y atrévete a conjeturar: equivocarse y descubrir por qué es parte del aprendizaje.</p>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(14)">← Exploración libre</button>
+          <button class="btn-nav next" onclick="irAPagina(15)">Comenzar: ¿Puede la tabla mentir? →</button>
+        </div>
+      </div>
+    </div>
 
     <!-- PÁGINA 15 — ¿Puede la tabla mentir? -->
     <div class="page" id="page-15">
@@ -1187,7 +1229,7 @@ Tabla de frecuencia → Gráfico circular.</div>
           </div>
         </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(14)">← ¿Se puede probar?</button>
+          <button class="btn-nav prev" onclick="irAPagina('14b')">← Presentación Cap. III</button>
           <button class="btn-nav next" onclick="irAPagina(16)">Frecuencias esperadas →</button>
         </div>
       </div>
@@ -1744,6 +1786,7 @@ Tabla de frecuencia → Gráfico circular.</div>
     <span class="pi-dot" onclick="irAPagina(12)"  title="Cap II · Formulación"></span>
     <span class="pi-dot" onclick="irAPagina(13)"  title="Cap II · Validación"></span>
     <span class="pi-dot" onclick="irAPagina(14)"  title="Cap II · ¿Se puede probar?"></span>
+    <span class="pi-dot" onclick="irAPagina('14b')" title="Cap III · Presentación"></span>
     <span class="pi-dot" onclick="irAPagina(15)"  title="Cap III · ¿Puede la tabla mentir?"></span>
     <span class="pi-dot" onclick="irAPagina(16)"  title="Cap III · Frecuencias esperadas"></span>
     <span class="pi-dot" onclick="irAPagina(17)"  title="Cap III · Ejemplo Eᵢⱼ"></span>
