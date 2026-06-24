@@ -155,7 +155,7 @@ let datosGrafico = {
 ════════════════════════════════ */
 
 // Orden lógico de páginas para determinar dirección de animación
-const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14];
+const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
 
 function irAPagina(n) {
   if (n === paginaActual) return;
@@ -243,6 +243,17 @@ function irAPagina(n) {
     chatChiIniciado = true;
     setTimeout(inicializarTutorChi, 400);
   }
+
+  // Cap III — Chi-cuadrado (págs 15-24)
+  if (n === 16) setTimeout(chi3P16Render, 300);
+  if (n === 17) setTimeout(chi3P17Init,   300);
+  if (n === 18) setTimeout(chi3P18Render, 300);
+  if (n === 19) setTimeout(chi3P19Render, 300);
+  if (n === 20) setTimeout(chi3P20Render, 300);
+  if (n === 21) setTimeout(chi3P21Init,   300);
+  if (n === 22) setTimeout(chi3P22Render, 300);
+  if (n === 23) setTimeout(chi3P23Render, 300);
+  if (n === 24) setTimeout(chi3P24Render, 300);
 }
 
 function actualizarIndicadores() {
@@ -2926,4 +2937,626 @@ async function pBEnviarMensajeLibre() {
     quitarTypingGen(tid); setStatusGen('tutor-status-pB', 'En línea');
     agregarMensajeGen('chat-contB', 'Problema de conexión. Intenta de nuevo.', 'tutor');
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CAPÍTULO III — PRUEBA CHI-CUADRADO (págs 15–24)
+   Prefijos de sesión: chi3_p15_ … chi3_p24_
+══════════════════════════════════════════════════════════════ */
+
+// ── Datos compartidos del ejemplo guiado (págs 17, 18, 19, 21) ──
+const CHI3_EJ1 = {
+  titulo: 'Programa × Software (60 estudiantes)',
+  filas: ['Matemáticas','Estadística'],
+  cols:  ['R','Python','SPSS'],
+  O: [[12,11,2],[4,8,8]],
+  N: 60,
+  // Eᵢⱼ calculadas: fᵢ·=[25,20,15] NO — filas son programas
+  // filas: Mat=25, Est=20+15=35? No: Mat=25,Est=35 total 60
+  // Recalculamos: Mat fila=12+11+2=25, Est fila=4+8+8=20 → total 45, falta 15
+  // Ajuste: añadir tercera fila o usar 2x3 con sums correctas
+  // Mat:25, Est:20, Fís:15 → pero HTML solo tiene 2 programas. Usamos Mat+Est
+  // Mat=25,Est=35 → O: [[12,11,2],[10,16,9]] suma=60 ✓
+};
+// Matrices correctas para el ejemplo de págs 17-19
+const CHI3_O = [[12,11,2],[10,16,9]]; // Mat(25) + Est(35) = 60
+const CHI3_FILAS = ['Matemáticas','Estadística'];
+const CHI3_COLS  = ['R','Python','SPSS'];
+const CHI3_N     = 60;
+
+function chi3CalcE(O, filas, cols, N) {
+  const totF = O.map(r => r.reduce((s,v)=>s+v,0));
+  const totC = cols.map((_,j) => O.reduce((s,r)=>s+r[j],0));
+  return O.map((r,i) => r.map((_,j) => parseFloat((totF[i]*totC[j]/N).toFixed(4))));
+}
+
+// Eᵢⱼ precalculadas para el ejemplo
+const CHI3_E = chi3CalcE(CHI3_O, CHI3_FILAS, CHI3_COLS, CHI3_N);
+const CHI3_CHI2 = CHI3_O.reduce((s,r,i)=>s+r.reduce((ss,v,j)=>ss+Math.pow(v-CHI3_E[i][j],2)/CHI3_E[i][j],0),0);
+
+// ── Ejemplo 2 (pág 21): Inglés × Intercambio (75 estudiantes) ──
+const CHI3_O2 = [[3,27],[7,18],[12,8]];
+const CHI3_FILAS2 = ['Básico','Intermedio','Avanzado'];
+const CHI3_COLS2  = ['Sí','No'];
+const CHI3_N2     = 75;
+const CHI3_E2 = chi3CalcE(CHI3_O2, CHI3_FILAS2, CHI3_COLS2, CHI3_N2);
+const CHI3_CHI2_2 = CHI3_O2.reduce((s,r,i)=>s+r.reduce((ss,v,j)=>ss+Math.pow(v-CHI3_E2[i][j],2)/CHI3_E2[i][j],0),0);
+
+// ── Helper: render tabla chi3 ──
+function chi3RenderTbl(O, E, filas, cols, N, modo) {
+  const totF = O.map(r=>r.reduce((s,v)=>s+v,0));
+  const totC = cols.map((_,j)=>O.reduce((s,r)=>s+r[j],0));
+  let h = `<table class="chi3-tbl"><thead><tr><th>↓/→</th>`;
+  cols.forEach(c=>{h+=`<th>${c}</th>`;});
+  h+=`<th>Total</th></tr></thead><tbody>`;
+  filas.forEach((f,i)=>{
+    h+=`<tr><td>${f}</td>`;
+    cols.forEach((_,j)=>{
+      let val,cls='';
+      if(modo==='obs')  { val=O[i][j]; }
+      else if(modo==='esp') { val=E[i][j].toFixed(2); }
+      else { // diferencia con color
+        const d=O[i][j]-E[i][j];
+        val=(d>0?'+':'')+d.toFixed(2);
+        cls=d>0?' style="color:#c0392b;font-weight:600"':d<0?' style="color:#2980b9;font-weight:600"':'';
+      }
+      h+=`<td${cls}>${val}</td>`;
+    });
+    h+=`<td class="td-marg">${totF[i]}</td></tr>`;
+  });
+  h+=`<tr><td>Total</td>`;
+  totC.forEach(tc=>{h+=`<td class="td-marg">${tc}</td>`;});
+  h+=`<td class="td-marg">${N}</td></tr></tbody></table>`;
+  return h;
+}
+
+// ── Helper: chat genérico chi3 ──
+async function chi3Enviar(pageId, mensaje, esContexto=false) {
+  const sid = `chi3_${pageId}_${sessionId}`;
+  const chatId = `chi3-${pageId}`;
+  const panelId = `chi3-${pageId}-tutor`;
+  const panel = document.getElementById(panelId);
+  if (panel) panel.style.display = 'flex';
+  if (!esContexto) agregarMensajeGen(`chat-${chatId}`, mensaje, 'user');
+  else agregarMensajeGen(`chat-${chatId}`, '📋 Enviando al tutor…', 'user');
+  const tid = agregarTypingGen(`chat-${chatId}`);
+  setStatusGen(`ts-${chatId}`, 'Analizando…');
+  try {
+    const res  = await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:mensaje,session_id:sid})});
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen(`ts-${chatId}`,'En línea');
+    if(data.reply) agregarMensajeGen(`chat-${chatId}`,data.reply,'tutor');
+  } catch(e) {
+    quitarTypingGen(tid); setStatusGen(`ts-${chatId}`,'En línea');
+    agregarMensajeGen(`chat-${chatId}`,'Problema de conexión. Intenta de nuevo.','tutor');
+  }
+  setTimeout(()=>panel?.scrollIntoView({behavior:'smooth',block:'start'}),300);
+}
+
+async function chi3ChatLibre(pageId) {
+  const inp = document.getElementById(`input-chi3-${pageId}`);
+  if(!inp?.value.trim()) return;
+  const txt = inp.value.trim(); inp.value='';
+  await chi3Enviar(pageId, txt, false);
+}
+
+// Registrar audio para todos los tutores chi3
+['p15','p16','p17','p18','p19','p20','p21','p22','p23','p24'].forEach(pid=>{
+  AUDIO_MAP[`chi3-${pid}`] = {btn:`audio-btn-chi3-${pid}`, waves:`audio-waves-chi3-${pid}`};
+  BOX_TO_AUDIO[`chat-chi3-${pid}`] = `chi3-${pid}`;
+  audioState[`chi3-${pid}`] = false;
+});
+
+/* ── PÁGINA 15 ── */
+async function chi3P15EnviarAlTutor() {
+  const q1 = document.getElementById('chi3-p15-q1')?.value||'(sin responder)';
+  const q2 = document.getElementById('chi3-p15-q2')?.value||'(sin responder)';
+  const q3 = document.getElementById('chi3-p15-q3')?.value||'(sin responder)';
+  const ctx = `[CONTEXTO P15 — Introducción Chi-cuadrado]
+La tabla presentada: Bus/Siempre=10,AvVeces=14,Nunca=6(tot30); Bici=12,8,5(tot25); APie=2,10,3(tot15). N=90.
+Respuestas del estudiante:
+P1 (¿Hay relación?): ${q1}
+P2 (¿Podría ser azar?): ${q2}
+P3 (¿Qué necesitarías?): ${q3}
+Analiza el nivel de Curcio de cada respuesta. El estudiante aún no conoce chi-cuadrado. Activa el conflicto cognitivo: ¿cómo distinguir una diferencia real del azar? No menciones chi-cuadrado ni p-valor.`;
+  await chi3Enviar('p15', ctx, true);
+}
+
+/* ── PÁGINA 16 ── */
+const CHI3_P16_MARG_F = [30,25,15]; // Bus,Bici,APie
+const CHI3_P16_MARG_C = [24,32,14]; // Siempre,AvVeces,Nunca
+const CHI3_P16_N = 90;
+// Eᵢⱼ de independencia: E[i][j] = margF[i]*margC[j]/N
+const CHI3_P16_E = CHI3_P16_MARG_F.map(mf=>CHI3_P16_MARG_C.map(mc=>parseFloat((mf*mc/CHI3_P16_N).toFixed(4))));
+
+function chi3P16Render() {
+  const filas=['Bus','Bicicleta','A pie'];
+  const cols =['Siempre','A veces','Nunca'];
+  let h=`<table class="chi3-tbl"><thead><tr><th>↓/→</th>`;
+  cols.forEach(c=>{h+=`<th>${c}</th>`;});
+  h+=`<th>Total fila</th></tr></thead><tbody>`;
+  filas.forEach((f,i)=>{
+    h+=`<tr><td>${f}</td>`;
+    cols.forEach((_,j)=>{
+      h+=`<td><input type="number" min="0" class="p5c-cell chi3-p16-cell" id="chi3-p16-${i}-${j}"
+          data-correct="${CHI3_P16_E[i][j]}" data-mf="${CHI3_P16_MARG_F[i]}" data-mc="${CHI3_P16_MARG_C[j]}"
+          placeholder="?" oninput="chi3P16Actualizar()" style="width:64px;"></td>`;
+    });
+    h+=`<td class="td-marg" id="chi3-p16-rowsum-${i}" style="color:var(--slate);">${CHI3_P16_MARG_F[i]}</td></tr>`;
+  });
+  h+=`<tr><td>Total col</td>`;
+  cols.forEach((_,j)=>{h+=`<td class="td-marg" id="chi3-p16-colsum-${j}">${CHI3_P16_MARG_C[j]}</td>`;});
+  h+=`<td class="td-marg">${CHI3_P16_N}</td></tr></tbody></table>`;
+  const w=document.getElementById('chi3-p16-tabla-wrap');
+  if(w) w.innerHTML=h;
+}
+
+function chi3P16Actualizar() {
+  const filas=3,cols=3;
+  for(let i=0;i<filas;i++){
+    let rs=0;
+    for(let j=0;j<cols;j++){
+      const v=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;
+      rs+=v;
+    }
+    const el=document.getElementById(`chi3-p16-rowsum-${i}`);
+    if(el){el.textContent=`${rs} / ${CHI3_P16_MARG_F[i]}`;el.style.color=rs===CHI3_P16_MARG_F[i]?'var(--moss)':'var(--gold)';}
+  }
+  for(let j=0;j<cols;j++){
+    let cs=0;
+    for(let i=0;i<filas;i++){cs+=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;}
+    const el=document.getElementById(`chi3-p16-colsum-${j}`);
+    if(el){el.textContent=`${cs} / ${CHI3_P16_MARG_C[j]}`;el.style.color=cs===CHI3_P16_MARG_C[j]?'var(--moss)':'var(--gold)';}
+  }
+}
+
+function chi3P16Verificar() {
+  const filas=3,cols=3;
+  let ok=true, msgs=[];
+  for(let i=0;i<filas;i++){
+    let rs=0;
+    for(let j=0;j<cols;j++){rs+=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;}
+    if(rs!==CHI3_P16_MARG_F[i]){ok=false;msgs.push(`La fila ${['Bus','Bicicleta','A pie'][i]} suma ${rs}, pero debería sumar ${CHI3_P16_MARG_F[i]}.`);}
+  }
+  for(let j=0;j<cols;j++){
+    let cs=0;
+    for(let i=0;i<filas;i++){cs+=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;}
+    if(cs!==CHI3_P16_MARG_C[j]){ok=false;msgs.push(`La columna ${['Siempre','A veces','Nunca'][j]} suma ${cs}, pero debería sumar ${CHI3_P16_MARG_C[j]}.`);}
+  }
+  const fb=document.getElementById('chi3-p16-validacion');
+  if(!fb) return;
+  fb.style.display='block';
+  if(ok){fb.className='prob-feedback ok';fb.textContent='✅ ¡Los marginales se respetan! Tu distribución es matemáticamente válida. Ahora envíala al tutor.';}
+  else{fb.className='prob-feedback error';fb.innerHTML='⚠️ '+msgs.join('<br>');}
+}
+
+async function chi3P16EnviarAlTutor() {
+  const filas=['Bus','Bicicleta','A pie'],cols=['Siempre','A veces','Nunca'];
+  let tablaEst='Distribución del estudiante:\n';
+  filas.forEach((f,i)=>{
+    let rs=0;
+    const vals=cols.map((_,j)=>{const v=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;rs+=v;return v;});
+    tablaEst+=`${f}: ${vals.join(', ')} (suma=${rs}, marginal=${CHI3_P16_MARG_F[i]})\n`;
+  });
+  tablaEst+=`Marginales columna: ${CHI3_P16_MARG_C.join(', ')}\n`;
+  tablaEst+=`Eᵢⱼ si hubiera independencia perfecta:\n`;
+  filas.forEach((f,i)=>{tablaEst+=`${f}: ${CHI3_P16_E[i].map(v=>v.toFixed(2)).join(', ')}\n`;});
+  const ctx=`[CONTEXTO P16 — Construir independencia]
+${tablaEst}
+El estudiante debe descubrir por sí mismo la fórmula Eᵢⱼ=(fᵢ·×f·ⱼ)/N. NO la des directamente. Devuelve consecuencias matemáticas de su distribución y pregunta si se le ocurre una forma de calcular cada celda con solo los marginales.`;
+  await chi3Enviar('p16', ctx, true);
+}
+
+/* ── PÁGINA 17 ── */
+let chi3P17PasoActual = 0;
+const CHI3_P17_PASOS = [
+  {
+    titulo: 'Paso 1 — La tabla observada (Oᵢⱼ)',
+    desc: 'Estos son los datos que recogiste: cuántos estudiantes de cada programa usan cada software. Estos valores se llaman <strong>frecuencias observadas Oᵢⱼ</strong>.',
+    accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'obs'),
+    modo: 'obs',
+  },
+  {
+    titulo: 'Paso 2 — Los totales marginales',
+    desc: 'Los totales de fila (fᵢ·) y columna (f·ⱼ) son la clave para calcular las frecuencias esperadas. <br>Matemáticas: <strong>25</strong>, Estadística: <strong>35</strong><br>R: <strong>22</strong>, Python: <strong>27</strong>, SPSS: <strong>11</strong>',
+    accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'obs'),
+    modo: 'obs',
+  },
+  {
+    titulo: 'Paso 3 — Calcular Eᵢⱼ para la primera celda',
+    desc: `Si no hubiera relación, esperaríamos que la proporción de usuarios de R en Matemáticas fuera la misma que en el total:<br><br>
+    <code>E[Mat,R] = (fᵢ· × f·ⱼ) / N = (25 × 22) / 60 = <strong>${CHI3_E[0][0].toFixed(2)}</strong></code><br><br>
+    En cambio, observamos Oᵢⱼ = <strong>${CHI3_O[0][0]}</strong>. ¿Son muy distintos?`,
+    accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'esp'),
+    modo: 'esp',
+  },
+  {
+    titulo: 'Paso 4 — Tabla esperada completa (Eᵢⱼ)',
+    desc: 'Aplicando la fórmula a todas las celdas obtenemos la tabla esperada. Compara con la observada usando el toggle de la derecha.',
+    accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'esp'),
+    modo: 'esp',
+  },
+  {
+    titulo: 'Paso 5 — La diferencia Oᵢⱼ − Eᵢⱼ',
+    desc: 'Las celdas en <span style="color:#c0392b;font-weight:600">rojo</span> tienen más estudiantes de los esperados. Las <span style="color:#2980b9;font-weight:600">azules</span> tienen menos. ¿Qué celdas se alejan más?',
+    accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'dif'),
+    modo: 'dif',
+  },
+];
+
+let chi3P17Modo = 'obs';
+function chi3P17Init() {
+  chi3P17PasoActual = 0;
+  chi3P17Renderizar();
+}
+function chi3P17Renderizar() {
+  const paso = CHI3_P17_PASOS[chi3P17PasoActual];
+  const total = CHI3_P17_PASOS.length;
+  document.getElementById('chi3-paso-counter').textContent = `Paso ${chi3P17PasoActual+1} / ${total}`;
+  document.getElementById('chi3-p17-prev').disabled = chi3P17PasoActual===0;
+  document.getElementById('chi3-p17-next').disabled = chi3P17PasoActual===total-1;
+  document.getElementById('chi3-p17-contenido').innerHTML =
+    `<div class="chi3-paso-card"><div class="chi3-paso-titulo">${paso.titulo}</div><p class="chi3-paso-desc">${paso.desc}</p></div>`;
+  chi3P17Modo = paso.modo;
+  chi3P17ActualizarTabla();
+}
+function chi3P17Paso(dir) { chi3P17PasoActual=Math.max(0,Math.min(CHI3_P17_PASOS.length-1,chi3P17PasoActual+dir)); chi3P17Renderizar(); }
+function chi3P17Toggle(modo) {
+  chi3P17Modo=modo;
+  document.querySelectorAll('.chi3-tg-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.chi3-tg-btn[onclick*="${modo}"]`)?.classList.add('active');
+  chi3P17ActualizarTabla();
+}
+function chi3P17ActualizarTabla() {
+  const el=document.getElementById('chi3-p17-tabla-display');
+  if(el) el.innerHTML=chi3RenderTbl(CHI3_O,CHI3_E,CHI3_FILAS,CHI3_COLS,CHI3_N,chi3P17Modo);
+}
+async function chi3P17PreguntarTutor() {
+  const paso=CHI3_P17_PASOS[chi3P17PasoActual];
+  const ctx=`[CONTEXTO P17 — Ejemplo Eᵢⱼ]
+El estudiante está en el ${paso.titulo}. Modo de tabla visible: ${chi3P17Modo}.
+Datos: Oᵢⱼ=${JSON.stringify(CHI3_O)}, Eᵢⱼ=${JSON.stringify(CHI3_E.map(r=>r.map(v=>v.toFixed(2))))}.
+Responde preguntas sobre este paso específico. Usa el nivel de Curcio adecuado. No avances al siguiente paso por el estudiante.`;
+  await chi3Enviar('p17', ctx, true);
+}
+
+/* ── PÁGINA 18 ── */
+function chi3P18Render() {
+  const filas=CHI3_FILAS,cols=CHI3_COLS;
+  let h=`<table class="chi3-tbl"><thead><tr><th>Celda</th><th>Oᵢⱼ</th><th>Eᵢⱼ</th><th>(O−E)²/E</th><th>Contribución</th></tr></thead><tbody>`;
+  let chi2=0;
+  filas.forEach((f,i)=>{
+    cols.forEach((c,j)=>{
+      const corr=parseFloat(Math.pow(CHI3_O[i][j]-CHI3_E[i][j],2)/CHI3_E[i][j]).toFixed(4);
+      h+=`<tr>
+        <td>${f} / ${c}</td>
+        <td>${CHI3_O[i][j]}</td>
+        <td>${CHI3_E[i][j].toFixed(2)}</td>
+        <td><input type="number" step="0.0001" class="p5c-cell chi3-p18-cell"
+            id="chi3-p18-${i}-${j}" data-correct="${corr}"
+            placeholder="?" oninput="chi3P18Actualizar()" style="width:90px;"></td>
+        <td id="chi3-p18-contrib-${i}-${j}" class="td-marg">—</td>
+      </tr>`;
+    });
+  });
+  h+=`</tbody></table>`;
+  const w=document.getElementById('chi3-p18-tabla-wrap');
+  if(w) w.innerHTML=h;
+  chi3P18Actualizar();
+}
+
+function chi3P18Actualizar() {
+  let chi2=0,todas=true;
+  document.querySelectorAll('.chi3-p18-cell').forEach(inp=>{
+    const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);
+    const contrib=document.getElementById(inp.id.replace('chi3-p18-','chi3-p18-contrib-').replace(/(-\d+-\d+)/,'$1'));
+    if(!isNaN(v)){
+      chi2+=v;
+      inp.classList.toggle('p5c-ok',Math.abs(v-c)<0.011);
+      inp.classList.toggle('p5c-err',Math.abs(v-c)>=0.011);
+      if(contrib) contrib.textContent=v.toFixed(4);
+    } else { todas=false; if(contrib) contrib.textContent='—'; }
+  });
+  const bar=document.getElementById('chi3-p18-acum-bar');
+  const val=document.getElementById('chi3-p18-acum-val');
+  if(val) val.textContent=chi2.toFixed(4);
+  if(bar) bar.style.width=`${Math.min(100,chi2/CHI3_CHI2*100).toFixed(1)}%`;
+}
+
+function chi3P18Verificar() {
+  const inputs=document.querySelectorAll('.chi3-p18-cell');
+  let ok=0,total=inputs.length;
+  inputs.forEach(inp=>{
+    const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);
+    if(!isNaN(v)&&Math.abs(v-c)<0.011) ok++;
+  });
+  const fb=document.getElementById('chi3-p18-feedback');
+  fb.style.display='block';
+  if(ok===total){fb.className='prob-feedback ok';fb.textContent=`✅ ¡Correcto! χ² = ${CHI3_CHI2.toFixed(4)}. Todas las contribuciones son correctas. Consulta al tutor.`;}
+  else{fb.className='prob-feedback parcial';fb.textContent=`${ok}/${total} contribuciones correctas. Las rojas tienen error.`;}
+}
+
+async function chi3P18EnviarAlTutor() {
+  const inputs=document.querySelectorAll('.chi3-p18-cell');
+  let detalle='';
+  inputs.forEach(inp=>{detalle+=`  ${inp.id}: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correct}\n`;});
+  const q1=document.getElementById('chi3-p18-q1')?.value||'(sin responder)';
+  const q2=document.getElementById('chi3-p18-q2')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P18 — Calcular χ²]
+Oᵢⱼ=${JSON.stringify(CHI3_O)}, Eᵢⱼ=${JSON.stringify(CHI3_E.map(r=>r.map(v=>v.toFixed(2))))}.
+χ² correcto = ${CHI3_CHI2.toFixed(4)}.
+Contribuciones ingresadas:\n${detalle}
+P1 (¿Por qué elevar al cuadrado?): ${q1}
+P2 (¿Qué significa χ²=0?): ${q2}
+Analiza los cálculos y las respuestas conceptuales. Empuja hacia N3: ¿qué celdas contribuyen más y qué significa desde el contexto?`;
+  await chi3Enviar('p18', ctx, true);
+}
+
+/* ── PÁGINA 19 ── */
+function chi3P19Render() {
+  const el=document.getElementById('chi3-p19-tabla-resumen');
+  if(!el) return;
+  let h=`<table class="chi3-tbl" style="font-size:.75rem;"><thead><tr><th>Celda</th><th>Oᵢⱼ</th><th>Eᵢⱼ</th><th>(O−E)²/E</th></tr></thead><tbody>`;
+  CHI3_FILAS.forEach((f,i)=>{CHI3_COLS.forEach((c,j)=>{
+    const contrib=Math.pow(CHI3_O[i][j]-CHI3_E[i][j],2)/CHI3_E[i][j];
+    h+=`<tr><td>${f}/${c}</td><td>${CHI3_O[i][j]}</td><td>${CHI3_E[i][j].toFixed(2)}</td><td><strong>${contrib.toFixed(4)}</strong></td></tr>`;
+  });});
+  h+=`<tr class="p5c-total-row"><td colspan="3">χ² total</td><td><strong>${CHI3_CHI2.toFixed(4)}</strong></td></tr>`;
+  h+=`</tbody></table>`;
+  el.innerHTML=h;
+}
+
+async function chi3P19EnviarAlTutor() {
+  const txt=document.getElementById('chi3-p19-verbaliza')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P19 — Síntesis Eᵢⱼ y χ²]
+El estudiante verbalizó lo aprendido: "${txt}"
+χ² del ejemplo = ${CHI3_CHI2.toFixed(4)}.
+Evalúa si la verbalización cubre: (1) qué son Eᵢⱼ y qué representan, (2) cómo se calcula χ², (3) qué significa χ²=0 vs χ² grande, (4) la condición Eᵢⱼ≥5.
+Si cubre todo hasta N3, habilita mentalmente el avance (responde positivamente). Si falta algo, pide que profundice ese punto específico.`;
+  await chi3Enviar('p19', ctx, true);
+  // Habilitar botón de continuar tras enviar
+  const btn=document.getElementById('btn-p19-next');
+  if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+}
+
+/* ── PÁGINA 20 ── */
+const CHI3_P20_CASOS = [
+  {gl:1,chi2:6.5,desc:'Tabla 2×2 (4 celdas)',vc:3.841},
+  {gl:3,chi2:6.5,desc:'Tabla 2×4 (8 celdas)',vc:7.815},
+  {gl:5,chi2:6.5,desc:'Tabla 3×3 (9 celdas)',vc:11.07},
+];
+
+function chi3P20Render() {
+  const el=document.getElementById('chi3-p20-casos');
+  if(!el) return;
+  let h='<div class="chi3-p20-casos-grid">';
+  CHI3_P20_CASOS.forEach((c,i)=>{
+    const rechaza=c.chi2>c.vc;
+    h+=`<div class="chi3-caso-card ${rechaza?'chi3-caso-rechaza':'chi3-caso-no-rechaza'}">
+      <div class="chi3-caso-num">Caso ${i+1}</div>
+      <div class="chi3-caso-desc">${c.desc}</div>
+      <div class="chi3-caso-dato">gl = <strong>${c.gl}</strong></div>
+      <div class="chi3-caso-dato">χ² = <strong>${c.chi2}</strong></div>
+      <div class="chi3-caso-dato">χ²crítico = <strong>${c.vc}</strong></div>
+      <div class="chi3-caso-resultado">${rechaza?'✅ Se rechaza H₀':'❌ No se rechaza H₀'}</div>
+    </div>`;
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+function chi3P20Verificar() {
+  const gl=parseInt(document.getElementById('chi3-p20-gl')?.value);
+  const chi2=parseFloat(document.getElementById('chi3-p20-chi2')?.value);
+  const vc=parseFloat(document.getElementById('chi3-p20-vc')?.value);
+  const glCorr=2, chi2Corr=parseFloat(CHI3_CHI2.toFixed(3)), vcCorr=5.991;
+  let msgs=[];
+  if(gl!==glCorr) msgs.push(`gl = (2−1)(3−1) = ${glCorr}, no ${gl}.`);
+  if(Math.abs(chi2-chi2Corr)>0.1) msgs.push(`χ² calculado ≈ ${chi2Corr}, no ${chi2}.`);
+  if(Math.abs(vc-vcCorr)>0.01) msgs.push(`Valor crítico para gl=2 y α=0.05 es ${vcCorr}.`);
+  const fb=document.getElementById('chi3-p18-feedback'); // reutilizar un elemento cercano
+  // Mostrar feedback inline
+  const wrap=document.getElementById('chi3-p20-casos');
+  const fbEl=document.createElement('div');
+  fbEl.className=msgs.length===0?'prob-feedback ok':'prob-feedback parcial';
+  fbEl.innerHTML=msgs.length===0
+    ?`✅ ¡Correcto! gl=${glCorr}, χ²≈${chi2Corr}, vc=${vcCorr}. Como χ²>${vcCorr}, se rechaza H₀: hay evidencia de asociación.`
+    :`⚠️ Revisa: ${msgs.join(' ')}`;
+  wrap.parentNode.insertBefore(fbEl, wrap.nextSibling);
+  setTimeout(()=>fbEl.remove(),6000);
+}
+
+async function chi3P20EnviarAlTutor() {
+  const reflex=document.getElementById('chi3-p20-reflex')?.value||'(sin responder)';
+  const gl=document.getElementById('chi3-p20-gl')?.value||'(vacío)';
+  const concl=document.getElementById('chi3-p20-concl')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P20 — gl y Valor Crítico]
+Tres casos contrastantes mostrados: gl=1,3,5 con mismo χ²=6.5 y vc=3.841,7.815,11.07.
+Reflexión del estudiante sobre los casos: ${reflex}
+gl calculado por el estudiante: ${gl} (correcto: 2)
+χ² del ejemplo: ${CHI3_CHI2.toFixed(4)}, vc=5.991
+Conclusión del estudiante: ${concl}
+Evalúa el razonamiento. Si confunde gl con número de celdas o no entiende por qué gl afecta el umbral, devuelve consecuencias. Empuja hacia N3: ¿qué pasaría con el valor crítico si la tabla fuera más grande?`;
+  await chi3Enviar('p20', ctx, true);
+}
+
+/* ── PÁGINA 21 ── */
+let chi3P21PasoActual = 0;
+const CHI3_P21_PASOS = [
+  {titulo:'Paso 1 — Datos e hipótesis', desc:`Tabla observada (Inglés × Intercambio, N=75):<br>${chi3RenderTbl(CHI3_O2,CHI3_E2,CHI3_FILAS2,CHI3_COLS2,CHI3_N2,'obs')}<br><strong>H₀:</strong> El nivel de inglés y la participación en intercambios son independientes.<br><strong>H₁:</strong> Existe asociación entre ambas variables.`},
+  {titulo:'Paso 2 — Verificar supuesto Eᵢⱼ ≥ 5', desc:`Todas las Eᵢⱼ deben ser ≥ 5 para que la prueba sea válida.<br>${chi3RenderTbl(CHI3_O2,CHI3_E2,CHI3_FILAS2,CHI3_COLS2,CHI3_N2,'esp')}<br>¿Hay alguna celda problemática?`},
+  {titulo:'Paso 3 — Contribución de cada celda', desc:`(Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ:<br>${(()=>{let h='<table class="chi3-tbl"><thead><tr><th>Celda</th><th>O</th><th>E</th><th>Contrib.</th></tr></thead><tbody>';CHI3_FILAS2.forEach((f,i)=>CHI3_COLS2.forEach((c,j)=>{const ct=Math.pow(CHI3_O2[i][j]-CHI3_E2[i][j],2)/CHI3_E2[i][j];h+=`<tr><td>${f}/${c}</td><td>${CHI3_O2[i][j]}</td><td>${CHI3_E2[i][j].toFixed(2)}</td><td><strong>${ct.toFixed(4)}</strong></td></tr>`;}));h+='</tbody></table>';return h;})()}`},
+  {titulo:'Paso 4 — Estadístico χ²', desc:`χ² = Σ contribuciones = <strong>${CHI3_CHI2_2.toFixed(4)}</strong>`},
+  {titulo:'Paso 5 — Grados de libertad', desc:`gl = (filas−1)(columnas−1) = (3−1)(2−1) = <strong>2</strong>`},
+  {titulo:'Paso 6 — Comparar con valor crítico', desc:`Para gl=2 y α=0.05, el valor crítico es <strong>5.991</strong>.<br>χ² = ${CHI3_CHI2_2.toFixed(4)} ${CHI3_CHI2_2>5.991?'>':'<'} 5.991<br>Por tanto: <strong>${CHI3_CHI2_2>5.991?'Se rechaza H₀':'No se rechaza H₀'}</strong>.`},
+  {titulo:'Paso 7 — Conclusión estadística', desc:`Existe evidencia estadística suficiente (χ²=${CHI3_CHI2_2.toFixed(2)}, gl=2, p<0.05) para concluir que el nivel de inglés y la participación en intercambios <strong>${CHI3_CHI2_2>5.991?'no son independientes (hay asociación)':'son independientes (no hay asociación)'}</strong>.`},
+  {titulo:'Paso 8 — Reflexión N4', desc:`Rechazar H₀ no significa que el nivel de inglés <em>cause</em> la participación en intercambios. ¿Qué otras variables podrían explicar esta asociación?`},
+];
+
+function chi3P21Init() { chi3P21PasoActual=0; chi3P21Renderizar(); }
+function chi3P21Renderizar() {
+  const paso=CHI3_P21_PASOS[chi3P21PasoActual];
+  const total=CHI3_P21_PASOS.length;
+  document.getElementById('chi3-p21-counter').textContent=`Paso ${chi3P21PasoActual+1} / ${total}`;
+  document.getElementById('chi3-p21-prev').disabled=chi3P21PasoActual===0;
+  document.getElementById('chi3-p21-next').disabled=chi3P21PasoActual===total-1;
+  document.getElementById('chi3-p21-contenido').innerHTML=
+    `<div class="chi3-paso-card"><div class="chi3-paso-titulo">${paso.titulo}</div><div class="chi3-paso-desc">${paso.desc}</div></div>`;
+}
+function chi3P21Paso(dir){chi3P21PasoActual=Math.max(0,Math.min(CHI3_P21_PASOS.length-1,chi3P21PasoActual+dir));chi3P21Renderizar();}
+async function chi3P21PreguntarTutor(){
+  const paso=CHI3_P21_PASOS[chi3P21PasoActual];
+  const ctx=`[CONTEXTO P21 — Ejemplo completo] Paso actual: ${paso.titulo}. Datos: N=75, filas=Básico/Intermedio/Avanzado, cols=Sí/No. O=${JSON.stringify(CHI3_O2)}, E=${JSON.stringify(CHI3_E2.map(r=>r.map(v=>v.toFixed(2))))}, χ²=${CHI3_CHI2_2.toFixed(4)}, gl=2, vc=5.991. Responde dudas sobre este paso. Empuja hacia N3/N4.`;
+  await chi3Enviar('p21',ctx,true);
+}
+
+/* ── PÁGINA 22 ── */
+const CHI3_P22_CASOS = [
+  {titulo:'Caso 1 — Zapatos y crimen',desc:'Un estudio encontró asociación significativa entre el número de pares de zapatos que posee una persona y su probabilidad de cometer un delito.',variable:'Nivel socioeconómico: las personas de mayor NSE tienen más zapatos Y menor tasa de criminalidad.'},
+  {titulo:'Caso 2 — Helado y ahogamientos',desc:'Los datos muestran que las ventas de helado y los ahogamientos en piscinas están asociados (χ² significativo).',variable:'La temperatura: en verano sube el consumo de helado Y el uso de piscinas.'},
+  {titulo:'Caso 3 — Internet y esperanza de vida',desc:'Los países con mayor penetración de internet tienen mayor esperanza de vida (asociación muy significativa).',variable:'Nivel de desarrollo económico: determina tanto el acceso a internet como la calidad de salud.'},
+];
+
+function chi3P22Render(){
+  const el=document.getElementById('chi3-p22-casos');
+  if(!el) return;
+  let h='';
+  CHI3_P22_CASOS.forEach((c,i)=>{
+    h+=`<div class="chi3-causa-card">
+      <div class="chi3-causa-titulo">${c.titulo}</div>
+      <p class="chi3-causa-desc">${c.desc}</p>
+      <div class="chi3-causa-q">¿Qué variable oculta podría explicar esta asociación?</div>
+      <textarea class="p5d-resp-input" id="chi3-p22-caso-${i}" rows="2" placeholder="Variable oculta posible…"></textarea>
+      <div class="chi3-causa-retro" id="chi3-p22-retro-${i}" style="display:none;">💡 ${c.variable}</div>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
+async function chi3P22EnviarAlTutor(){
+  const casos=CHI3_P22_CASOS.map((c,i)=>({caso:c.titulo,respuesta:document.getElementById(`chi3-p22-caso-${i}`)?.value||'(sin responder)'}));
+  const q1=document.getElementById('chi3-p22-q1')?.value||'(sin responder)';
+  const q2=document.getElementById('chi3-p22-q2')?.value||'(sin responder)';
+  const q3=document.getElementById('chi3-p22-q3')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P22 — ¿Asociación = Causalidad? N4]
+Respuestas a los tres casos de correlaciones espurias:
+${casos.map(c=>`${c.caso}: ${c.respuesta}`).join('\n')}
+P1 (¿Cuándo sería irresponsable concluir causalidad?): ${q1}
+P2 (¿Qué pasaría con χ² con N=9000?): ${q2}
+P3 (¿Qué tipo de estudio para causalidad?): ${q3}
+Este es el nivel N4 de Curcio. Evalúa si el estudiante: (1) identifica variables ocultas, (2) distingue asociación de causalidad, (3) comprende el efecto del N en χ², (4) conoce diseños experimentales vs. observacionales. Cuestiona cada punto que esté superficial.`;
+  await chi3Enviar('p22',ctx,true);
+}
+
+/* ── PÁGINA 23 ── */
+function chi3P23Render(){
+  const el=document.getElementById('chi3-p23-flujo');
+  if(!el) return;
+  const pasos=[
+    {ico:'📋',txt:'Tabla observada Oᵢⱼ'},
+    {ico:'🧮',txt:'Calcular Eᵢⱼ = (fᵢ·×f·ⱼ)/N'},
+    {ico:'✅',txt:'Verificar Eᵢⱼ ≥ 5'},
+    {ico:'➗',txt:'Calcular (Oᵢⱼ−Eᵢⱼ)²/Eᵢⱼ por celda'},
+    {ico:'∑',txt:'Sumar → χ²'},
+    {ico:'📐',txt:'gl = (f−1)(c−1)'},
+    {ico:'📊',txt:'Comparar χ² con valor crítico'},
+    {ico:'📝',txt:'Conclusión estadística'},
+    {ico:'🤔',txt:'¿Asociación ≠ Causalidad?'},
+  ];
+  let h='<div class="chi3-flujo-steps">';
+  pasos.forEach((p,i)=>{
+    h+=`<div class="chi3-flujo-step"><span class="chi3-flujo-ico">${p.ico}</span><span class="chi3-flujo-txt">${p.txt}</span></div>`;
+    if(i<pasos.length-1) h+=`<div class="chi3-flujo-arrow">↓</div>`;
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+async function chi3P23EnviarAlTutor(){
+  const txt=document.getElementById('chi3-p23-verbaliza')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P23 — Síntesis Final Chi-cuadrado]
+El estudiante verbalizó el proceso completo: "${txt}"
+Evalúa si cubre los 9 pasos del flujo completo. Clasifica el nivel de Curcio de la verbalización. Si está en N2/N3, pide que profundice la parte de causalidad o condiciones de aplicación. Si ya está en N4, valida y cierra el capítulo con una pregunta de conexión con la vida real.`;
+  await chi3Enviar('p23',ctx,true);
+}
+
+/* ── PÁGINA 24 ── */
+// Datos: internet × rendimiento, N=120
+const CHI3_P24_O = [[14,18,8],[22,16,6],[4,14,18]];
+const CHI3_P24_FILAS=['Solo móvil','Fijo en casa','Sin acceso'];
+const CHI3_P24_COLS=['Alto','Medio','Bajo'];
+const CHI3_P24_N=120;
+const CHI3_P24_E=chi3CalcE(CHI3_P24_O,CHI3_P24_FILAS,CHI3_P24_COLS,CHI3_P24_N);
+const CHI3_P24_CHI2=CHI3_P24_O.reduce((s,r,i)=>s+r.reduce((ss,v,j)=>ss+Math.pow(v-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j],0),0);
+const CHI3_P24_GL=(CHI3_P24_FILAS.length-1)*(CHI3_P24_COLS.length-1); // 4
+
+function chi3P24Render(){
+  const el=document.getElementById('chi3-p24-etapas');
+  if(!el) return;
+  let h='';
+  // Etapa 1: tabla observada
+  h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 1 — Tabla observada</div>${chi3RenderTbl(CHI3_P24_O,CHI3_P24_E,CHI3_P24_FILAS,CHI3_P24_COLS,CHI3_P24_N,'obs')}</div>`;
+  // Etapa 2: Eᵢⱼ inputs
+  h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 2 — Calcula Eᵢⱼ = (fᵢ·×f·ⱼ)/N</div><table class="chi3-tbl"><thead><tr><th>↓/→</th>${CHI3_P24_COLS.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+  CHI3_P24_FILAS.forEach((f,i)=>{
+    h+=`<tr><td>${f}</td>${CHI3_P24_COLS.map((_,j)=>`<td><input type="number" step="0.01" class="p5c-cell chi3-p24-e-cell" id="chi3-p24-e-${i}-${j}" data-correct="${CHI3_P24_E[i][j].toFixed(2)}" placeholder="?" style="width:70px;"></td>`).join('')}</tr>`;
+  });
+  h+=`</tbody></table><button class="btn-verificar" style="background:var(--moss);margin-top:6px;" onclick="chi3P24VerifE()">✅ Verificar Eᵢⱼ</button><div id="chi3-p24-fb-e" class="prob-feedback" style="display:none;"></div></div>`;
+  // Etapa 3: chi2 inputs
+  h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 3 — Calcula (Oᵢⱼ−Eᵢⱼ)²/Eᵢⱼ y χ²</div><table class="chi3-tbl"><thead><tr><th>Celda</th><th>Contrib.</th></tr></thead><tbody>`;
+  CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
+    const corr=Math.pow(CHI3_P24_O[i][j]-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j];
+    h+=`<tr><td>${f}/${c}</td><td><input type="number" step="0.0001" class="p5c-cell chi3-p24-contrib-cell" id="chi3-p24-ct-${i}-${j}" data-correct="${corr.toFixed(4)}" placeholder="?" style="width:100px;"></td></tr>`;
+  }));
+  h+=`<tr class="p5c-total-row"><td>χ² total</td><td><input type="number" step="0.0001" class="p5c-cell" id="chi3-p24-chi2-total" data-correct="${CHI3_P24_CHI2.toFixed(4)}" placeholder="suma →" style="width:110px;"></td></tr>`;
+  h+=`</tbody></table><button class="btn-verificar" style="background:var(--moss);margin-top:6px;" onclick="chi3P24VerifChi()">✅ Verificar χ²</button><div id="chi3-p24-fb-chi" class="prob-feedback" style="display:none;"></div></div>`;
+  // Etapa 4: conclusión
+  h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 4 — Conclusión (gl=${CHI3_P24_GL}, α=0.05)</div>
+    <p style="font-size:.8rem;">Valor crítico para gl=${CHI3_P24_GL}: <strong>9.488</strong></p>
+    <textarea class="p5d-resp-input" id="chi3-p24-concl" rows="3" placeholder="¿Se rechaza H₀? Redacta la conclusión estadística y en lenguaje cotidiano…"></textarea>
+  </div>`;
+  el.innerHTML=h;
+}
+
+function chi3P24VerifE(){
+  const inputs=document.querySelectorAll('.chi3-p24-e-cell');
+  let ok=0;inputs.forEach(inp=>{const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);if(!isNaN(v)&&Math.abs(v-c)<0.1){ok++;inp.classList.add('p5c-ok');}else if(inp.value) inp.classList.add('p5c-err');});
+  const fb=document.getElementById('chi3-p24-fb-e');fb.style.display='block';
+  fb.className=ok===inputs.length?'prob-feedback ok':'prob-feedback parcial';
+  fb.textContent=ok===inputs.length?`✅ Todas las Eᵢⱼ son correctas.`:`${ok}/${inputs.length} correctas.`;
+}
+
+function chi3P24VerifChi(){
+  const inputs=document.querySelectorAll('.chi3-p24-contrib-cell');
+  let ok=0;inputs.forEach(inp=>{const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);if(!isNaN(v)&&Math.abs(v-c)<0.011){ok++;inp.classList.add('p5c-ok');}else if(inp.value) inp.classList.add('p5c-err');});
+  const tot=document.getElementById('chi3-p24-chi2-total');
+  const totOk=tot&&Math.abs(parseFloat(tot.value)-CHI3_P24_CHI2)<0.1;
+  if(totOk) tot?.classList.add('p5c-ok');
+  const fb=document.getElementById('chi3-p24-fb-chi');fb.style.display='block';
+  fb.className=(ok===inputs.length&&totOk)?'prob-feedback ok':'prob-feedback parcial';
+  fb.textContent=(ok===inputs.length&&totOk)?`✅ χ² = ${CHI3_P24_CHI2.toFixed(4)}. ¡Correcto!`:`Contribuciones: ${ok}/${inputs.length} correctas.`;
+}
+
+async function chi3P24EnviarAlTutor(){
+  const eInputs=document.querySelectorAll('.chi3-p24-e-cell');
+  const ctInputs=document.querySelectorAll('.chi3-p24-contrib-cell');
+  let eVals='',ctVals='';
+  CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
+    eVals+=`  E[${f}/${c}]: est=${document.getElementById(`chi3-p24-e-${i}-${j}`)?.value||'vacío'}, corr=${CHI3_P24_E[i][j].toFixed(2)}\n`;
+    ctVals+=`  (O-E)²/E[${f}/${c}]: est=${document.getElementById(`chi3-p24-ct-${i}-${j}`)?.value||'vacío'}, corr=${(Math.pow(CHI3_P24_O[i][j]-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j]).toFixed(4)}\n`;
+  }));
+  const concl=document.getElementById('chi3-p24-concl')?.value||'(sin responder)';
+  const q1=document.getElementById('chi3-p24-q1')?.value||'(sin responder)';
+  const q2=document.getElementById('chi3-p24-q2')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P24 — Situación libre final]
+Datos: Internet×Rendimiento, N=${CHI3_P24_N}, O=${JSON.stringify(CHI3_P24_O)}.
+χ² correcto=${CHI3_P24_CHI2.toFixed(4)}, gl=${CHI3_P24_GL}, vc=9.488.
+E��ⱼ ingresadas:\n${eVals}
+Contribuciones:\n${ctVals}
+Conclusión del estudiante: ${concl}
+P1 (causalidad/variable oculta): ${q1}
+P2 (implicaciones para política educativa): ${q2}
+Evalúa el ciclo completo. Clasifica el nivel de Curcio de la conclusión y las respuestas N4. Cuestiona lo que esté superficial. Si todo está en N4, valida y cierra el capítulo.`;
+  await chi3Enviar('p24',ctx,true);
 }
