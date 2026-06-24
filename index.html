@@ -1109,14 +1109,609 @@ Tabla de frecuencia → Gráfico circular.</div>
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(13)">← Validación</button>
-          <span class="footer-note">Capítulo III — Prueba Chi-cuadrado · Próximamente</span>
+          <button class="btn-nav next" onclick="irAPagina(15)">Cap. III: Chi-cuadrado →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ CAP III · CHI-CUADRADO ══════════ -->
+
+    <!-- PÁGINA 15 — ¿Puede la tabla mentir? -->
+    <div class="page" id="page-15">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Introducción</span>
+          <span class="phase-indicator"><span class="phase-dot phase-a"></span><span class="phase-label">¿Podemos estar seguros?</span></span>
+          <span class="page-num">14</span>
+        </div>
+        <div class="chi3-pres-layout">
+          <div class="chi3-pres-left">
+            <h2 class="chi3-pres-title">¿Puede la tabla mentir?</h2>
+            <p class="chi3-pres-intro">Has aprendido a construir tablas de contingencia y a calcular porcentajes por fila, columna y total. Pero hay algo que esas herramientas <strong>no pueden responder</strong>:</p>
+            <div class="chi3-conflicto-box">
+              <div class="chi3-conflicto-escena">
+                <div class="chi3-persona"><span class="chi3-avatar">🧑‍🎓</span><p>Ana estudió la misma tabla y dijo: <em>"Hay una relación clara entre el transporte y la puntualidad."</em></p></div>
+                <div class="chi3-persona"><span class="chi3-avatar">🧑‍💻</span><p>Carlos analizó la misma tabla y dijo: <em>"La diferencia podría ser puro azar de la muestra."</em></p></div>
+              </div>
+              <p class="chi3-conflicto-preg">¿Quién tiene razón? ¿Cómo se podría decidir con certeza?</p>
+            </div>
+            <div class="chi3-tabla-ejemplo">
+              <div class="chi3-tabla-label">La tabla que analizaron (90 estudiantes):</div>
+              <table class="chi3-tbl">
+                <thead><tr><th>Transporte ↓ / Puntualidad →</th><th>Siempre</th><th>A veces</th><th>Nunca</th><th>Total</th></tr></thead>
+                <tbody>
+                  <tr><td>Bus</td><td>10</td><td>14</td><td>6</td><td>30</td></tr>
+                  <tr><td>Bicicleta</td><td>12</td><td>8</td><td>5</td><td>25</td></tr>
+                  <tr><td>A pie</td><td>2</td><td>10</td><td>3</td><td>15</td></tr>
+                  <tr class="chi3-tbl-total"><td>Total</td><td>24</td><td>32</td><td>14</td><td>90</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="chi3-pres-right">
+            <div class="chi3-reflexion-panel">
+              <div class="chi3-ref-title">✍️ Antes de continuar — escribe tu intuición</div>
+              <div class="chi3-preg-card">
+                <p class="chi3-preg-num">Pregunta 1</p>
+                <p class="chi3-preg-text">Mirando la tabla, ¿crees que el medio de transporte y la puntualidad están relacionados? ¿Por qué?</p>
+                <textarea class="p5d-resp-input" id="chi3-p15-q1" rows="2" placeholder="Escribe tu razonamiento…"></textarea>
+              </div>
+              <div class="chi3-preg-card">
+                <p class="chi3-preg-num">Pregunta 2</p>
+                <p class="chi3-preg-text">¿Podría ser que esa diferencia aparezca solo porque encuestaron a <em>ese grupo específico</em> de 90 estudiantes, y con otro grupo los números fueran distintos?</p>
+                <textarea class="p5d-resp-input" id="chi3-p15-q2" rows="2" placeholder="Escribe tu razonamiento…"></textarea>
+              </div>
+              <div class="chi3-preg-card">
+                <p class="chi3-preg-num">Pregunta 3</p>
+                <p class="chi3-preg-text">¿Qué necesitarías saber o calcular para estar <em>seguro</em> de que la relación es real y no producto del azar?</p>
+                <textarea class="p5d-resp-input" id="chi3-p15-q3" rows="2" placeholder="Escribe tu razonamiento…"></textarea>
+              </div>
+              <button class="btn-verificar" style="background:var(--navy);margin-top:8px;" onclick="chi3P15EnviarAlTutor()">💬 Enviar al tutor</button>
+              <!-- Panel tutor oculto -->
+              <div class="tutor-panel p5d-tutor-panel" id="chi3-p15-tutor" style="display:none;margin-top:12px;">
+                <div class="tutor-header" style="background:#1a3a5a;">
+                  <div class="tutor-avatar">🎓</div>
+                  <div class="tutor-info">
+                    <div class="tutor-name">Tutor Virtual UIS</div>
+                    <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p15">Analizando…</span></div>
+                  </div>
+                  <button class="audio-toggle-btn" id="audio-btn-chi3-p15" onclick="toggleAudio('chi3-p15')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p15"><span></span><span></span><span></span></span></button>
+                </div>
+                <div id="chat-chi3-p15" class="chat-box p5d-chat-box"></div>
+                <div class="chat-input-area">
+                  <input type="text" id="input-chi3-p15" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p15')">
+                  <button class="btn-send" onclick="chi3ChatLibre('p15')">Enviar <span class="send-icon">↑</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(14)">← ¿Se puede probar?</button>
+          <button class="btn-nav next" onclick="irAPagina(16)">Frecuencias esperadas →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 16 — ¿Qué esperaríamos si no hubiera relación? -->
+    <div class="page" id="page-16">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Acción</span>
+          <span class="phase-indicator"><span class="phase-dot phase-a"></span><span class="phase-label">Construye lo esperado</span></span>
+          <span class="page-num">15</span>
+        </div>
+        <div class="pAB-single-col">
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">Situación a-didáctica</div>
+            <p class="prob-enunciado-text">Usa la misma tabla de 90 estudiantes. Los <strong>totales de fila y columna están fijos</strong> — no puedes cambiarlos. Tu tarea: distribuir los 90 casos en las celdas internas como si el transporte y la puntualidad <strong>no tuvieran ninguna relación</strong> entre sí.</p>
+            <div class="prob-pregunta-box" style="border-left-color:var(--gold);">
+              <span class="prob-pregunta-label">Pregunta guía:</span>
+              <p class="prob-pregunta-text">Si no hay ninguna relación entre las dos variables, ¿cómo se repartirían los estudiantes en cada celda?</p>
+            </div>
+          </div>
+          <div class="chi3-marginales-ref">
+            <div class="chi3-marg-label">Marginales fijos (no editables):</div>
+            <div class="chi3-marg-strip">
+              <span class="chi3-marg-chip">Bus: <strong>30</strong></span>
+              <span class="chi3-marg-chip">Bicicleta: <strong>25</strong></span>
+              <span class="chi3-marg-chip">A pie: <strong>15</strong></span>
+              <span class="chi3-marg-chip chi3-marg-col">Siempre: <strong>24</strong></span>
+              <span class="chi3-marg-chip chi3-marg-col">A veces: <strong>32</strong></span>
+              <span class="chi3-marg-chip chi3-marg-col">Nunca: <strong>14</strong></span>
+              <span class="chi3-marg-chip chi3-marg-total">N = <strong>90</strong></span>
+            </div>
+          </div>
+          <div id="chi3-p16-tabla-wrap"></div>
+          <div class="chi3-p16-validacion" id="chi3-p16-validacion"></div>
+          <div class="prob-bottom-row">
+            <button class="btn-verificar" style="background:var(--gold);color:var(--ink);" onclick="chi3P16Verificar()">🔍 Verificar que respetan los marginales</button>
+            <button class="btn-verificar" style="background:var(--navy);" onclick="chi3P16EnviarAlTutor()">💬 Enviar al tutor</button>
+          </div>
+          <div class="tutor-panel p5d-tutor-panel" id="chi3-p16-tutor" style="display:none;margin-top:12px;">
+            <div class="tutor-header" style="background:#1a3a5a;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p16">Analizando…</span></div>
+              </div>
+              <button class="audio-toggle-btn" id="audio-btn-chi3-p16" onclick="toggleAudio('chi3-p16')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p16"><span></span><span></span><span></span></span></button>
+            </div>
+            <div class="tutor-context-strip" style="border-left-color:var(--gold);">🤔 El tutor te devolverá las consecuencias matemáticas de tu distribución. No dará la fórmula — te ayudará a descubrirla.</div>
+            <div id="chat-chi3-p16" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-chi3-p16" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p16')">
+              <button class="btn-send" onclick="chi3ChatLibre('p16')">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(15)">← Introducción</button>
+          <button class="btn-nav next" onclick="irAPagina(17)">Ejemplo guiado →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 17 — Ejemplo guiado: Eᵢⱼ paso a paso -->
+    <div class="page" id="page-17">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Ejemplo</span>
+          <span class="phase-indicator"><span class="phase-dot phase-b"></span><span class="phase-label">Construyendo Eᵢⱼ</span></span>
+          <span class="page-num">16</span>
+        </div>
+        <div class="chi3-ej-layout">
+          <div class="chi3-ej-left">
+            <div class="chi3-ej-enunciado">
+              <div class="prob-num-badge">Ejemplo guiado — Frecuencias Esperadas</div>
+              <p class="prob-enunciado-text">Se encuestaron <strong>60 estudiantes</strong> sobre su <strong>programa</strong> (Matemáticas / Estadística) y su <strong>uso de software</strong> (R / Python / SPSS). ¿Cómo calcular las frecuencias que <em>esperaríamos</em> si no hubiera ninguna relación entre programa y software?</p>
+            </div>
+            <div class="chi3-pasos-nav">
+              <button class="chi3-paso-btn" id="chi3-p17-prev" onclick="chi3P17Paso(-1)" disabled>← Paso anterior</button>
+              <span class="chi3-paso-counter" id="chi3-paso-counter">Paso 1 / 5</span>
+              <button class="chi3-paso-btn" id="chi3-p17-next" onclick="chi3P17Paso(1)">Siguiente paso →</button>
+            </div>
+            <div id="chi3-p17-contenido"></div>
+          </div>
+          <div class="chi3-ej-right">
+            <div class="chi3-toggle-group">
+              <div class="chi3-tg-label">Ver tabla como:</div>
+              <button class="chi3-tg-btn active" onclick="chi3P17Toggle('obs')">Observada (Oᵢⱼ)</button>
+              <button class="chi3-tg-btn" onclick="chi3P17Toggle('esp')">Esperada (Eᵢⱼ)</button>
+              <button class="chi3-tg-btn" onclick="chi3P17Toggle('dif')">Diferencia</button>
+            </div>
+            <div id="chi3-p17-tabla-display"></div>
+            <div class="chi3-ej-tutor-wrap">
+              <button class="btn-verificar" style="background:var(--navy);width:100%;margin-top:10px;" onclick="chi3P17PreguntarTutor()">💬 Preguntarle al tutor sobre este paso</button>
+              <div class="tutor-panel p5d-tutor-panel" id="chi3-p17-tutor" style="display:none;margin-top:8px;">
+                <div class="tutor-header" style="background:#1a3a5a;">
+                  <div class="tutor-avatar">🎓</div>
+                  <div class="tutor-info">
+                    <div class="tutor-name">Tutor Virtual UIS</div>
+                    <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p17">En línea</span></div>
+                  </div>
+                  <button class="audio-toggle-btn" id="audio-btn-chi3-p17" onclick="toggleAudio('chi3-p17')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p17"><span></span><span></span><span></span></span></button>
+                </div>
+                <div id="chat-chi3-p17" class="chat-box p5d-chat-box"></div>
+                <div class="chat-input-area">
+                  <input type="text" id="input-chi3-p17" class="chat-input" placeholder="¿Tienes alguna duda sobre este paso?" onkeydown="if(event.key==='Enter') chi3ChatLibre('p17')">
+                  <button class="btn-send" onclick="chi3ChatLibre('p17')">Enviar <span class="send-icon">↑</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(16)">← Acción</button>
+          <button class="btn-nav next" onclick="irAPagina(18)">Calcular χ² →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 18 — El estadístico χ² -->
+    <div class="page" id="page-18">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Formulación</span>
+          <span class="phase-indicator"><span class="phase-dot phase-b"></span><span class="phase-label">Calculando χ²</span></span>
+          <span class="page-num">17</span>
+        </div>
+        <div class="pAB-single-col">
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">Actividad — El estadístico χ²</div>
+            <p class="prob-enunciado-text">Usando el ejemplo de la pág. anterior (60 estudiantes, Programa × Software), ya tienes Oᵢⱼ y Eᵢⱼ. Ahora calcula la contribución de cada celda y suma para obtener χ².</p>
+            <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
+              <span class="prob-pregunta-label">Fórmula:</span>
+              <p class="prob-pregunta-text" style="font-family:'JetBrains Mono',monospace;">χ² = Σ (Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ</p>
+            </div>
+          </div>
+          <div id="chi3-p18-tabla-wrap"></div>
+          <div class="chi3-p18-acum">
+            <span class="chi3-acum-label">χ² acumulado:</span>
+            <span class="chi3-acum-val" id="chi3-p18-acum-val">0.000</span>
+            <div class="chi3-acum-bar-wrap"><div class="chi3-acum-bar" id="chi3-p18-acum-bar"></div></div>
+          </div>
+          <div class="prob-feedback" id="chi3-p18-feedback" style="display:none;"></div>
+          <div class="chi3-p18-preguntas">
+            <div class="chi3-preg-card">
+              <p class="chi3-preg-num">Pregunta 1</p>
+              <p class="chi3-preg-text">¿Por qué se eleva al cuadrado la diferencia (Oᵢⱼ − Eᵢⱼ)² en lugar de sumarla directamente?</p>
+              <textarea class="p5d-resp-input" id="chi3-p18-q1" rows="2" placeholder="Tu razonamiento…"></textarea>
+            </div>
+            <div class="chi3-preg-card">
+              <p class="chi3-preg-num">Pregunta 2</p>
+              <p class="chi3-preg-text">¿Qué significaría obtener χ² = 0? ¿Es posible en la práctica?</p>
+              <textarea class="p5d-resp-input" id="chi3-p18-q2" rows="2" placeholder="Tu razonamiento…"></textarea>
+            </div>
+          </div>
+          <div class="prob-bottom-row">
+            <button class="btn-verificar" style="background:var(--moss);" onclick="chi3P18Verificar()">✅ Verificar cálculos</button>
+            <button class="btn-verificar" style="background:var(--navy);" onclick="chi3P18EnviarAlTutor()">💬 Consultar tutor</button>
+          </div>
+          <div class="tutor-panel p5d-tutor-panel" id="chi3-p18-tutor" style="display:none;margin-top:12px;">
+            <div class="tutor-header" style="background:#1a3a5a;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p18">Analizando…</span></div>
+              </div>
+              <button class="audio-toggle-btn" id="audio-btn-chi3-p18" onclick="toggleAudio('chi3-p18')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p18"><span></span><span></span><span></span></span></button>
+            </div>
+            <div id="chat-chi3-p18" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-chi3-p18" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p18')">
+              <button class="btn-send" onclick="chi3ChatLibre('p18')">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(17)">← Ejemplo Eᵢⱼ</button>
+          <button class="btn-nav next" onclick="irAPagina(19)">Síntesis →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 19 — Síntesis: Eᵢⱼ y χ² -->
+    <div class="page" id="page-19">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Síntesis</span>
+          <span class="phase-indicator"><span class="phase-dot phase-c"></span><span class="phase-label">Consolidando Eᵢⱼ y χ²</span></span>
+          <span class="page-num">18</span>
+        </div>
+        <div class="chi3-syn-layout">
+          <div class="chi3-syn-left">
+            <h3 class="chi3-syn-title">Lo que construiste hasta aquí</h3>
+            <div class="chi3-syn-cards">
+              <div class="chi3-syn-card" style="border-left-color:var(--navy);">
+                <div class="chi3-syn-card-title">Frecuencias Esperadas (Eᵢⱼ)</div>
+                <div class="chi3-syn-formula">Eᵢⱼ = (fᵢ· × f·ⱼ) / N</div>
+                <p class="chi3-syn-desc">Representan lo que <em>ocurriría</em> si las dos variables fueran completamente independientes. Si Oᵢⱼ ≈ Eᵢⱼ en todas las celdas, no hay evidencia de asociación.</p>
+                <div class="chi3-syn-cond">⚠️ Condición: Eᵢⱼ ≥ 5 en todas las celdas para que la prueba sea válida.</div>
+              </div>
+              <div class="chi3-syn-card" style="border-left-color:var(--moss);">
+                <div class="chi3-syn-card-title">Estadístico χ²</div>
+                <div class="chi3-syn-formula">χ² = Σ (Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ</div>
+                <p class="chi3-syn-desc">Mide el <em>alejamiento global</em> entre lo observado y lo esperado. χ² = 0 significa independencia perfecta. Cuanto mayor sea χ², mayor evidencia de asociación.</p>
+              </div>
+              <div class="chi3-syn-card" style="border-left-color:var(--gold);">
+                <div class="chi3-syn-card-title">Contribución por celda</div>
+                <div class="chi3-syn-formula">(Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ</div>
+                <p class="chi3-syn-desc">Las celdas con mayor contribución son las que más se alejan de la independencia. Son la "firma" de la asociación.</p>
+              </div>
+            </div>
+            <div class="chi3-syn-resumen">
+              <div class="chi3-syn-resumen-title">Tabla resumen del ejemplo trabajado</div>
+              <div id="chi3-p19-tabla-resumen"></div>
+            </div>
+          </div>
+          <div class="chi3-syn-right">
+            <div class="chi3-syn-tutor-label">💬 Verbaliza lo aprendido — el tutor te hará preguntas de consolidación</div>
+            <p style="font-size:.78rem;color:var(--slate);margin-bottom:8px;">Explica con tus propias palabras qué significa Eᵢⱼ y qué nos dice χ². El tutor cuestionará hasta que tu explicación sea sólida.</p>
+            <textarea class="p5d-resp-input" id="chi3-p19-verbaliza" rows="4" placeholder="Explica con tus propias palabras qué son las frecuencias esperadas y qué nos dice el estadístico χ² cuando es grande vs. cuando es pequeño…"></textarea>
+            <button class="btn-verificar" style="background:var(--navy);margin-top:8px;width:100%;" onclick="chi3P19EnviarAlTutor()">💬 Enviar al tutor de consolidación</button>
+            <div class="tutor-panel p5d-tutor-panel" id="chi3-p19-tutor" style="display:none;margin-top:12px;">
+              <div class="tutor-header" style="background:#1a3a5a;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p19">Analizando…</span></div>
+                </div>
+                <button class="audio-toggle-btn" id="audio-btn-chi3-p19" onclick="toggleAudio('chi3-p19')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p19"><span></span><span></span><span></span></span></button>
+              </div>
+              <div id="chat-chi3-p19" class="chat-box p5d-chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-chi3-p19" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p19')">
+                <button class="btn-send" onclick="chi3ChatLibre('p19')">Enviar <span class="send-icon">↑</span></button>
+              </div>
+            </div>
+            <button class="btn-nav next" id="btn-p19-next" style="margin-top:14px;opacity:.4;pointer-events:none;" onclick="irAPagina(20)">Continuar: gl y valor crítico →</button>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(18)">← Calcular χ²</button>
+          <button class="btn-nav next" onclick="irAPagina(20)">gl y valor crítico →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 20 — Grados de libertad y valor crítico -->
+    <div class="page" id="page-20">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Validación</span>
+          <span class="phase-indicator"><span class="phase-dot phase-b"></span><span class="phase-label">¿Cuándo es suficiente?</span></span>
+          <span class="page-num">19</span>
+        </div>
+        <div class="pAB-single-col">
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">Actividad — gl y Valor Crítico</div>
+            <p class="prob-enunciado-text">El mismo valor de χ² puede ser evidencia fuerte o débil dependiendo del tamaño de la tabla. Aquí explorarás por qué los <strong>grados de libertad</strong> importan.</p>
+          </div>
+          <!-- Tres casos contrastantes -->
+          <div class="chi3-p20-casos" id="chi3-p20-casos"></div>
+          <div class="chi3-preg-card">
+            <p class="chi3-preg-num">Reflexión</p>
+            <p class="chi3-preg-text">Con el mismo χ² = 6.5 pero distintos grados de libertad, ¿en cuál de los tres casos hay más evidencia de asociación? ¿Por qué crees que el tamaño de la tabla afecta la interpretación?</p>
+            <textarea class="p5d-resp-input" id="chi3-p20-reflex" rows="3" placeholder="Ordénalos de más a menos evidencia y explica…"></textarea>
+          </div>
+          <!-- Tabla de valores críticos -->
+          <div class="chi3-vc-section">
+            <div class="chi3-vc-title">Tabla de valores críticos (α = 0.05)</div>
+            <table class="chi3-tbl chi3-vc-tabla">
+              <thead><tr><th>gl</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+              <tbody><tr><td>χ²crítico</td><td>3.841</td><td>5.991</td><td>7.815</td><td>9.488</td><td>11.07</td><td>12.59</td></tr></tbody>
+            </table>
+            <div class="chi3-preg-card" style="margin-top:10px;">
+              <p class="chi3-preg-num">Aplica al ejemplo</p>
+              <p class="chi3-preg-text">En el ejemplo del Cap III (Programa × Software, 2×3), calcula los grados de libertad. Luego ubica el χ² que calculaste en pág. 18 y compara con el valor crítico. ¿Qué concluyes?</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+                <div><label style="font-size:.75rem;">gl = (filas−1)(col−1) =</label><input type="number" id="chi3-p20-gl" class="p5c-cell" style="width:70px;" placeholder="?"></div>
+                <div><label style="font-size:.75rem;">χ² calculado =</label><input type="number" id="chi3-p20-chi2" step="0.001" class="p5c-cell" style="width:90px;" placeholder="?"></div>
+                <div><label style="font-size:.75rem;">Valor crítico =</label><input type="number" id="chi3-p20-vc" step="0.001" class="p5c-cell" style="width:90px;" placeholder="?"></div>
+              </div>
+              <textarea class="p5d-resp-input" id="chi3-p20-concl" rows="2" placeholder="¿Rechazas H₀? ¿Qué concluyes sobre la relación programa–software?" style="margin-top:8px;"></textarea>
+            </div>
+          </div>
+          <div class="prob-bottom-row">
+            <button class="btn-verificar" style="background:var(--moss);" onclick="chi3P20Verificar()">✅ Verificar gl y valor crítico</button>
+            <button class="btn-verificar" style="background:var(--navy);" onclick="chi3P20EnviarAlTutor()">💬 Consultar tutor</button>
+          </div>
+          <div class="tutor-panel p5d-tutor-panel" id="chi3-p20-tutor" style="display:none;margin-top:12px;">
+            <div class="tutor-header" style="background:#1a3a5a;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p20">Analizando…</span></div>
+              </div>
+              <button class="audio-toggle-btn" id="audio-btn-chi3-p20" onclick="toggleAudio('chi3-p20')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p20"><span></span><span></span><span></span></span></button>
+            </div>
+            <div id="chat-chi3-p20" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-chi3-p20" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p20')">
+              <button class="btn-send" onclick="chi3ChatLibre('p20')">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(19)">← Síntesis Eᵢⱼ y χ²</button>
+          <button class="btn-nav next" onclick="irAPagina(21)">Ejemplo completo →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 21 — Ejemplo guiado completo -->
+    <div class="page" id="page-21">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Ejemplo</span>
+          <span class="phase-indicator"><span class="phase-dot phase-c"></span><span class="phase-label">Ciclo completo</span></span>
+          <span class="page-num">20</span>
+        </div>
+        <div class="chi3-ej-layout">
+          <div class="chi3-ej-left">
+            <div class="chi3-ej-enunciado">
+              <div class="prob-num-badge">Ejemplo guiado — De la tabla a la conclusión</div>
+              <p class="prob-enunciado-text">Se encuestaron <strong>75 estudiantes</strong> sobre su <strong>nivel de inglés</strong> (Básico / Avanzado) y su <strong>participación en intercambios</strong> (Sí / No). ¿Existe asociación estadística entre estas variables?</p>
+            </div>
+            <div class="chi3-pasos-nav">
+              <button class="chi3-paso-btn" id="chi3-p21-prev" onclick="chi3P21Paso(-1)" disabled>← Paso anterior</button>
+              <span class="chi3-paso-counter" id="chi3-p21-counter">Paso 1 / 8</span>
+              <button class="chi3-paso-btn" id="chi3-p21-next" onclick="chi3P21Paso(1)">Siguiente paso →</button>
+            </div>
+            <div id="chi3-p21-contenido"></div>
+          </div>
+          <div class="chi3-ej-right">
+            <div class="chi3-ej-tutor-wrap">
+              <button class="btn-verificar" style="background:var(--navy);width:100%;" onclick="chi3P21PreguntarTutor()">💬 Preguntarle al tutor sobre este paso</button>
+              <div class="tutor-panel p5d-tutor-panel" id="chi3-p21-tutor" style="display:none;margin-top:8px;">
+                <div class="tutor-header" style="background:#1a3a5a;">
+                  <div class="tutor-avatar">🎓</div>
+                  <div class="tutor-info">
+                    <div class="tutor-name">Tutor Virtual UIS</div>
+                    <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p21">En línea</span></div>
+                  </div>
+                  <button class="audio-toggle-btn" id="audio-btn-chi3-p21" onclick="toggleAudio('chi3-p21')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p21"><span></span><span></span><span></span></span></button>
+                </div>
+                <div id="chat-chi3-p21" class="chat-box p5d-chat-box"></div>
+                <div class="chat-input-area">
+                  <input type="text" id="input-chi3-p21" class="chat-input" placeholder="¿Tienes alguna duda?" onkeydown="if(event.key==='Enter') chi3ChatLibre('p21')">
+                  <button class="btn-send" onclick="chi3ChatLibre('p21')">Enviar <span class="send-icon">↑</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(20)">← gl y valor crítico</button>
+          <button class="btn-nav next" onclick="irAPagina(22)">¿Asociación = causalidad? →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 22 — ¿Asociación implica causalidad? -->
+    <div class="page" id="page-22">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Reflexión</span>
+          <span class="phase-indicator"><span class="phase-dot phase-done"></span><span class="phase-label">N4 · Pensamiento crítico</span></span>
+          <span class="page-num">21</span>
+        </div>
+        <div class="pAB-single-col">
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">¿Asociación implica causalidad?</div>
+            <p class="prob-enunciado-text">Rechazar H₀ significa que hay evidencia estadística de asociación. Pero eso <strong>no significa que una variable cause la otra</strong>. Analiza los tres casos reales a continuación.</p>
+          </div>
+          <div class="chi3-casos-causales" id="chi3-p22-casos"></div>
+          <div class="chi3-preg-card">
+            <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Limitaciones</p>
+            <p class="chi3-preg-text">¿Cuándo sería estadística y éticamente irresponsable concluir causalidad a partir de un χ² significativo? Da un ejemplo propio del contexto colombiano.</p>
+            <textarea class="p5d-resp-input" id="chi3-p22-q1" rows="3" placeholder="Tu análisis…"></textarea>
+          </div>
+          <div class="chi3-preg-card">
+            <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Tamaño muestral</p>
+            <p class="chi3-preg-text">Si repitieras el estudio de puntualidad con 9000 estudiantes (manteniendo las mismas proporciones), ¿qué le pasaría a χ²? ¿Eso lo haría más o menos útil para tomar decisiones?</p>
+            <textarea class="p5d-resp-input" id="chi3-p22-q2" rows="3" placeholder="Tu análisis…"></textarea>
+          </div>
+          <div class="chi3-preg-card">
+            <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Diseño de estudio</p>
+            <p class="chi3-preg-text">¿Qué tipo de estudio adicional (diferente a una encuesta) te permitiría ir más allá de la asociación estadística y explorar si existe una relación causal?</p>
+            <textarea class="p5d-resp-input" id="chi3-p22-q3" rows="3" placeholder="Tu análisis…"></textarea>
+          </div>
+          <button class="btn-verificar" style="background:var(--navy);margin-top:8px;" onclick="chi3P22EnviarAlTutor()">💬 Enviar al tutor</button>
+          <div class="tutor-panel p5d-tutor-panel" id="chi3-p22-tutor" style="display:none;margin-top:12px;">
+            <div class="tutor-header" style="background:#1a3a5a;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p22">Analizando…</span></div>
+              </div>
+              <button class="audio-toggle-btn" id="audio-btn-chi3-p22" onclick="toggleAudio('chi3-p22')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p22"><span></span><span></span><span></span></span></button>
+            </div>
+            <div id="chat-chi3-p22" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-chi3-p22" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p22')">
+              <button class="btn-send" onclick="chi3ChatLibre('p22')">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(21)">← Ejemplo completo</button>
+          <button class="btn-nav next" onclick="irAPagina(23)">Síntesis final →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 23 — Síntesis final Chi-cuadrado -->
+    <div class="page" id="page-23">
+      <div class="page-inner">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Síntesis Final</span>
+          <span class="phase-indicator"><span class="phase-dot phase-done"></span><span class="phase-label">Chi-cuadrado completo</span></span>
+          <span class="page-num">22</span>
+        </div>
+        <div class="chi3-syn-layout">
+          <div class="chi3-syn-left">
+            <h3 class="chi3-syn-title">Diagrama del proceso completo</h3>
+            <div class="chi3-flujo" id="chi3-p23-flujo"></div>
+            <div class="chi3-syn-cards" style="margin-top:14px;">
+              <div class="chi3-syn-card" style="border-left-color:var(--navy);">
+                <div class="chi3-syn-card-title">¿Cuándo usar χ² vs. % por fila/columna?</div>
+                <table class="chi3-tbl" style="font-size:.75rem;">
+                  <thead><tr><th>Herramienta</th><th>Responde a…</th><th>Limitación</th></tr></thead>
+                  <tbody>
+                    <tr><td>% por fila / columna</td><td>¿Cómo se distribuye el grupo?</td><td>No descarta el azar</td></tr>
+                    <tr><td>Prueba χ²</td><td>¿La asociación es estadísticamente significativa?</td><td>No establece causalidad</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="chi3-syn-card" style="border-left-color:var(--gold);">
+                <div class="chi3-syn-card-title">Condiciones de aplicación</div>
+                <p style="font-size:.78rem;line-height:1.5;">• Eᵢⱼ ≥ 5 en todas las celdas<br>• Datos de conteo (frecuencias absolutas)<br>• Muestra aleatoria<br>• Observaciones independientes</p>
+              </div>
+            </div>
+          </div>
+          <div class="chi3-syn-right">
+            <div class="chi3-syn-tutor-label">💬 Verbaliza el proceso completo</div>
+            <p style="font-size:.78rem;color:var(--slate);margin-bottom:8px;">Explica con tus palabras el recorrido completo: desde la tabla observada hasta la conclusión estadística. El tutor verificará que tu comprensión cubra todos los pasos.</p>
+            <textarea class="p5d-resp-input" id="chi3-p23-verbaliza" rows="5" placeholder="Describe el proceso paso a paso con tus propias palabras…"></textarea>
+            <button class="btn-verificar" style="background:var(--navy);margin-top:8px;width:100%;" onclick="chi3P23EnviarAlTutor()">💬 Enviar al tutor de síntesis</button>
+            <div class="tutor-panel p5d-tutor-panel" id="chi3-p23-tutor" style="display:none;margin-top:12px;">
+              <div class="tutor-header" style="background:#1a3a5a;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p23">Analizando…</span></div>
+                </div>
+                <button class="audio-toggle-btn" id="audio-btn-chi3-p23" onclick="toggleAudio('chi3-p23')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p23"><span></span><span></span><span></span></span></button>
+              </div>
+              <div id="chat-chi3-p23" class="chat-box p5d-chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-chi3-p23" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p23')">
+                <button class="btn-send" onclick="chi3ChatLibre('p23')">Enviar <span class="send-icon">↑</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(22)">← Causalidad</button>
+          <button class="btn-nav next" onclick="irAPagina(24)">Situación libre final →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA 24 — Aplica todo: situación nueva completa -->
+    <div class="page" id="page-24">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Aplicación</span>
+          <span class="phase-indicator"><span class="phase-dot phase-done"></span><span class="phase-label">Ciclo N1 → N4</span></span>
+          <span class="page-num">23</span>
+        </div>
+        <div class="pAB-single-col">
+          <div class="prob-enunciado">
+            <div class="prob-num-badge">Situación libre final</div>
+            <p class="prob-enunciado-text">Un estudio en Bucaramanga encuestó a <strong>120 jóvenes</strong> sobre su <strong>acceso a internet</strong> (Solo móvil / Fijo en casa / Sin acceso) y su <strong>rendimiento académico auto-reportado</strong> (Alto / Medio / Bajo). Los datos fueron: Solo móvil+Alto: 14, Solo móvil+Medio: 18, Solo móvil+Bajo: 8 · Fijo+Alto: 22, Fijo+Medio: 16, Fijo+Bajo: 6 · Sin acceso+Alto: 4, Sin acceso+Medio: 14, Sin acceso+Bajo: 18.</p>
+          </div>
+          <!-- Etapas del ciclo completo -->
+          <div class="chi3-p24-etapas" id="chi3-p24-etapas"></div>
+          <!-- Preguntas N4 -->
+          <div class="chi3-preg-card" style="margin-top:12px;">
+            <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Causalidad</p>
+            <p class="chi3-preg-text">Si la prueba resulta significativa, ¿podría afirmarse que la falta de internet <em>causa</em> bajo rendimiento? ¿Qué variable oculta podría explicar la asociación?</p>
+            <textarea class="p5d-resp-input" id="chi3-p24-q1" rows="3" placeholder="Tu análisis…"></textarea>
+          </div>
+          <div class="chi3-preg-card">
+            <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Implicaciones</p>
+            <p class="chi3-preg-text">Si fueras asesor de política educativa municipal, ¿qué acciones tomarías con base en estos resultados? ¿Qué información adicional pedirías antes de actuar?</p>
+            <textarea class="p5d-resp-input" id="chi3-p24-q2" rows="3" placeholder="Tu análisis…"></textarea>
+          </div>
+          <button class="btn-verificar" style="background:var(--navy);margin-top:8px;" onclick="chi3P24EnviarAlTutor()">💬 Enviar todo al tutor</button>
+          <div class="tutor-panel p5d-tutor-panel" id="chi3-p24-tutor" style="display:none;margin-top:12px;">
+            <div class="tutor-header" style="background:#1a3a5a;">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p24">Analizando…</span></div>
+              </div>
+              <button class="audio-toggle-btn" id="audio-btn-chi3-p24" onclick="toggleAudio('chi3-p24')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p24"><span></span><span></span><span></span></span></button>
+            </div>
+            <div id="chat-chi3-p24" class="chat-box p5d-chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="input-chi3-p24" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p24')">
+              <button class="btn-send" onclick="chi3ChatLibre('p24')">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(23)">← Síntesis final</button>
         </div>
       </div>
     </div>
 
   </div><!-- /book-pages -->
 
-  <!-- Indicadores de página — 14 puntos (0,1,3,5,5b,6–14) -->
+  <!-- Indicadores de página -->
   <div class="page-indicators">
     <span class="pi-dot active" onclick="irAPagina(0)"   title="Portada"></span>
     <span class="pi-dot" onclick="irAPagina(1)"   title="Cap I · Presentación"></span>
@@ -1134,6 +1729,16 @@ Tabla de frecuencia → Gráfico circular.</div>
     <span class="pi-dot" onclick="irAPagina(12)"  title="Cap II · Formulación"></span>
     <span class="pi-dot" onclick="irAPagina(13)"  title="Cap II · Validación"></span>
     <span class="pi-dot" onclick="irAPagina(14)"  title="Cap II · ¿Se puede probar?"></span>
+    <span class="pi-dot" onclick="irAPagina(15)"  title="Cap III · ¿Puede la tabla mentir?"></span>
+    <span class="pi-dot" onclick="irAPagina(16)"  title="Cap III · Frecuencias esperadas"></span>
+    <span class="pi-dot" onclick="irAPagina(17)"  title="Cap III · Ejemplo Eᵢⱼ"></span>
+    <span class="pi-dot" onclick="irAPagina(18)"  title="Cap III · Calcular χ²"></span>
+    <span class="pi-dot" onclick="irAPagina(19)"  title="Cap III · Síntesis Eᵢⱼ y χ²"></span>
+    <span class="pi-dot" onclick="irAPagina(20)"  title="Cap III · gl y valor crítico"></span>
+    <span class="pi-dot" onclick="irAPagina(21)"  title="Cap III · Ejemplo completo"></span>
+    <span class="pi-dot" onclick="irAPagina(22)"  title="Cap III · Causalidad"></span>
+    <span class="pi-dot" onclick="irAPagina(23)"  title="Cap III · Síntesis final"></span>
+    <span class="pi-dot" onclick="irAPagina(24)"  title="Cap III · Situación libre"></span>
   </div>
 
 </div><!-- /book-shell -->
