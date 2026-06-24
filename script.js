@@ -155,7 +155,7 @@ let datosGrafico = {
 ════════════════════════════════ */
 
 // Orden lógico de páginas para determinar dirección de animación
-const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14,'14b',15,16,17,18,19,20,21,22,23,24];
 
 function irAPagina(n) {
   if (n === paginaActual) return;
@@ -273,9 +273,9 @@ function actualizarFaseCap2(texto) {
   const esB = texto.includes('Frecuencia Marginal') || texto.includes('bordes de la tabla') ||
                texto.includes('total de mujeres') || texto.includes('total general');
   const esC = texto.includes('titular impactante') || texto.includes('cambiar la forma') ||
-               texto.includes('Frecuencia Condicionada') || texto.includes('proporción') ||
+               texto.includes('Frecuencia Relativa Condicionada') || texto.includes('proporción') ||
                texto.includes('porcentaje');
-  const fin  = texto.includes('Frecuencia Condicionada') && texto.includes('¡Muy bien!');
+  const fin  = texto.includes('Sesión terminada');
 
   if (fin) {
     dot.className     = 'phase-dot phase-done';
@@ -1596,21 +1596,13 @@ function verificarProblemaB() {
     else if (inp.value!=='') inp.classList.add('incorrecto');
   });
 
-  // Verificar preguntas localmente
-  p.preguntas.forEach(q => {
-    const inp  = document.getElementById(q.id);
-    const retro = document.getElementById(`${q.id}-retro`);
-    if (!inp || !retro || !inp.value.trim()) return;
-    const resp  = inp.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    const ok = q.claves.map(c=>c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')).some(c=>resp.includes(c));
-    retro.style.display='block';
-    retro.className = ok ? 'p5d-retro p5d-retro-ok' : 'p5d-retro p5d-retro-err';
-    retro.innerHTML = ok ? `✅ <strong>Bien encaminado.</strong> ${q.retro}` : `💡 <strong>Revisa:</strong> ${q.retro}`;
-  });
+  // NOTA TSD: las preguntas de análisis abiertas NO se autocalifican por palabras clave.
+  // Su evaluación la hace el tutor IA (pBEnviarAlTutor), que responde al razonamiento
+  // real del estudiante. Aquí solo validamos la tabla y el sistema de representación.
 
   const fb = document.getElementById('probB-feedback');
   fb.style.display='block';
-  if (correctas===total && tipoOk)       { fb.className='prob-feedback ok';     fb.innerHTML='✅ ¡Excelente! Sistema correcto y tabla completa. Ahora consulta al tutor para profundizar las preguntas.'; }
+  if (correctas===total && tipoOk)       { fb.className='prob-feedback ok';     fb.innerHTML='✅ ¡Excelente! Sistema correcto y tabla completa. Ahora pulsa "Consultar tutor" para que analice tus respuestas a las preguntas.'; }
   else if (correctas===total && !tipoOk) { fb.className='prob-feedback parcial'; fb.innerHTML='⚠️ Los valores son correctos pero el sistema no responde la pregunta planteada.'; }
   else                                   { fb.className='prob-feedback parcial'; fb.innerHTML=`⚠️ ${correctas} de ${total} celdas correctas.`; }
 }
@@ -2620,43 +2612,11 @@ function p5dVerificarTabla() {
   p5dActualizarCalculos();
 }
 
-function p5dVerificarRespuestas() {
-  const sit = P5D_SITUACIONES[p5dSituacionActual];
-  let correctas = 0;
-
-  sit.preguntas.forEach(p => {
-    const inp  = document.getElementById(p.id);
-    const retro = document.getElementById(`${p.id}-retro`);
-    if (!inp || !retro) return;
-    const resp  = (inp.value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    const claves = p.respClave.map(c => c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''));
-    const acertó = claves.some(c => resp.includes(c));
-
-    retro.style.display = 'block';
-    if (acertó) {
-      correctas++;
-      retro.className = 'p5d-retro p5d-retro-ok';
-      retro.innerHTML = `✅ <strong>¡Bien!</strong> ${p.retroalimentacion}`;
-    } else if (inp.value.trim() === '') {
-      retro.className = 'p5d-retro p5d-retro-warn';
-      retro.innerHTML = `⚠️ No escribiste ninguna respuesta. ${p.retroalimentacion}`;
-    } else {
-      retro.className = 'p5d-retro p5d-retro-err';
-      retro.innerHTML = `💡 <strong>Revisa:</strong> ${p.retroalimentacion}`;
-    }
-  });
-
-  const fb = document.getElementById('p5d-feedback-resp');
-  fb.style.display = 'block';
-  if (correctas === sit.preguntas.length) {
-    fb.className = 'prob-feedback ok';
-    fb.textContent = `🎉 ¡Excelente! Respondiste correctamente las ${correctas} preguntas de análisis.`;
-  } else {
-    fb.className = 'prob-feedback parcial';
-    fb.textContent = `${correctas} de ${sit.preguntas.length} respuestas acertadas. Lee la retroalimentación de cada pregunta.`;
-  }
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
+// NOTA: la verificación automática de respuestas por palabras clave fue retirada
+// intencionalmente. El análisis de las respuestas abiertas lo hace el tutor IA
+// (p5dEnviarAlTutor), que evalúa el razonamiento real del estudiante en lugar de
+// coincidencias de texto. Esto respeta la situación a-didáctica: el medio responde
+// al razonamiento, no a la forma exacta de las palabras.
 
 function p5dReset() {
   const sit = P5D_SITUACIONES[p5dSituacionActual];
