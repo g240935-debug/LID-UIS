@@ -2944,22 +2944,10 @@ async function pBEnviarMensajeLibre() {
    Prefijos de sesión: chi3_p15_ … chi3_p24_
 ══════════════════════════════════════════════════════════════ */
 
-// ── Datos compartidos del ejemplo guiado (págs 17, 18, 19, 21) ──
-const CHI3_EJ1 = {
-  titulo: 'Programa × Software (60 estudiantes)',
-  filas: ['Matemáticas','Estadística'],
-  cols:  ['R','Python','SPSS'],
-  O: [[12,11,2],[4,8,8]],
-  N: 60,
-  // Eᵢⱼ calculadas: fᵢ·=[25,20,15] NO — filas son programas
-  // filas: Mat=25, Est=20+15=35? No: Mat=25,Est=35 total 60
-  // Recalculamos: Mat fila=12+11+2=25, Est fila=4+8+8=20 → total 45, falta 15
-  // Ajuste: añadir tercera fila o usar 2x3 con sums correctas
-  // Mat:25, Est:20, Fís:15 → pero HTML solo tiene 2 programas. Usamos Mat+Est
-  // Mat=25,Est=35 → O: [[12,11,2],[10,16,9]] suma=60 ✓
-};
+// ── Datos compartidos del ejemplo guiado (págs 17, 18, 19) ──
 // Matrices correctas para el ejemplo de págs 17-19
-const CHI3_O = [[12,11,2],[10,16,9]]; // Mat(25) + Est(35) = 60
+// Mat(30) + Est(30) = 60. Todas Eᵢⱼ ≥ 5 (mínimo 7). χ²=15.48, rechaza H₀.
+const CHI3_O = [[20,8,2],[6,12,12]]; // Mat: R alto / Est: distribución opuesta
 const CHI3_FILAS = ['Matemáticas','Estadística'];
 const CHI3_COLS  = ['R','Python','SPSS'];
 const CHI3_N     = 60;
@@ -3113,22 +3101,66 @@ function chi3P16Actualizar() {
 
 function chi3P16Verificar() {
   const filas=3,cols=3;
+  const nFilas=['Bus','Bicicleta','A pie'], nCols=['Siempre','A veces','Nunca'];
   let ok=true, msgs=[];
+  // Leer la matriz completa
+  const M=[];
   for(let i=0;i<filas;i++){
-    let rs=0;
-    for(let j=0;j<cols;j++){rs+=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;}
-    if(rs!==CHI3_P16_MARG_F[i]){ok=false;msgs.push(`La fila ${['Bus','Bicicleta','A pie'][i]} suma ${rs}, pero debería sumar ${CHI3_P16_MARG_F[i]}.`);}
+    M[i]=[];
+    for(let j=0;j<cols;j++){M[i][j]=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;}
+  }
+  // 1) Verificar marginales
+  for(let i=0;i<filas;i++){
+    const rs=M[i].reduce((s,v)=>s+v,0);
+    if(rs!==CHI3_P16_MARG_F[i]){ok=false;msgs.push(`La fila ${nFilas[i]} suma ${rs}, pero debería sumar ${CHI3_P16_MARG_F[i]}.`);}
   }
   for(let j=0;j<cols;j++){
-    let cs=0;
-    for(let i=0;i<filas;i++){cs+=parseFloat(document.getElementById(`chi3-p16-${i}-${j}`)?.value)||0;}
-    if(cs!==CHI3_P16_MARG_C[j]){ok=false;msgs.push(`La columna ${['Siempre','A veces','Nunca'][j]} suma ${cs}, pero debería sumar ${CHI3_P16_MARG_C[j]}.`);}
+    let cs=0; for(let i=0;i<filas;i++) cs+=M[i][j];
+    if(cs!==CHI3_P16_MARG_C[j]){ok=false;msgs.push(`La columna ${nCols[j]} suma ${cs}, pero debería sumar ${CHI3_P16_MARG_C[j]}.`);}
   }
   const fb=document.getElementById('chi3-p16-validacion');
   if(!fb) return;
   fb.style.display='block';
-  if(ok){fb.className='prob-feedback ok';fb.textContent='✅ ¡Los marginales se respetan! Tu distribución es matemáticamente válida. Ahora envíala al tutor.';}
-  else{fb.className='prob-feedback error';fb.innerHTML='⚠️ '+msgs.join('<br>');}
+  if(!ok){
+    fb.className='prob-feedback error';
+    fb.innerHTML='⚠️ Los marginales todavía no cuadran:<br>'+msgs.join('<br>');
+    return;
+  }
+  // 2) Marginales correctos → el MEDIO ahora retroalimenta sobre INDEPENDENCIA
+  // Comparar la proporción de cada columna DENTRO de cada fila.
+  // Si hay independencia, la proporción de (p.ej.) "Siempre" debe ser la misma en Bus, Bici y A pie.
+  // El medio muestra las proporciones por fila SIN dar la fórmula — el estudiante ve la consecuencia.
+  let propTxt='<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:.74rem;">';
+  propTxt+='<tr><th style="text-align:left;padding:3px;">% dentro de la fila</th>'+nCols.map(c=>`<th style="padding:3px;">${c}</th>`).join('')+'</tr>';
+  const propsPorCol=[[],[],[]]; // para cada columna, las proporciones de cada fila
+  for(let i=0;i<filas;i++){
+    const rs=CHI3_P16_MARG_F[i];
+    propTxt+=`<tr><td style="padding:3px;font-weight:600;">${nFilas[i]}</td>`;
+    for(let j=0;j<cols;j++){
+      const p=rs>0?(M[i][j]/rs*100):0;
+      propsPorCol[j].push(p);
+      propTxt+=`<td style="padding:3px;text-align:center;">${p.toFixed(0)}%</td>`;
+    }
+    propTxt+='</tr>';
+  }
+  propTxt+='</table>';
+  // Medir cuán diferentes son las proporciones entre filas (rango máximo por columna)
+  let maxRango=0;
+  for(let j=0;j<cols;j++){
+    const r=Math.max(...propsPorCol[j])-Math.min(...propsPorCol[j]);
+    if(r>maxRango) maxRango=r;
+  }
+  if(maxRango<=6){
+    // Proporciones casi iguales entre filas → distribución de independencia lograda
+    fb.className='prob-feedback ok';
+    fb.innerHTML='✅ Los marginales se respetan <strong>y</strong> las proporciones de cada categoría son casi iguales entre las tres filas:'+propTxt+
+      '<br>Eso es justo lo que ocurre cuando las variables <strong>no tienen relación</strong>: el reparto interno "imita" al patrón general. Envíala al tutor para ponerle nombre a lo que construiste.';
+  } else {
+    // Marginales OK pero las proporciones difieren → todavía hay "relación" en el reparto
+    fb.className='prob-feedback parcial';
+    fb.innerHTML='⚠️ Los marginales se respetan, pero observa las proporciones <em>dentro de cada fila</em>:'+propTxt+
+      `<br>Las proporciones cambian bastante de una fila a otra (hasta ${maxRango.toFixed(0)} puntos de diferencia). Si <strong>no</strong> hubiera ninguna relación entre las variables, ¿deberían diferir tanto? Intenta acercar las proporciones de las tres filas.`;
+  }
 }
 
 async function chi3P16EnviarAlTutor() {
@@ -3142,9 +3174,11 @@ async function chi3P16EnviarAlTutor() {
   tablaEst+=`Marginales columna: ${CHI3_P16_MARG_C.join(', ')}\n`;
   tablaEst+=`Eᵢⱼ si hubiera independencia perfecta:\n`;
   filas.forEach((f,i)=>{tablaEst+=`${f}: ${CHI3_P16_E[i].map(v=>v.toFixed(2)).join(', ')}\n`;});
+  const n3=document.getElementById('chi3-p16-n3')?.value||'(sin responder)';
   const ctx=`[CONTEXTO P16 — Construir independencia]
 ${tablaEst}
-El estudiante debe descubrir por sí mismo la fórmula Eᵢⱼ=(fᵢ·×f·ⱼ)/N. NO la des directamente. Devuelve consecuencias matemáticas de su distribución y pregunta si se le ocurre una forma de calcular cada celda con solo los marginales.`;
+Respuesta del estudiante a la pregunta de interpretación (N3) — "si lo observado se pareciera/difiriera de esta tabla sin relación, ¿qué dirías?": ${n3}
+El estudiante debe descubrir por sí mismo la fórmula Eᵢⱼ=(fᵢ·×f·ⱼ)/N. NO la des directamente. Devuelve consecuencias matemáticas de su distribución y pregunta si se le ocurre una forma de calcular cada celda con solo los marginales. Sobre la respuesta N3, empuja: ¿qué tan parecidos o distintos tendrían que ser O y E para hablar de "relación"?`;
   await chi3Enviar('p16', ctx, true);
 }
 
@@ -3159,14 +3193,14 @@ const CHI3_P17_PASOS = [
   },
   {
     titulo: 'Paso 2 — Los totales marginales',
-    desc: 'Los totales de fila (fᵢ·) y columna (f·ⱼ) son la clave para calcular las frecuencias esperadas. <br>Matemáticas: <strong>25</strong>, Estadística: <strong>35</strong><br>R: <strong>22</strong>, Python: <strong>27</strong>, SPSS: <strong>11</strong>',
+    desc: 'Los totales de fila (fᵢ·) y columna (f·ⱼ) son la clave para calcular las frecuencias esperadas. <br>Matemáticas: <strong>30</strong>, Estadística: <strong>30</strong><br>R: <strong>26</strong>, Python: <strong>20</strong>, SPSS: <strong>14</strong>',
     accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'obs'),
     modo: 'obs',
   },
   {
     titulo: 'Paso 3 — Calcular Eᵢⱼ para la primera celda',
     desc: `Si no hubiera relación, esperaríamos que la proporción de usuarios de R en Matemáticas fuera la misma que en el total:<br><br>
-    <code>E[Mat,R] = (fᵢ· × f·ⱼ) / N = (25 × 22) / 60 = <strong>${CHI3_E[0][0].toFixed(2)}</strong></code><br><br>
+    <code>E[Mat,R] = (fᵢ· × f·ⱼ) / N = (30 × 26) / 60 = <strong>${CHI3_E[0][0].toFixed(2)}</strong></code><br><br>
     En cambio, observamos Oᵢⱼ = <strong>${CHI3_O[0][0]}</strong>. ¿Son muy distintos?`,
     accion: () => chi3RenderTbl(CHI3_O, CHI3_E, CHI3_FILAS, CHI3_COLS, CHI3_N, 'esp'),
     modo: 'esp',
@@ -3214,10 +3248,12 @@ function chi3P17ActualizarTabla() {
 }
 async function chi3P17PreguntarTutor() {
   const paso=CHI3_P17_PASOS[chi3P17PasoActual];
+  const n3=document.getElementById('chi3-p17-n3')?.value||'(sin responder)';
   const ctx=`[CONTEXTO P17 — Ejemplo Eᵢⱼ]
 El estudiante está en el ${paso.titulo}. Modo de tabla visible: ${chi3P17Modo}.
 Datos: Oᵢⱼ=${JSON.stringify(CHI3_O)}, Eᵢⱼ=${JSON.stringify(CHI3_E.map(r=>r.map(v=>v.toFixed(2))))}.
-Responde preguntas sobre este paso específico. Usa el nivel de Curcio adecuado. No avances al siguiente paso por el estudiante.`;
+Respuesta del estudiante a la pregunta de interpretación (N3) sobre las diferencias O−E: ${n3}
+Responde preguntas sobre este paso específico. Si la respuesta N3 solo describe el número (N1) sin interpretar, empuja: ¿qué significa esa diferencia en el contexto de programa y software? No avances al siguiente paso por el estudiante.`;
   await chi3Enviar('p17', ctx, true);
 }
 
@@ -3247,16 +3283,20 @@ function chi3P18Render() {
 }
 
 function chi3P18Actualizar() {
-  let chi2=0,todas=true;
+  // TSD: durante la escritura NO damos veredicto correcto/incorrecto por celda.
+  // Solo mostramos la consecuencia aritmética: la contribución que el estudiante ingresó
+  // y cómo se va acumulando el χ². El conflicto surge al comparar con la tabla, no por un semáforo.
+  let chi2=0;
   document.querySelectorAll('.chi3-p18-cell').forEach(inp=>{
-    const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);
-    const contrib=document.getElementById(inp.id.replace('chi3-p18-','chi3-p18-contrib-').replace(/(-\d+-\d+)/,'$1'));
+    const v=parseFloat(inp.value);
+    const ij = inp.id.replace('chi3-p18-','');
+    const contrib=document.getElementById(`chi3-p18-contrib-${ij}`);
     if(!isNaN(v)){
       chi2+=v;
-      inp.classList.toggle('p5c-ok',Math.abs(v-c)<0.011);
-      inp.classList.toggle('p5c-err',Math.abs(v-c)>=0.011);
       if(contrib) contrib.textContent=v.toFixed(4);
-    } else { todas=false; if(contrib) contrib.textContent='—'; }
+    } else {
+      if(contrib) contrib.textContent='—';
+    }
   });
   const bar=document.getElementById('chi3-p18-acum-bar');
   const val=document.getElementById('chi3-p18-acum-val');
@@ -3266,15 +3306,27 @@ function chi3P18Actualizar() {
 
 function chi3P18Verificar() {
   const inputs=document.querySelectorAll('.chi3-p18-cell');
-  let ok=0,total=inputs.length;
+  let sumaEst=0, vacias=0;
   inputs.forEach(inp=>{
-    const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);
-    if(!isNaN(v)&&Math.abs(v-c)<0.011) ok++;
+    if(inp.value==='') vacias++;
+    else sumaEst+=parseFloat(inp.value)||0;
   });
   const fb=document.getElementById('chi3-p18-feedback');
   fb.style.display='block';
-  if(ok===total){fb.className='prob-feedback ok';fb.textContent=`✅ ¡Correcto! χ² = ${CHI3_CHI2.toFixed(4)}. Todas las contribuciones son correctas. Consulta al tutor.`;}
-  else{fb.className='prob-feedback parcial';fb.textContent=`${ok}/${total} contribuciones correctas. Las rojas tienen error.`;}
+  if(vacias>0){
+    fb.className='prob-feedback parcial';
+    fb.textContent=`Aún faltan ${vacias} celda(s) por calcular. Completa la contribución de cada celda antes de comparar tu χ².`;
+    return;
+  }
+  // Consecuencia, no veredicto: comparar la suma del estudiante con la esperada
+  const diff=Math.abs(sumaEst-CHI3_CHI2);
+  if(diff<0.05){
+    fb.className='prob-feedback ok';
+    fb.innerHTML=`Tu χ² acumulado es <strong>${sumaEst.toFixed(4)}</strong>. Las contribuciones que calculaste son consistentes entre sí y con la tabla. Ahora consulta al tutor sobre qué <em>significa</em> ese número.`;
+  } else {
+    fb.className='prob-feedback parcial';
+    fb.innerHTML=`Tu χ² acumulado da <strong>${sumaEst.toFixed(4)}</strong>. Revisa celda por celda: para cada una, ¿la diferencia (Oᵢⱼ−Eᵢⱼ) al cuadrado, dividida entre Eᵢⱼ, coincide con lo que escribiste? Una de las contribuciones no está cuadrando con las demás.`;
+  }
 }
 
 async function chi3P18EnviarAlTutor() {
@@ -3283,13 +3335,15 @@ async function chi3P18EnviarAlTutor() {
   inputs.forEach(inp=>{detalle+=`  ${inp.id}: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correct}\n`;});
   const q1=document.getElementById('chi3-p18-q1')?.value||'(sin responder)';
   const q2=document.getElementById('chi3-p18-q2')?.value||'(sin responder)';
+  const q3=document.getElementById('chi3-p18-q3')?.value||'(sin responder)';
   const ctx=`[CONTEXTO P18 — Calcular χ²]
 Oᵢⱼ=${JSON.stringify(CHI3_O)}, Eᵢⱼ=${JSON.stringify(CHI3_E.map(r=>r.map(v=>v.toFixed(2))))}.
 χ² correcto = ${CHI3_CHI2.toFixed(4)}.
 Contribuciones ingresadas:\n${detalle}
 P1 (¿Por qué elevar al cuadrado?): ${q1}
 P2 (¿Qué significa χ²=0?): ${q2}
-Analiza los cálculos y las respuestas conceptuales. Empuja hacia N3: ¿qué celdas contribuyen más y qué significa desde el contexto?`;
+P3 (N3 — celda de mayor contribución y qué revela): ${q3}
+Analiza los cálculos y las tres respuestas. P1 y P2 son N2 (concepto). P3 es N3 (interpretación). Si P3 solo nombra la celda sin contar la "historia" de la asociación, empuja a interpretar. No des la respuesta directa.`;
   await chi3Enviar('p18', ctx, true);
 }
 
@@ -3326,24 +3380,52 @@ const CHI3_P20_CASOS = [
   {gl:3,chi2:6.5,desc:'Tabla 2×4 (8 celdas)',vc:7.815},
   {gl:5,chi2:6.5,desc:'Tabla 3×3 (9 celdas)',vc:11.07},
 ];
+let chi3P20Revelado = false;
 
 function chi3P20Render() {
+  chi3P20Revelado = false;
+  chi3P20RenderCasos();
+}
+
+function chi3P20RenderCasos() {
   const el=document.getElementById('chi3-p20-casos');
   if(!el) return;
-  let h='<div class="chi3-p20-casos-grid">';
+  let h='';
+  // Situación de FORMULACIÓN: primero solo gl y χ². El estudiante conjetura
+  // dónde hay más evidencia ANTES de ver el valor crítico.
+  if(!chi3P20Revelado){
+    h+=`<div class="chi3-p20-conjetura-aviso">🔮 <strong>Antes de revelar:</strong> los tres casos tienen el <strong>mismo χ² = 6.5</strong> pero distinto tamaño de tabla. Conjetura: ¿en cuál crees que hay <em>más</em> evidencia de asociación? Anótalo en la reflexión de abajo y luego pulsa "Revelar valores críticos".</div>`;
+  }
+  h+='<div class="chi3-p20-casos-grid">';
   CHI3_P20_CASOS.forEach((c,i)=>{
     const rechaza=c.chi2>c.vc;
-    h+=`<div class="chi3-caso-card ${rechaza?'chi3-caso-rechaza':'chi3-caso-no-rechaza'}">
+    const claseCard = chi3P20Revelado ? (rechaza?'chi3-caso-rechaza':'chi3-caso-no-rechaza') : 'chi3-caso-oculto';
+    h+=`<div class="chi3-caso-card ${claseCard}">
       <div class="chi3-caso-num">Caso ${i+1}</div>
       <div class="chi3-caso-desc">${c.desc}</div>
       <div class="chi3-caso-dato">gl = <strong>${c.gl}</strong></div>
-      <div class="chi3-caso-dato">χ² = <strong>${c.chi2}</strong></div>
-      <div class="chi3-caso-dato">χ²crítico = <strong>${c.vc}</strong></div>
-      <div class="chi3-caso-resultado">${rechaza?'✅ Se rechaza H₀':'❌ No se rechaza H₀'}</div>
-    </div>`;
+      <div class="chi3-caso-dato">χ² = <strong>${c.chi2}</strong></div>`;
+    if(chi3P20Revelado){
+      h+=`<div class="chi3-caso-dato">χ²crítico = <strong>${c.vc}</strong></div>
+          <div class="chi3-caso-resultado">${rechaza?'✅ Se rechaza H₀':'❌ No se rechaza H₀'}</div>`;
+    } else {
+      h+=`<div class="chi3-caso-dato chi3-caso-tapado">χ²crítico = <strong>?</strong></div>
+          <div class="chi3-caso-resultado chi3-caso-tapado">¿Se rechaza H₀?</div>`;
+    }
+    h+=`</div>`;
   });
   h+='</div>';
+  if(!chi3P20Revelado){
+    h+=`<button class="btn-verificar" style="background:var(--gold);color:var(--ink);margin-top:10px;" onclick="chi3P20Revelar()">🔓 Revelar valores críticos</button>`;
+  } else {
+    h+=`<div class="chi3-p20-revelado-nota">Observa: con el mismo χ²=6.5, el Caso 1 (tabla pequeña) <strong>sí</strong> rechaza H₀, pero los casos con más grados de libertad <strong>no</strong>. A mayor número de celdas, el umbral de evidencia sube. ¿Por qué crees que ocurre esto?</div>`;
+  }
   el.innerHTML=h;
+}
+
+function chi3P20Revelar() {
+  chi3P20Revelado = true;
+  chi3P20RenderCasos();
 }
 
 function chi3P20Verificar() {
@@ -3352,19 +3434,28 @@ function chi3P20Verificar() {
   const vc=parseFloat(document.getElementById('chi3-p20-vc')?.value);
   const glCorr=2, chi2Corr=parseFloat(CHI3_CHI2.toFixed(3)), vcCorr=5.991;
   let msgs=[];
-  if(gl!==glCorr) msgs.push(`gl = (2−1)(3−1) = ${glCorr}, no ${gl}.`);
-  if(Math.abs(chi2-chi2Corr)>0.1) msgs.push(`χ² calculado ≈ ${chi2Corr}, no ${chi2}.`);
-  if(Math.abs(vc-vcCorr)>0.01) msgs.push(`Valor crítico para gl=2 y α=0.05 es ${vcCorr}.`);
-  const fb=document.getElementById('chi3-p18-feedback'); // reutilizar un elemento cercano
-  // Mostrar feedback inline
+  // Consecuencias, no veredictos
+  if(isNaN(gl)) msgs.push('Aún no calculaste los grados de libertad.');
+  else if(gl!==glCorr) msgs.push(`Tienes gl=${gl}. Recuerda: gl=(filas−1)(columnas−1). Con una tabla 2×3, ¿cuánto da?`);
+  if(isNaN(chi2)) msgs.push('Falta el χ² que calculaste en la pág. anterior.');
+  else if(Math.abs(chi2-chi2Corr)>0.1) msgs.push(`El χ² que registraste (${chi2}) no coincide con el que obtuviste antes (${chi2Corr}). Revísalo.`);
+  if(isNaN(vc)) msgs.push('Falta ubicar el valor crítico en la tabla para tu gl.');
+  else if(Math.abs(vc-vcCorr)>0.01) msgs.push(`Busca en la tabla la fila de gl=${glCorr}: el valor crítico para α=0.05 está allí.`);
+
   const wrap=document.getElementById('chi3-p20-casos');
+  // Quitar feedback previo
+  document.getElementById('chi3-p20-verif-fb')?.remove();
   const fbEl=document.createElement('div');
-  fbEl.className=msgs.length===0?'prob-feedback ok':'prob-feedback parcial';
-  fbEl.innerHTML=msgs.length===0
-    ?`✅ ¡Correcto! gl=${glCorr}, χ²≈${chi2Corr}, vc=${vcCorr}. Como χ²>${vcCorr}, se rechaza H₀: hay evidencia de asociación.`
-    :`⚠️ Revisa: ${msgs.join(' ')}`;
+  fbEl.id='chi3-p20-verif-fb';
+  if(msgs.length===0){
+    fbEl.className='prob-feedback ok';
+    const rechaza=chi2Corr>vcCorr;
+    fbEl.innerHTML=`gl=${glCorr}, χ²=${chi2Corr}, valor crítico=${vcCorr}. Como χ² ${rechaza?'>':'<'} valor crítico, ${rechaza?'<strong>se rechaza H₀</strong>: hay evidencia de asociación entre programa y software.':'<strong>no se rechaza H₀</strong>.'} ¿Qué significa esto en el contexto del problema? Coméntalo con el tutor.`;
+  } else {
+    fbEl.className='prob-feedback parcial';
+    fbEl.innerHTML='Revisa:<br>'+msgs.join('<br>');
+  }
   wrap.parentNode.insertBefore(fbEl, wrap.nextSibling);
-  setTimeout(()=>fbEl.remove(),6000);
 }
 
 async function chi3P20EnviarAlTutor() {
@@ -3520,22 +3611,55 @@ function chi3P24Render(){
 }
 
 function chi3P24VerifE(){
-  const inputs=document.querySelectorAll('.chi3-p24-e-cell');
-  let ok=0;inputs.forEach(inp=>{const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);if(!isNaN(v)&&Math.abs(v-c)<0.1){ok++;inp.classList.add('p5c-ok');}else if(inp.value) inp.classList.add('p5c-err');});
+  // TSD: consecuencia, no veredicto cromático. Revisamos coherencia de cada Eᵢⱼ
+  // con la regla de que cada fila de Eᵢⱼ debe sumar el marginal de esa fila.
   const fb=document.getElementById('chi3-p24-fb-e');fb.style.display='block';
-  fb.className=ok===inputs.length?'prob-feedback ok':'prob-feedback parcial';
-  fb.textContent=ok===inputs.length?`✅ Todas las Eᵢⱼ son correctas.`:`${ok}/${inputs.length} correctas.`;
+  let vacias=0;
+  CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
+    if((document.getElementById(`chi3-p24-e-${i}-${j}`)?.value||'')==='') vacias++;
+  }));
+  if(vacias>0){fb.className='prob-feedback parcial';fb.textContent=`Faltan ${vacias} celda(s) de Eᵢⱼ por calcular.`;return;}
+  // Comparar sumas de fila de las Eᵢⱼ ingresadas con los marginales
+  const margF=CHI3_P24_O.map(r=>r.reduce((s,v)=>s+v,0));
+  let inconsistencias=[];
+  CHI3_P24_FILAS.forEach((f,i)=>{
+    let rs=0;
+    CHI3_P24_COLS.forEach((_,j)=>{rs+=parseFloat(document.getElementById(`chi3-p24-e-${i}-${j}`)?.value)||0;});
+    if(Math.abs(rs-margF[i])>0.5) inconsistencias.push(`La fila ${f} de tus Eᵢⱼ suma ${rs.toFixed(1)}, pero el total real de esa fila es ${margF[i]}.`);
+  });
+  if(inconsistencias.length===0){
+    fb.className='prob-feedback ok';
+    fb.innerHTML='Tus Eᵢⱼ son coherentes: cada fila suma su marginal correcto. Eso confirma que aplicaste bien la fórmula. Continúa con las contribuciones.';
+  } else {
+    fb.className='prob-feedback parcial';
+    fb.innerHTML='Revisa: '+inconsistencias.join('<br>')+'<br>Recuerda que las Eᵢⱼ de una fila siempre suman el total de esa fila.';
+  }
 }
 
 function chi3P24VerifChi(){
-  const inputs=document.querySelectorAll('.chi3-p24-contrib-cell');
-  let ok=0;inputs.forEach(inp=>{const v=parseFloat(inp.value),c=parseFloat(inp.dataset.correct);if(!isNaN(v)&&Math.abs(v-c)<0.011){ok++;inp.classList.add('p5c-ok');}else if(inp.value) inp.classList.add('p5c-err');});
-  const tot=document.getElementById('chi3-p24-chi2-total');
-  const totOk=tot&&Math.abs(parseFloat(tot.value)-CHI3_P24_CHI2)<0.1;
-  if(totOk) tot?.classList.add('p5c-ok');
   const fb=document.getElementById('chi3-p24-fb-chi');fb.style.display='block';
-  fb.className=(ok===inputs.length&&totOk)?'prob-feedback ok':'prob-feedback parcial';
-  fb.textContent=(ok===inputs.length&&totOk)?`✅ χ² = ${CHI3_P24_CHI2.toFixed(4)}. ¡Correcto!`:`Contribuciones: ${ok}/${inputs.length} correctas.`;
+  let sumaEst=0,vacias=0;
+  document.querySelectorAll('.chi3-p24-contrib-cell').forEach(inp=>{
+    if(inp.value==='') vacias++; else sumaEst+=parseFloat(inp.value)||0;
+  });
+  if(vacias>0){fb.className='prob-feedback parcial';fb.textContent=`Faltan ${vacias} contribución(es) por calcular.`;return;}
+  const tot=document.getElementById('chi3-p24-chi2-total');
+  const totEst=parseFloat(tot?.value);
+  // Consecuencia 1: ¿la suma manual del total coincide con la suma de las contribuciones?
+  if(!isNaN(totEst) && Math.abs(totEst-sumaEst)>0.05){
+    fb.className='prob-feedback parcial';
+    fb.innerHTML=`Tu χ² total dice <strong>${totEst.toFixed(4)}</strong>, pero al sumar tus propias contribuciones celda por celda da <strong>${sumaEst.toFixed(4)}</strong>. Esas dos cifras deberían coincidir — revisa la suma.`;
+    return;
+  }
+  // Consecuencia 2: comparar con el χ² coherente con la tabla
+  const diff=Math.abs(sumaEst-CHI3_P24_CHI2);
+  if(diff<0.1){
+    fb.className='prob-feedback ok';
+    fb.innerHTML=`Tu χ² = <strong>${sumaEst.toFixed(4)}</strong>. Las contribuciones son consistentes con la tabla. Ahora compáralo con el valor crítico para decidir.`;
+  } else {
+    fb.className='prob-feedback parcial';
+    fb.innerHTML=`Tu χ² acumulado da <strong>${sumaEst.toFixed(4)}</strong>. Revisa cada contribución: (Oᵢⱼ−Eᵢⱼ)²/Eᵢⱼ. Alguna celda no está cuadrando con las Eᵢⱼ que ya validaste.`;
+  }
 }
 
 async function chi3P24EnviarAlTutor(){
