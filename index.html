@@ -308,7 +308,7 @@ Tabla de frecuencia → Gráfico circular.</div>
           </table>
         </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(5)">← Actividad</button>
+          <button class="btn-nav prev" onclick="irAPagina(3)">← Actividad</button>
           <button class="btn-nav next" onclick="irAPagina('5b')">Ejemplo Dinámico →</button>
         </div>
       </div>
@@ -362,7 +362,6 @@ Tabla de frecuencia → Gráfico circular.</div>
             <div class="ejf-grafico-tabs" id="ejf-grafico-tabs">
               <button class="ejf-gtab active" id="ejf-gtab-barras" onclick="ejfCambiarGrafico('barras')">Barras</button>
               <button class="ejf-gtab" id="ejf-gtab-pie" onclick="ejfCambiarGrafico('pie')">Pastel</button>
-              <button class="ejf-gtab" id="ejf-gtab-acum" onclick="ejfCambiarGrafico('acum')">Acumulada</button>
             </div>
             <div style="max-height:320px;position:relative;">
               <canvas id="ejf-canvas" style="max-height:300px;"></canvas>
@@ -487,7 +486,6 @@ Tabla de frecuencia → Gráfico circular.</div>
             <div id="p5d-preguntas-list"></div>
             <div class="p5d-resp-acciones">
               <button class="btn-verificar" style="background:var(--navy);" onclick="p5dEnviarAlTutor()">💬 Enviar al tutor</button>
-              <button class="btn-verificar" style="background:var(--moss);" onclick="p5dVerificarRespuestas()">📋 Auto-verificar</button>
             </div>
             <div class="prob-feedback" id="p5d-feedback-resp" style="display:none;"></div>
 
