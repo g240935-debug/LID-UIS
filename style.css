@@ -2346,7 +2346,7 @@ html, body {
   min-height: 180px !important;
   max-height: 280px !important;
 }
-@media (max-width: 900px) {
+@media (max-width: 820px) {
   .chi3-descubre-paso2-grid.tutor-abierto {
     grid-template-columns: 1fr;
   }
