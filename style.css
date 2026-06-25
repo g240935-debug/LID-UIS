@@ -2296,3 +2296,24 @@ html, body {
   border-left: 3px solid var(--sky);
   background: #eef5fb;
 }
+
+/* ── Pág 18: momento a-didáctico de descubrimiento del cuadrado ── */
+.chi3-descubre {
+  display: flex; flex-direction: column; gap: 12px; margin: 8px 0;
+}
+.chi3-descubre-paso {
+  background: #fdf6e3; border: 1px solid #e0c870;
+  border-radius: 4px; padding: 14px;
+}
+.chi3-descubre-titulo {
+  font-size: .85rem; font-weight: 700; color: #6a5410; margin-bottom: 8px;
+}
+.chi3-descubre-txt {
+  font-size: .82rem; line-height: 1.55; margin: 6px 0; color: var(--ink);
+}
+.chi3-descubre-input-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+}
+.chi3-descubre-input-row label {
+  font-size: .8rem; font-weight: 600; color: var(--ink);
+}
