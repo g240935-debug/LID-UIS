@@ -1443,23 +1443,34 @@ Tabla de frecuencia → Gráfico circular.</div>
             <button class="btn-verificar" style="background:var(--moss);" onclick="chi3P18Verificar()">✅ Verificar cálculos</button>
             <button class="btn-verificar" style="background:var(--navy);" onclick="chi3P18EnviarAlTutor()">💬 Consultar tutor</button>
           </div>
-          <div class="tutor-panel p5d-tutor-panel" id="chi3-p18-tutor" style="display:none;margin-top:12px;">
-            <div class="tutor-header" style="background:#1a3a5a;">
-              <div class="tutor-avatar">🎓</div>
-              <div class="tutor-info">
-                <div class="tutor-name">Tutor Virtual UIS</div>
-                <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p18">Analizando…</span></div>
-              </div>
-              <button class="audio-toggle-btn" id="audio-btn-chi3-p18" onclick="toggleAudio('chi3-p18')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p18"><span></span><span></span><span></span></span></button>
-            </div>
-            <div id="chat-chi3-p18" class="chat-box p5d-chat-box"></div>
-            <div class="chat-input-area">
-              <input type="text" id="input-chi3-p18" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p18')">
-              <button class="btn-send" onclick="chi3ChatLibre('p18')">Enviar <span class="send-icon">↑</span></button>
-            </div>
+          <div class="prob-bottom-row">
+            <button class="btn-verificar" style="background:var(--moss);" onclick="chi3P18Verificar()">✅ Verificar cálculos</button>
+            <button class="btn-verificar" style="background:var(--navy);" onclick="chi3P18EnviarAlTutor()">💬 Consultar tutor</button>
           </div>
-          </div><!-- /chi3-p18-calculo -->
+          
+        </div><div class="tutor-panel p5d-tutor-panel" id="chi3-p18-tutor" style="display:none;margin-top:12px;">
+          <div class="tutor-header" style="background:#1a3a5a;">
+            <div class="tutor-avatar">🎓</div>
+            <div class="tutor-info">
+              <div class="tutor-name">Tutor Virtual UIS</div>
+              <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p18">Analizando…</span></div>
+            </div>
+            <button class="audio-toggle-btn" id="audio-btn-chi3-p18" onclick="toggleAudio('chi3-p18')" title="Activar voz">
+              <span class="audio-icon">🔇</span>
+              <span class="audio-waves" id="audio-waves-chi3-p18"><span></span><span></span><span></span></span>
+            </button>
+          </div>
+          <div id="chat-chi3-p18" class="chat-box p5d-chat-box"></div>
+          <div class="chat-input-area">
+            <input type="text" id="input-chi3-p18" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p18')">
+            <button class="btn-send" onclick="chi3ChatLibre('p18')">Enviar <span class="send-icon">↑</span></button>
+          </div>
         </div>
+
+      </div><div class="page-footer">
+        <button class="btn-nav prev" onclick="irAPagina(17)">← Ejemplo Eᵢⱼ</button>
+        <button class="btn-nav next" onclick="irAPagina(19)">Síntesis →</button>
+      </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(17)">← Ejemplo Eᵢⱼ</button>
           <button class="btn-nav next" onclick="irAPagina(19)">Síntesis →</button>
