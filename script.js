@@ -3233,11 +3233,9 @@ function chi3P18Render() {
   if(sumaInp) sumaInp.value='';
   const idea=document.getElementById('chi3-p18-idea-cuadrado');
   if(idea) idea.value='';
-  // Reset del panel del tutor de descubrimiento y del botón continuar
+  // Reset del panel del tutor de descubrimiento
   const descWrap=document.getElementById('chi3-p18-desc-tutor-wrap');
   if(descWrap) descWrap.style.display='none';
-  const continuarBtn=document.getElementById('chi3-p18-continuar-btn');
-  if(continuarBtn) continuarBtn.style.display='none';
   const descChat=document.getElementById('chat-chi3-p18-desc');
   if(descChat) descChat.innerHTML='';
 
@@ -3302,43 +3300,68 @@ function chi3P18DescubreSuma() {
   if(paso2){ paso2.style.display='block'; setTimeout(()=>paso2.scrollIntoView({behavior:'smooth',block:'nearest'}),200); }
 }
 
-// Paso 2: el estudiante propone elevar al cuadrado → se abre tutor dedicado al lado
+// Paso 2: el estudiante propone elevar al cuadrado → se abre tutor dedicado al lado.
+// El tutor (no el estudiante) decide cuándo la comprensión es suficiente para avanzar:
+// cuando lo detecta, escribe la frase-señal "[AVANZAR]" en su respuesta, y el frontend
+// la usa para revelar el paso 3 automáticamente (sin botón de autorreporte).
 async function chi3P18DescubreIdea() {
   const idea=document.getElementById('chi3-p18-idea-cuadrado')?.value||'(sin responder)';
-  // Revelar el panel del tutor de descubrimiento (no toca el paso 3 ni la tabla)
   const wrap=document.getElementById('chi3-p18-desc-tutor-wrap');
   if(wrap) wrap.style.display='flex';
-  const sid=`chi3_p18_${sessionId}`;
-  const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado]
+  const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado · turno inicial]
 El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
-Ahora propone esta forma de eliminar el problema de los signos: "${idea}"
-Si propone elevar al cuadrado (o valor absoluto), reconoce que va por buen camino y explica brevemente por qué el cuadrado es preferible (penaliza más las diferencias grandes y es matemáticamente manejable). Si propone otra cosa o no responde, guíalo con una pregunta: ¿qué operación convierte −5 y +5 en el mismo valor positivo? No reveles la fórmula completa de χ² todavía; solo valida la idea del cuadrado.`;
-  agregarMensajeGen('chat-chi3-p18-desc', '📋 Enviando mi propuesta…', 'user');
+Propuesta del estudiante para eliminar el problema de los signos: "${idea}"
+
+Tu tarea: dialogar con el estudiante hasta que muestre que comprende por qué elevar al cuadrado resuelve el problema. NO reveles la fórmula completa de χ² todavía.
+
+Reglas de avance (CRÍTICAS):
+- Si la propuesta del estudiante es elevar al cuadrado O usar valor absoluto: valida la idea, pero cuestiónalo con una pregunta breve para que ARGUMENTE por qué funciona (no basta con que lo nombre). Una vez argumente con sus palabras que el cuadrado/valor absoluto convierte los negativos en positivos y por eso evita la cancelación, considera que comprendió.
+- Si propone otra cosa o no responde: guíalo con una pregunta — "¿qué operación convierte −5 y +5 en el mismo valor positivo?" — sin dar la respuesta.
+- Cuando, y SOLO cuando, el estudiante haya argumentado con sus palabras por qué el cuadrado (o valor absoluto) resuelve la cancelación de signos, termina tu respuesta con esta frase-señal exacta en una línea aparte, sin formato adicional:
+[AVANZAR]
+- Nunca escribas [AVANZAR] en el primer intercambio aunque la propuesta sea correcta — primero pide la argumentación. La señal va solo después de que el estudiante haya razonado, no solo nombrado.`;
+  await chi3P18DescEnviar(ctx);
+}
+
+// Chat libre del tutor de descubrimiento (sigue detectando la señal [AVANZAR])
+async function chi3P18DescChatLibre() {
+  const inp=document.getElementById('input-chi3-p18-desc');
+  if(!inp?.value.trim()) return;
+  const txt=inp.value.trim(); inp.value='';
+  agregarMensajeGen('chat-chi3-p18-desc', txt, 'user');
+  await chi3P18DescEnviar(txt);
+}
+
+// Envía mensaje al tutor del descubrimiento, detecta [AVANZAR] y revela paso 3
+async function chi3P18DescEnviar(mensaje) {
+  const sid=`chi3_p18_${sessionId}`;
+  if(mensaje.startsWith('[CONTEXTO')) agregarMensajeGen('chat-chi3-p18-desc', '📋 Enviando mi propuesta…', 'user');
   const tid = agregarTypingGen('chat-chi3-p18-desc');
   setStatusGen('ts-chi3-p18-desc','Analizando…');
   try {
     const res = await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:ctx,session_id:sid})});
+      body:JSON.stringify({message:mensaje,session_id:sid})});
     const data = await res.json();
     quitarTypingGen(tid); setStatusGen('ts-chi3-p18-desc','En línea');
-    if(data.reply) agregarMensajeGen('chat-chi3-p18-desc',data.reply,'tutor');
+    if(data.reply){
+      // Detectar la señal del tutor para revelar paso 3
+      const avanzar = data.reply.includes('[AVANZAR]');
+      // Mostrar el mensaje SIN la frase-señal (el estudiante no la ve)
+      const visible = data.reply.replace(/\[AVANZAR\]/g,'').trim();
+      agregarMensajeGen('chat-chi3-p18-desc', visible, 'tutor');
+      if(avanzar){
+        // El tutor validó: revelar paso 3 y la tabla de cálculo
+        const paso3=document.getElementById('chi3-descubre-paso3');
+        const calculo=document.getElementById('chi3-p18-calculo');
+        if(paso3) paso3.style.display='block';
+        if(calculo) calculo.style.display='block';
+        setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),400);
+      }
+    }
   } catch(e) {
     quitarTypingGen(tid); setStatusGen('ts-chi3-p18-desc','En línea');
     agregarMensajeGen('chat-chi3-p18-desc','Problema de conexión. Intenta de nuevo.','tutor');
   }
-  // Mostrar el botón "continuar al paso siguiente" tras el primer intercambio
-  const btn=document.getElementById('chi3-p18-continuar-btn');
-  if(btn) btn.style.display='block';
-  setTimeout(()=>wrap?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
-}
-
-// Paso 3: el estudiante decide cuándo continuar tras dialogar con el tutor
-function chi3P18ContinuarPaso3() {
-  const paso3=document.getElementById('chi3-descubre-paso3');
-  const calculo=document.getElementById('chi3-p18-calculo');
-  if(paso3) paso3.style.display='block';
-  if(calculo) calculo.style.display='block';
-  setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
 }
 
 function chi3P18Actualizar() {
