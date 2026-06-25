@@ -2325,14 +2325,17 @@ html, body {
   gap: 12px;
   align-items: start;
 }
-/* Cuando el tutor del descubrimiento se hace visible (display:flex), se activa el grid 2-col en escritorio */
-.chi3-descubre-paso2-grid:has(.chi3-descubre-tutor-wrap[style*="flex"]) {
+/* Clase añadida por JS cuando el tutor se activa */
+.chi3-descubre-paso2-grid.tutor-abierto {
   grid-template-columns: 1fr 1fr;
 }
 .chi3-descubre-tutor-wrap {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 8px;
+}
+.chi3-descubre-tutor-wrap.activo {
+  display: flex;
 }
 .chi3-descubre-tutor-wrap .p5d-tutor-panel {
   border: 1px solid var(--rule);
@@ -2344,7 +2347,7 @@ html, body {
   max-height: 280px !important;
 }
 @media (max-width: 900px) {
-  .chi3-descubre-paso2-grid:has(.chi3-descubre-tutor-wrap[style*="flex"]) {
+  .chi3-descubre-paso2-grid.tutor-abierto {
     grid-template-columns: 1fr;
   }
 }
