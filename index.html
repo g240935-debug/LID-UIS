@@ -1397,25 +1397,9 @@ Tabla de frecuencia → Gráfico circular.</div>
               <button class="btn-verificar" style="background:var(--navy);margin-top:6px;" onclick="chi3P18DescubreIdea()">💬 Discutir con el tutor</button>
             </div>
 
-            <!-- Panel del tutor del descubrimiento (aparece al lado en escritorio) -->
-            <div class="chi3-descubre-tutor-wrap" id="chi3-p18-desc-tutor-wrap">
-              <div class="tutor-panel p5d-tutor-panel" id="chi3-p18-desc-tutor">
-                <div class="tutor-header" style="background:#1a3a5a;">
-                  <div class="tutor-avatar">🎓</div>
-                  <div class="tutor-info">
-                    <div class="tutor-name">Tutor Virtual UIS</div>
-                    <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p18-desc">Analizando…</span></div>
-                  </div>
-                  <button class="audio-toggle-btn" id="audio-btn-chi3-p18-desc" onclick="toggleAudio('chi3-p18-desc')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p18-desc"><span></span><span></span><span></span></span></button>
-                </div>
-                <div class="tutor-context-strip" style="border-left-color:var(--gold);">💡 Discute tu propuesta con el tutor. Cuando él vea que comprendiste por qué el cuadrado resuelve el problema, avanzarás al paso siguiente.</div>
-                <div id="chat-chi3-p18-desc" class="chat-box p5d-chat-box"></div>
-                <div class="chat-input-area">
-                  <input type="text" id="input-chi3-p18-desc" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3P18DescChatLibre()">
-                  <button class="btn-send" onclick="chi3P18DescChatLibre()">Enviar <span class="send-icon">↑</span></button>
-                </div>
-              </div>
-            </div>
+            <!-- Panel del tutor del descubrimiento ELIMINADO:
+                 El botón "Discutir con el tutor" envía al tutor principal (abajo)
+                 para evitar problemas de layout -->
             </div><!-- /chi3-descubre-paso2-grid -->
 
             <div class="chi3-descubre-paso" id="chi3-descubre-paso3" style="display:none;">
