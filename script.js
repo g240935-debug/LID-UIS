@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════════
    LID — script.js
    Conexión al backend: https://lid-uis.onrender.com/api/chat
-   No modificar URL_BACKEND sin actualizar el servidor
+   No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINAS
+   MAPA DE PÁGINAS:
    0  → Portada 
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
@@ -2990,7 +2990,7 @@ async function chi3ChatLibre(pageId) {
 }
 
 // Registrar audio para todos los tutores chi3 (incluido el tutor dedicado al descubrimiento de pág 18)
-['p15','p16','p17','p18','p18-desc','p19','p20','p21','p22','p23','p24'].forEach(pid=>{
+['p15','p16','p17','p18','p19','p20','p21','p22','p23','p24'].forEach(pid=>{
   AUDIO_MAP[`chi3-${pid}`] = {btn:`audio-btn-chi3-${pid}`, waves:`audio-waves-chi3-${pid}`};
   BOX_TO_AUDIO[`chat-chi3-${pid}`] = `chi3-${pid}`;
   audioState[`chi3-${pid}`] = false;
@@ -3233,13 +3233,10 @@ function chi3P18Render() {
   if(sumaInp) sumaInp.value='';
   const idea=document.getElementById('chi3-p18-idea-cuadrado');
   if(idea) idea.value='';
-  // Reset del panel del tutor de descubrimiento (quitar clases, no style)
-  const descWrap=document.getElementById('chi3-p18-desc-tutor-wrap');
-  if(descWrap) descWrap.classList.remove('activo');
-  const grid=document.querySelector('.chi3-descubre-paso2-grid');
-  if(grid) grid.classList.remove('tutor-abierto');
-  const descChat=document.getElementById('chat-chi3-p18-desc');
-  if(descChat) descChat.innerHTML='';
+  // Reset del tutor principal de pág 18
+  const mainChat=document.getElementById('chat-chi3-p18');
+  if(mainChat) mainChat.innerHTML='';
+  setStatusGen('ts-chi3-p18','En espera…');
 
   // Poblar la lista de diferencias Oᵢⱼ − Eᵢⱼ (sin cuadrado) para el paso 1
   const difsEl=document.getElementById('chi3-p18-difs-display');
@@ -3308,21 +3305,9 @@ function chi3P18DescubreSuma() {
 // la usa para revelar el paso 3 automáticamente (sin botón de autorreporte).
 async function chi3P18DescubreIdea() {
   const idea=document.getElementById('chi3-p18-idea-cuadrado')?.value||'(sin responder)';
-  // Asegurar que paso 2 esté visible (por si el estudiante manipuló el DOM)
-  const paso2=document.getElementById('chi3-descubre-paso2');
-  if(paso2 && paso2.style.display==='none') paso2.style.display='block';
-  // Activar tutor al lado: añadir clases en vez de manipular style (más robusto)
-  const wrap=document.getElementById('chi3-p18-desc-tutor-wrap');
-  const grid=document.querySelector('.chi3-descubre-paso2-grid');
-  if(wrap) wrap.classList.add('activo');
-  if(grid) grid.classList.add('tutor-abierto');
-  // Asegurar que el panel del tutor sea visible: scroll a él tras un frame
-  setTimeout(()=>{
-    const headerTutor=document.getElementById('chi3-p18-desc-tutor');
-    if(headerTutor && typeof headerTutor.scrollIntoView==='function'){
-      headerTutor.scrollIntoView({behavior:'smooth',block:'center'});
-    }
-  }, 100);
+  // Mostrar el tutor principal de pág 18 (el que ya funciona, debajo de la tabla)
+  const panelPrincipal=document.getElementById('chi3-p18-tutor');
+  if(panelPrincipal) panelPrincipal.style.display='flex';
   const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado · turno inicial]
 El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
 Propuesta del estudiante para eliminar el problema de los signos: "${idea}"
@@ -3335,37 +3320,21 @@ Reglas de avance (CRÍTICAS):
 - Cuando, y SOLO cuando, el estudiante haya argumentado con sus palabras por qué el cuadrado (o valor absoluto) resuelve la cancelación de signos, termina tu respuesta con esta frase-señal exacta en una línea aparte, sin formato adicional:
 [AVANZAR]
 - Nunca escribas [AVANZAR] en el primer intercambio aunque la propuesta sea correcta — primero pide la argumentación. La señal va solo después de que el estudiante haya razonado, no solo nombrado.`;
-  await chi3P18DescEnviar(ctx);
-}
-
-// Chat libre del tutor de descubrimiento (sigue detectando la señal [AVANZAR])
-async function chi3P18DescChatLibre() {
-  const inp=document.getElementById('input-chi3-p18-desc');
-  if(!inp?.value.trim()) return;
-  const txt=inp.value.trim(); inp.value='';
-  agregarMensajeGen('chat-chi3-p18-desc', txt, 'user');
-  await chi3P18DescEnviar(txt);
-}
-
-// Envía mensaje al tutor del descubrimiento, detecta [AVANZAR] y revela paso 3
-async function chi3P18DescEnviar(mensaje) {
+  // Enviar al tutor principal de pág 18
+  agregarMensajeGen('chat-chi3-p18', '💡 Propuesta sobre los signos: ' + idea, 'user');
+  const tid=agregarTypingGen('chat-chi3-p18');
+  setStatusGen('ts-chi3-p18','Analizando…');
   const sid=`chi3_p18_${sessionId}`;
-  if(mensaje.startsWith('[CONTEXTO')) agregarMensajeGen('chat-chi3-p18-desc', '📋 Enviando mi propuesta…', 'user');
-  const tid = agregarTypingGen('chat-chi3-p18-desc');
-  setStatusGen('ts-chi3-p18-desc','Analizando…');
   try {
-    const res = await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:mensaje,session_id:sid})});
-    const data = await res.json();
-    quitarTypingGen(tid); setStatusGen('ts-chi3-p18-desc','En línea');
+    const res=await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:ctx,session_id:sid})});
+    const data=await res.json();
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
     if(data.reply){
-      // Detectar la señal del tutor para revelar paso 3
-      const avanzar = data.reply.includes('[AVANZAR]');
-      // Mostrar el mensaje SIN la frase-señal (el estudiante no la ve)
-      const visible = data.reply.replace(/\[AVANZAR\]/g,'').trim();
-      agregarMensajeGen('chat-chi3-p18-desc', visible, 'tutor');
+      const avanzar=data.reply.includes('[AVANZAR]');
+      const visible=data.reply.replace(/\[AVANZAR\]/g,'').trim();
+      agregarMensajeGen('chat-chi3-p18',visible,'tutor');
       if(avanzar){
-        // El tutor validó: revelar paso 3 y la tabla de cálculo
         const paso3=document.getElementById('chi3-descubre-paso3');
         const calculo=document.getElementById('chi3-p18-calculo');
         if(paso3) paso3.style.display='block';
@@ -3373,9 +3342,39 @@ async function chi3P18DescEnviar(mensaje) {
         setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),400);
       }
     }
-  } catch(e) {
-    quitarTypingGen(tid); setStatusGen('ts-chi3-p18-desc','En línea');
-    agregarMensajeGen('chat-chi3-p18-desc','Problema de conexión. Intenta de nuevo.','tutor');
+  } catch(e){
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
+    agregarMensajeGen('chat-chi3-p18','Problema de conexión. Intenta de nuevo.','tutor');
+  }
+  setTimeout(()=>panelPrincipal?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
+}
+
+
+async function chi3EnviarPrincipalP18(texto) {
+  const sid=`chi3_p18_${sessionId}`;
+  agregarMensajeGen('chat-chi3-p18',texto,'user');
+  const tid=agregarTypingGen('chat-chi3-p18');
+  setStatusGen('ts-chi3-p18','Escribiendo…');
+  try {
+    const res=await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:texto,session_id:sid})});
+    const data=await res.json();
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
+    if(data.reply){
+      const avanzar=data.reply.includes('[AVANZAR]');
+      const visible=data.reply.replace(/\[AVANZAR\]/g,'').trim();
+      agregarMensajeGen('chat-chi3-p18',visible,'tutor');
+      if(avanzar){
+        const paso3=document.getElementById('chi3-descubre-paso3');
+        const calculo=document.getElementById('chi3-p18-calculo');
+        if(paso3) paso3.style.display='block';
+        if(calculo) calculo.style.display='block';
+        setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),400);
+      }
+    }
+  } catch(e){
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
+    agregarMensajeGen('chat-chi3-p18','Problema de conexión.','tutor');
   }
 }
 
