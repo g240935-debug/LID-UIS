@@ -1370,13 +1370,45 @@ Tabla de frecuencia → Gráfico circular.</div>
         </div>
         <div class="pAB-single-col">
           <div class="prob-enunciado">
-            <div class="prob-num-badge">Actividad — El estadístico χ²</div>
-            <p class="prob-enunciado-text">Usando el ejemplo de la pág. anterior (60 estudiantes, Programa × Software), ya tienes Oᵢⱼ y Eᵢⱼ. Ahora calcula la contribución de cada celda y suma para obtener χ².</p>
-            <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
-              <span class="prob-pregunta-label">Fórmula:</span>
-              <p class="prob-pregunta-text" style="font-family:'JetBrains Mono',monospace;">χ² = Σ (Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ</p>
+            <div class="prob-num-badge">Descubrimiento — ¿Cómo medir el alejamiento total?</div>
+            <p class="prob-enunciado-text">Ya tienes las diferencias Oᵢⱼ − Eᵢⱼ de cada celda (ejemplo de 60 estudiantes, Programa × Software). Parece natural sumarlas todas para medir cuánto se aleja la tabla de la independencia. <strong>Antes de ver ninguna fórmula, vamos a probarlo.</strong></p>
+          </div>
+
+          <!-- MOMENTO A-DIDÁCTICO: descubrir por qué el cuadrado -->
+          <div class="chi3-descubre" id="chi3-p18-descubre">
+            <div class="chi3-descubre-paso" id="chi3-descubre-paso1">
+              <div class="chi3-descubre-titulo">Paso 1 — Suma las diferencias tal cual</div>
+              <p class="chi3-descubre-txt">Estas son las diferencias Oᵢⱼ − Eᵢⱼ de las 6 celdas. Súmalas todas (con su signo) y escribe el resultado:</p>
+              <div id="chi3-p18-difs-display"></div>
+              <div class="chi3-descubre-input-row">
+                <label>Suma de las diferencias (con signo) =</label>
+                <input type="number" step="any" id="chi3-p18-suma-dif" class="p5c-cell" style="width:90px;" placeholder="?">
+                <button class="btn-verificar" style="background:var(--gold);color:var(--ink);" onclick="chi3P18DescubreSuma()">Comprobar</button>
+              </div>
+              <div class="prob-feedback" id="chi3-p18-descubre-fb1" style="display:none;"></div>
+            </div>
+
+            <div class="chi3-descubre-paso" id="chi3-descubre-paso2" style="display:none;">
+              <div class="chi3-descubre-titulo">Paso 2 — El problema de los signos</div>
+              <p class="chi3-descubre-txt">La suma dio (aprox.) <strong>cero</strong>, aunque la tabla claramente se aleja de lo esperado. Las diferencias positivas y negativas <em>se cancelan</em> entre sí. Necesitamos una forma de medir el tamaño del alejamiento sin que el signo lo borre.</p>
+              <p class="chi3-descubre-txt">¿Qué operación matemática convierte cualquier número (positivo o negativo) en un valor positivo que crece con la magnitud? Escribe tu idea:</p>
+              <textarea class="p5d-resp-input" id="chi3-p18-idea-cuadrado" rows="2" placeholder="Tu propuesta para eliminar el problema de los signos…"></textarea>
+              <button class="btn-verificar" style="background:var(--navy);margin-top:6px;" onclick="chi3P18DescubreIdea()">💬 Discutir con el tutor</button>
+            </div>
+
+            <div class="chi3-descubre-paso" id="chi3-descubre-paso3" style="display:none;">
+              <div class="chi3-descubre-titulo">Paso 3 — ¿Por qué dividir entre Eᵢⱼ?</div>
+              <p class="chi3-descubre-txt">Elevar al cuadrado resuelve el signo. Pero falta algo: una diferencia de 5 estudiantes <em>pesa distinto</em> si se esperaban 6 que si se esperaban 200. Por eso cada cuadrado se divide entre su Eᵢⱼ, para medir el alejamiento <strong>relativo</strong>. Así nace el estadístico:</p>
+              <div class="prob-pregunta-box" style="border-left-color:var(--moss);">
+                <span class="prob-pregunta-label">Estadístico Chi-cuadrado:</span>
+                <p class="prob-pregunta-text" style="font-family:'JetBrains Mono',monospace;">χ² = Σ (Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ</p>
+              </div>
+              <p class="chi3-descubre-txt">Ahora sí, calcula cada contribución y obtén el χ² total:</p>
             </div>
           </div>
+
+          <!-- Tabla de cálculo (oculta hasta completar el descubrimiento) -->
+          <div id="chi3-p18-calculo" style="display:none;">
           <div id="chi3-p18-tabla-wrap"></div>
           <div class="chi3-p18-acum">
             <span class="chi3-acum-label">χ² acumulado:</span>
@@ -1387,7 +1419,7 @@ Tabla de frecuencia → Gráfico circular.</div>
           <div class="chi3-p18-preguntas">
             <div class="chi3-preg-card">
               <p class="chi3-preg-num">Pregunta 1</p>
-              <p class="chi3-preg-text">¿Por qué se eleva al cuadrado la diferencia (Oᵢⱼ − Eᵢⱼ)² en lugar de sumarla directamente?</p>
+              <p class="chi3-preg-text">Con tus palabras: ¿por qué elevar al cuadrado cada diferencia resuelve el problema que descubriste al sumarlas directamente?</p>
               <textarea class="p5d-resp-input" id="chi3-p18-q1" rows="2" placeholder="Tu razonamiento…"></textarea>
             </div>
             <div class="chi3-preg-card">
@@ -1420,6 +1452,7 @@ Tabla de frecuencia → Gráfico circular.</div>
               <button class="btn-send" onclick="chi3ChatLibre('p18')">Enviar <span class="send-icon">↑</span></button>
             </div>
           </div>
+          </div><!-- /chi3-p18-calculo -->
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(17)">← Ejemplo Eᵢⱼ</button>
