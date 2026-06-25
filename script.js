@@ -3,8 +3,8 @@
    Conexión al backend: https://lid-uis.onrender.com/api/chat
    No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINA
-   0  → Portada
+   MAPA DE PÁGINAS:
+   0  → Portada 
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
    3  → Cap I · Actividad: Curcio N3/N4               (IA: freq_B_*)
@@ -3233,9 +3233,11 @@ function chi3P18Render() {
   if(sumaInp) sumaInp.value='';
   const idea=document.getElementById('chi3-p18-idea-cuadrado');
   if(idea) idea.value='';
-  // Reset del panel del tutor de descubrimiento
+  // Reset del panel del tutor de descubrimiento (quitar clases, no style)
   const descWrap=document.getElementById('chi3-p18-desc-tutor-wrap');
-  if(descWrap) descWrap.style.display='none';
+  if(descWrap) descWrap.classList.remove('activo');
+  const grid=document.querySelector('.chi3-descubre-paso2-grid');
+  if(grid) grid.classList.remove('tutor-abierto');
   const descChat=document.getElementById('chat-chi3-p18-desc');
   if(descChat) descChat.innerHTML='';
 
@@ -3306,8 +3308,11 @@ function chi3P18DescubreSuma() {
 // la usa para revelar el paso 3 automáticamente (sin botón de autorreporte).
 async function chi3P18DescubreIdea() {
   const idea=document.getElementById('chi3-p18-idea-cuadrado')?.value||'(sin responder)';
+  // Activar tutor al lado: añadir clases en vez de manipular style (más robusto)
   const wrap=document.getElementById('chi3-p18-desc-tutor-wrap');
-  if(wrap) wrap.style.display='flex';
+  const grid=document.querySelector('.chi3-descubre-paso2-grid');
+  if(wrap) wrap.classList.add('activo');
+  if(grid) grid.classList.add('tutor-abierto');
   const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado · turno inicial]
 El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
 Propuesta del estudiante para eliminar el problema de los signos: "${idea}"
