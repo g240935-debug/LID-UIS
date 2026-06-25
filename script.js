@@ -2989,8 +2989,8 @@ async function chi3ChatLibre(pageId) {
   await chi3Enviar(pageId, txt, false);
 }
 
-// Registrar audio para todos los tutores chi3
-['p15','p16','p17','p18','p19','p20','p21','p22','p23','p24'].forEach(pid=>{
+// Registrar audio para todos los tutores chi3 (incluido el tutor dedicado al descubrimiento de pág 18)
+['p15','p16','p17','p18','p18-desc','p19','p20','p21','p22','p23','p24'].forEach(pid=>{
   AUDIO_MAP[`chi3-${pid}`] = {btn:`audio-btn-chi3-${pid}`, waves:`audio-waves-chi3-${pid}`};
   BOX_TO_AUDIO[`chat-chi3-${pid}`] = `chi3-${pid}`;
   audioState[`chi3-${pid}`] = false;
@@ -3233,6 +3233,13 @@ function chi3P18Render() {
   if(sumaInp) sumaInp.value='';
   const idea=document.getElementById('chi3-p18-idea-cuadrado');
   if(idea) idea.value='';
+  // Reset del panel del tutor de descubrimiento y del botón continuar
+  const descWrap=document.getElementById('chi3-p18-desc-tutor-wrap');
+  if(descWrap) descWrap.style.display='none';
+  const continuarBtn=document.getElementById('chi3-p18-continuar-btn');
+  if(continuarBtn) continuarBtn.style.display='none';
+  const descChat=document.getElementById('chat-chi3-p18-desc');
+  if(descChat) descChat.innerHTML='';
 
   // Poblar la lista de diferencias Oᵢⱼ − Eᵢⱼ (sin cuadrado) para el paso 1
   const difsEl=document.getElementById('chi3-p18-difs-display');
@@ -3295,19 +3302,43 @@ function chi3P18DescubreSuma() {
   if(paso2){ paso2.style.display='block'; setTimeout(()=>paso2.scrollIntoView({behavior:'smooth',block:'nearest'}),200); }
 }
 
-// Paso 2: el estudiante propone elevar al cuadrado → lo discute con el tutor y se revela la fórmula
+// Paso 2: el estudiante propone elevar al cuadrado → se abre tutor dedicado al lado
 async function chi3P18DescubreIdea() {
   const idea=document.getElementById('chi3-p18-idea-cuadrado')?.value||'(sin responder)';
+  // Revelar el panel del tutor de descubrimiento (no toca el paso 3 ni la tabla)
+  const wrap=document.getElementById('chi3-p18-desc-tutor-wrap');
+  if(wrap) wrap.style.display='flex';
+  const sid=`chi3_p18_${sessionId}`;
   const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado]
 El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
 Ahora propone esta forma de eliminar el problema de los signos: "${idea}"
 Si propone elevar al cuadrado (o valor absoluto), reconoce que va por buen camino y explica brevemente por qué el cuadrado es preferible (penaliza más las diferencias grandes y es matemáticamente manejable). Si propone otra cosa o no responde, guíalo con una pregunta: ¿qué operación convierte −5 y +5 en el mismo valor positivo? No reveles la fórmula completa de χ² todavía; solo valida la idea del cuadrado.`;
-  await chi3Enviar('p18', ctx, true);
-  // Revelar el paso 3 (la fórmula completa) y la tabla de cálculo
+  agregarMensajeGen('chat-chi3-p18-desc', '📋 Enviando mi propuesta…', 'user');
+  const tid = agregarTypingGen('chat-chi3-p18-desc');
+  setStatusGen('ts-chi3-p18-desc','Analizando…');
+  try {
+    const res = await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:ctx,session_id:sid})});
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p18-desc','En línea');
+    if(data.reply) agregarMensajeGen('chat-chi3-p18-desc',data.reply,'tutor');
+  } catch(e) {
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p18-desc','En línea');
+    agregarMensajeGen('chat-chi3-p18-desc','Problema de conexión. Intenta de nuevo.','tutor');
+  }
+  // Mostrar el botón "continuar al paso siguiente" tras el primer intercambio
+  const btn=document.getElementById('chi3-p18-continuar-btn');
+  if(btn) btn.style.display='block';
+  setTimeout(()=>wrap?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
+}
+
+// Paso 3: el estudiante decide cuándo continuar tras dialogar con el tutor
+function chi3P18ContinuarPaso3() {
   const paso3=document.getElementById('chi3-descubre-paso3');
   const calculo=document.getElementById('chi3-p18-calculo');
   if(paso3) paso3.style.display='block';
-  if(calculo){ calculo.style.display='block'; setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),200); }
+  if(calculo) calculo.style.display='block';
+  setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
 }
 
 function chi3P18Actualizar() {
