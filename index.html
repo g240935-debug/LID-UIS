@@ -1388,6 +1388,7 @@ Tabla de frecuencia → Gráfico circular.</div>
               <div class="prob-feedback" id="chi3-p18-descubre-fb1" style="display:none;"></div>
             </div>
 
+            <div class="chi3-descubre-paso2-grid">
             <div class="chi3-descubre-paso" id="chi3-descubre-paso2" style="display:none;">
               <div class="chi3-descubre-titulo">Paso 2 — El problema de los signos</div>
               <p class="chi3-descubre-txt">La suma dio (aprox.) <strong>cero</strong>, aunque la tabla claramente se aleja de lo esperado. Las diferencias positivas y negativas <em>se cancelan</em> entre sí. Necesitamos una forma de medir el tamaño del alejamiento sin que el signo lo borre.</p>
@@ -1395,6 +1396,28 @@ Tabla de frecuencia → Gráfico circular.</div>
               <textarea class="p5d-resp-input" id="chi3-p18-idea-cuadrado" rows="2" placeholder="Tu propuesta para eliminar el problema de los signos…"></textarea>
               <button class="btn-verificar" style="background:var(--navy);margin-top:6px;" onclick="chi3P18DescubreIdea()">💬 Discutir con el tutor</button>
             </div>
+
+            <!-- Panel del tutor del descubrimiento (aparece al lado en escritorio) -->
+            <div class="chi3-descubre-tutor-wrap" id="chi3-p18-desc-tutor-wrap" style="display:none;">
+              <div class="tutor-panel p5d-tutor-panel" id="chi3-p18-desc-tutor">
+                <div class="tutor-header" style="background:#1a3a5a;">
+                  <div class="tutor-avatar">🎓</div>
+                  <div class="tutor-info">
+                    <div class="tutor-name">Tutor Virtual UIS</div>
+                    <div class="tutor-status"><span class="status-dot"></span><span id="ts-chi3-p18-desc">Analizando…</span></div>
+                  </div>
+                  <button class="audio-toggle-btn" id="audio-btn-chi3-p18-desc" onclick="toggleAudio('chi3-p18-desc')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p18-desc"><span></span><span></span><span></span></span></button>
+                </div>
+                <div class="tutor-context-strip" style="border-left-color:var(--gold);">💡 Discute tu propuesta. Cuando sientas que entendiste por qué se usa el cuadrado, pulsa abajo para continuar.</div>
+                <div id="chat-chi3-p18-desc" class="chat-box p5d-chat-box"></div>
+                <div class="chat-input-area">
+                  <input type="text" id="input-chi3-p18-desc" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p18-desc')">
+                  <button class="btn-send" onclick="chi3ChatLibre('p18-desc')">Enviar <span class="send-icon">↑</span></button>
+                </div>
+              </div>
+              <button class="btn-verificar" id="chi3-p18-continuar-btn" style="background:var(--moss);margin-top:10px;width:100%;display:none;" onclick="chi3P18ContinuarPaso3()">✓ Entendí — continuar al paso siguiente</button>
+            </div>
+            </div><!-- /chi3-descubre-paso2-grid -->
 
             <div class="chi3-descubre-paso" id="chi3-descubre-paso3" style="display:none;">
               <div class="chi3-descubre-titulo">Paso 3 — ¿Por qué dividir entre Eᵢⱼ?</div>
