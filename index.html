@@ -1408,14 +1408,13 @@ Tabla de frecuencia → Gráfico circular.</div>
                   </div>
                   <button class="audio-toggle-btn" id="audio-btn-chi3-p18-desc" onclick="toggleAudio('chi3-p18-desc')" title="Activar voz"><span class="audio-icon">🔇</span><span class="audio-waves" id="audio-waves-chi3-p18-desc"><span></span><span></span><span></span></span></button>
                 </div>
-                <div class="tutor-context-strip" style="border-left-color:var(--gold);">💡 Discute tu propuesta. Cuando sientas que entendiste por qué se usa el cuadrado, pulsa abajo para continuar.</div>
+                <div class="tutor-context-strip" style="border-left-color:var(--gold);">💡 Discute tu propuesta con el tutor. Cuando él vea que comprendiste por qué el cuadrado resuelve el problema, avanzarás al paso siguiente.</div>
                 <div id="chat-chi3-p18-desc" class="chat-box p5d-chat-box"></div>
                 <div class="chat-input-area">
-                  <input type="text" id="input-chi3-p18-desc" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p18-desc')">
-                  <button class="btn-send" onclick="chi3ChatLibre('p18-desc')">Enviar <span class="send-icon">↑</span></button>
+                  <input type="text" id="input-chi3-p18-desc" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3P18DescChatLibre()">
+                  <button class="btn-send" onclick="chi3P18DescChatLibre()">Enviar <span class="send-icon">↑</span></button>
                 </div>
               </div>
-              <button class="btn-verificar" id="chi3-p18-continuar-btn" style="background:var(--moss);margin-top:10px;width:100%;display:none;" onclick="chi3P18ContinuarPaso3()">✓ Entendí — continuar al paso siguiente</button>
             </div>
             </div><!-- /chi3-descubre-paso2-grid -->
 
