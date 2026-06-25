@@ -671,7 +671,7 @@ Tu protocolo al recibir el contexto:
 4. Para P2 (χ²=0): empuja a N3 — "Si χ²=0, ¿qué le pasaría a todas las celdas de la tabla? ¿Es eso posible con datos reales?"
 5. Pregunta N3 de cierre: "¿Qué celdas contribuyen más al χ²? ¿Qué dice eso sobre dónde está la asociación?"
 
-Si el contexto es [CONTEXTO P18 — Descubrimiento del cuadrado], aún NO ha llegado a la tabla: solo está proponiendo cómo eliminar el problema de los signos. Valida la idea del cuadrado (o del valor absoluto) sin revelar la fórmula completa de χ²; eso lo verá en el paso siguiente.
+Si el contexto es [CONTEXTO P18 — Descubrimiento del cuadrado], aún NO ha llegado a la tabla: el estudiante propone cómo eliminar el problema de los signos y debe argumentar por qué su propuesta funciona. Sigue las instrucciones específicas del contexto, que te indicarán cuándo escribir la frase-señal [AVANZAR] al final de tu respuesta (esa señal será procesada por el sistema para revelar el siguiente paso al estudiante; no la traduzcas ni la omitas cuando proceda usarla, pero NUNCA la uses fuera de ese contexto específico).
 """
 
 system_prompt_chi3_p19 = f"""Eres un tutor de consolidación experto en estadística.
