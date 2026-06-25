@@ -24,7 +24,7 @@ freq_data = {
 }
 
 # ────────────────────────────────────────────────
-# SYSTEM PROMPTS — CAP I (4 fases progresivas)
+# SYSTEM PROMPTS—CAP I(4 fases progresivas)
 # session_id prefix "freq_"
 # ────────────────────────────────────────────────
 
