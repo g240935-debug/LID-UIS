@@ -3219,9 +3219,37 @@ Responde preguntas sobre este paso específico. Si la respuesta N3 solo describe
 
 /* ── PÁGINA 18 ── */
 function chi3P18Render() {
+  // Resetear el momento de descubrimiento cada vez que se entra
+  const paso1=document.getElementById('chi3-descubre-paso1');
+  const paso2=document.getElementById('chi3-descubre-paso2');
+  const paso3=document.getElementById('chi3-descubre-paso3');
+  const calculo=document.getElementById('chi3-p18-calculo');
+  if(paso2) paso2.style.display='none';
+  if(paso3) paso3.style.display='none';
+  if(calculo) calculo.style.display='none';
+  const fb1=document.getElementById('chi3-p18-descubre-fb1');
+  if(fb1) fb1.style.display='none';
+  const sumaInp=document.getElementById('chi3-p18-suma-dif');
+  if(sumaInp) sumaInp.value='';
+  const idea=document.getElementById('chi3-p18-idea-cuadrado');
+  if(idea) idea.value='';
+
+  // Poblar la lista de diferencias Oᵢⱼ − Eᵢⱼ (sin cuadrado) para el paso 1
+  const difsEl=document.getElementById('chi3-p18-difs-display');
+  if(difsEl){
+    let d='<table class="chi3-tbl" style="font-size:.75rem;"><thead><tr><th>Celda</th><th>Oᵢⱼ</th><th>Eᵢⱼ</th><th>Oᵢⱼ − Eᵢⱼ</th></tr></thead><tbody>';
+    CHI3_FILAS.forEach((f,i)=>CHI3_COLS.forEach((c,j)=>{
+      const dif=CHI3_O[i][j]-CHI3_E[i][j];
+      const signo=dif>0?'+':'';
+      d+=`<tr><td>${f}/${c}</td><td>${CHI3_O[i][j]}</td><td>${CHI3_E[i][j].toFixed(2)}</td><td><strong>${signo}${dif.toFixed(2)}</strong></td></tr>`;
+    }));
+    d+='</tbody></table>';
+    difsEl.innerHTML=d;
+  }
+
+  // Construir la tabla de cálculo (queda oculta hasta completar el descubrimiento)
   const filas=CHI3_FILAS,cols=CHI3_COLS;
   let h=`<table class="chi3-tbl"><thead><tr><th>Celda</th><th>Oᵢⱼ</th><th>Eᵢⱼ</th><th>(O−E)²/E</th><th>Contribución</th></tr></thead><tbody>`;
-  let chi2=0;
   filas.forEach((f,i)=>{
     cols.forEach((c,j)=>{
       const corr=parseFloat(Math.pow(CHI3_O[i][j]-CHI3_E[i][j],2)/CHI3_E[i][j]).toFixed(4);
@@ -3240,6 +3268,46 @@ function chi3P18Render() {
   const w=document.getElementById('chi3-p18-tabla-wrap');
   if(w) w.innerHTML=h;
   chi3P18Actualizar();
+}
+
+// Paso 1 del descubrimiento: el estudiante suma las diferencias y descubre que dan ~0
+function chi3P18DescubreSuma() {
+  const sumaReal = CHI3_O.reduce((s,r,i)=>s+r.reduce((ss,v,j)=>ss+(v-CHI3_E[i][j]),0),0);
+  const ingresado = parseFloat(document.getElementById('chi3-p18-suma-dif')?.value);
+  const fb=document.getElementById('chi3-p18-descubre-fb1');
+  fb.style.display='block';
+  if(isNaN(ingresado)){
+    fb.className='prob-feedback parcial';
+    fb.textContent='Escribe el resultado de sumar las 6 diferencias (con su signo) antes de comprobar.';
+    return;
+  }
+  // La suma real es ~0 (las diferencias de una tabla siempre suman 0)
+  if(Math.abs(ingresado)<0.5){
+    fb.className='prob-feedback ok';
+    fb.innerHTML='Exacto: la suma da <strong>cero</strong> (o casi). Aunque la tabla claramente se aleja de lo esperado, las diferencias positivas y negativas <em>se cancelan</em>. Ese es el problema que hay que resolver. 👇';
+  } else {
+    fb.className='prob-feedback parcial';
+    fb.innerHTML=`Obtuviste ${ingresado}. Vuelve a sumar con cuidado, respetando los signos (+ y −) de cada diferencia. Fíjate en lo que ocurre cuando juntas las positivas con las negativas.`;
+    return;
+  }
+  // Revelar el paso 2
+  const paso2=document.getElementById('chi3-descubre-paso2');
+  if(paso2){ paso2.style.display='block'; setTimeout(()=>paso2.scrollIntoView({behavior:'smooth',block:'nearest'}),200); }
+}
+
+// Paso 2: el estudiante propone elevar al cuadrado → lo discute con el tutor y se revela la fórmula
+async function chi3P18DescubreIdea() {
+  const idea=document.getElementById('chi3-p18-idea-cuadrado')?.value||'(sin responder)';
+  const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado]
+El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
+Ahora propone esta forma de eliminar el problema de los signos: "${idea}"
+Si propone elevar al cuadrado (o valor absoluto), reconoce que va por buen camino y explica brevemente por qué el cuadrado es preferible (penaliza más las diferencias grandes y es matemáticamente manejable). Si propone otra cosa o no responde, guíalo con una pregunta: ¿qué operación convierte −5 y +5 en el mismo valor positivo? No reveles la fórmula completa de χ² todavía; solo valida la idea del cuadrado.`;
+  await chi3Enviar('p18', ctx, true);
+  // Revelar el paso 3 (la fórmula completa) y la tabla de cálculo
+  const paso3=document.getElementById('chi3-descubre-paso3');
+  const calculo=document.getElementById('chi3-p18-calculo');
+  if(paso3) paso3.style.display='block';
+  if(calculo){ calculo.style.display='block'; setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),200); }
 }
 
 function chi3P18Actualizar() {
