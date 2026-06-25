@@ -3308,11 +3308,21 @@ function chi3P18DescubreSuma() {
 // la usa para revelar el paso 3 automáticamente (sin botón de autorreporte).
 async function chi3P18DescubreIdea() {
   const idea=document.getElementById('chi3-p18-idea-cuadrado')?.value||'(sin responder)';
+  // Asegurar que paso 2 esté visible (por si el estudiante manipuló el DOM)
+  const paso2=document.getElementById('chi3-descubre-paso2');
+  if(paso2 && paso2.style.display==='none') paso2.style.display='block';
   // Activar tutor al lado: añadir clases en vez de manipular style (más robusto)
   const wrap=document.getElementById('chi3-p18-desc-tutor-wrap');
   const grid=document.querySelector('.chi3-descubre-paso2-grid');
   if(wrap) wrap.classList.add('activo');
   if(grid) grid.classList.add('tutor-abierto');
+  // Asegurar que el panel del tutor sea visible: scroll a él tras un frame
+  setTimeout(()=>{
+    const headerTutor=document.getElementById('chi3-p18-desc-tutor');
+    if(headerTutor && typeof headerTutor.scrollIntoView==='function'){
+      headerTutor.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }, 100);
   const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado · turno inicial]
 El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
 Propuesta del estudiante para eliminar el problema de los signos: "${idea}"
