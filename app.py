@@ -11,7 +11,7 @@ CORS(app)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ════════════════════════════════════════════════
-# DATOS — CAPÍTULO I: TABLAS DE FRECUENCIA
+# DATOS — CAPÍTULO I:TABLAS DE FRECUENCIA
 # ════════════════════════════════════════════════
 total_n = 40
 freq_data = {
