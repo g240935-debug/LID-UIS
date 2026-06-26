@@ -71,7 +71,7 @@
             </div>
             <div class="cover-ch-item" onclick="irAPagina(14)">
               <span class="cover-ch-num">III</span>
-              <span class="cover-ch-title">Chi-cuadrado</span>
+              <span class="cover-ch-title">Chi-cuadrado · Próximamente</span>
               <span class="cover-ch-arrow">→</span>
             </div>
           </div>
@@ -1862,6 +1862,93 @@ Tabla de frecuencia → Gráfico circular.</div>
                 <span class="p25-etapa-titulo">Sube tu tabla de datos</span>
               </div>
               <p class="p25-intro">Formatos aceptados: <strong>CSV</strong> o <strong>Excel (.xlsx)</strong>. La primera fila debe tener los nombres de las columnas. Los datos no salen de tu navegador.</p>
+
+              <!-- Fuentes de datos colapsable -->
+              <div class="p25-fuentes-wrap">
+                <button class="p25-fuentes-toggle" onclick="p25ToggleFuentes()" id="p25-fuentes-btn">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <i class="ti ti-database" aria-hidden="true"></i>
+                    <span>¿No tienes datos propios? Aquí puedes encontrar tablas reales</span>
+                  </div>
+                  <i class="ti ti-chevron-down" id="p25-chevron" aria-hidden="true"></i>
+                </button>
+                <div class="p25-fuentes-body" id="p25-fuentes-body" style="display:none;">
+
+                  <!-- Colombia -->
+                  <div class="p25-fuentes-grupo">
+                    <div class="p25-fuentes-grupo-header">
+                      <span>Colombia</span><div class="p25-fuentes-linea"></div>
+                    </div>
+                    <div class="p25-fuentes-lista">
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://www.dane.gov.co/index.php/estadisticas-por-tema/salud/encuesta-nacional-de-salud" target="_blank" rel="noopener" class="p25-fuente-link">DANE — Encuesta de Calidad de Vida</a>
+                          <p class="p25-fuente-desc">Variables: estrato, tipo de vivienda, acceso a internet, nivel educativo. Ideal para tablas de contingencia y chi-cuadrado.</p>
+                        </div>
+                      </div>
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://www.dane.gov.co/index.php/estadisticas-por-tema/educacion" target="_blank" rel="noopener" class="p25-fuente-link">DANE — Estadísticas de Educación</a>
+                          <p class="p25-fuente-desc">Tasas de deserción, matrícula y resultados por departamento, grado y género.</p>
+                        </div>
+                      </div>
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://www.sispro.gov.co" target="_blank" rel="noopener" class="p25-fuente-link">MinSalud / SISPRO</a>
+                          <p class="p25-fuente-desc">Causas de consulta médica, cobertura de vacunación y afiliación por región y grupo etario.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Internacional -->
+                  <div class="p25-fuentes-grupo">
+                    <div class="p25-fuentes-grupo-header">
+                      <span>Internacional</span><div class="p25-fuentes-linea"></div>
+                    </div>
+                    <div class="p25-fuentes-lista">
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://ourworldindata.org" target="_blank" rel="noopener" class="p25-fuente-link">Our World in Data</a>
+                          <p class="p25-fuente-desc">Descarga directa en CSV sobre educación, salud, medio ambiente y economía. Datos globales con variables categóricas claras.</p>
+                        </div>
+                      </div>
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://www.kaggle.com/datasets" target="_blank" rel="noopener" class="p25-fuente-link">Kaggle — Datasets</a>
+                          <p class="p25-fuente-desc">Miles de tablas reales en CSV sobre deportes, encuestas de satisfacción, resultados académicos y preferencias de consumo.</p>
+                        </div>
+                      </div>
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://www.gapminder.org/data" target="_blank" rel="noopener" class="p25-fuente-link">Gapminder</a>
+                          <p class="p25-fuente-desc">Indicadores de desarrollo humano por país y año. Ideal para comparar por continente o nivel de ingreso.</p>
+                        </div>
+                      </div>
+                      <div class="p25-fuente-item">
+                        <i class="ti ti-external-link" aria-hidden="true"></i>
+                        <div>
+                          <a href="https://archive.ics.uci.edu/datasets" target="_blank" rel="noopener" class="p25-fuente-link">UCI Machine Learning Repository</a>
+                          <p class="p25-fuente-desc">Datos reales de estudios médicos, sociales y educativos con variables categóricas listas para contingencia y chi-cuadrado.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Nota -->
+                  <div class="p25-fuentes-nota">
+                    <i class="ti ti-info-circle" aria-hidden="true"></i>
+                    <p>Descarga el archivo en formato <strong>CSV o Excel</strong>, asegúrate de que la primera fila tenga los nombres de las columnas, y súbelo abajo.</p>
+                  </div>
+
+                </div>
+              </div>
               <div class="p25-upload-zone" id="p25-upload-zone" onclick="document.getElementById('p25-file-input').click()">
                 <div class="p25-upload-icon">📂</div>
                 <div class="p25-upload-txt">Haz clic aquí o arrastra tu archivo</div>
