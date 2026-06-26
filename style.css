@@ -2495,3 +2495,69 @@ html, body {
   .p25-sel-row         { grid-template-columns: 1fr; }
   .p25-analisis-opciones { grid-template-columns: 1fr; }
 }
+
+/* ── Pág 25: fuentes de datos colapsable ── */
+.p25-fuentes-wrap {
+  margin: 10px 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.p25-fuentes-toggle {
+  width: 100%; display: flex; align-items: center;
+  justify-content: space-between; padding: 11px 14px;
+  background: white; border: none; cursor: pointer;
+  font-size: .82rem; font-weight: 600; color: var(--navy);
+  gap: 10px; transition: background .15s;
+}
+.p25-fuentes-toggle:hover { background: #eaf2fb; }
+.p25-fuentes-toggle .ti-chevron-down {
+  font-size: 15px; color: var(--slate);
+  transition: transform .2s; flex-shrink: 0;
+}
+.p25-fuentes-toggle .ti-database { font-size: 16px; color: var(--navy); }
+.p25-fuentes-body {
+  padding: 14px 16px;
+  border-top: 1px solid var(--rule);
+  background: var(--cream);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.p25-fuentes-grupo { display: flex; flex-direction: column; gap: 8px; }
+.p25-fuentes-grupo-header {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .72rem; font-weight: 600;
+  color: var(--slate); text-transform: uppercase; letter-spacing: .06em;
+}
+.p25-fuentes-linea { flex: 1; height: 0.5px; background: var(--rule); }
+.p25-fuentes-lista { display: flex; flex-direction: column; gap: 6px; }
+.p25-fuente-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 12px; background: white;
+  border: 1px solid var(--rule); border-radius: 3px;
+}
+.p25-fuente-item .ti-external-link {
+  font-size: 14px; color: var(--navy);
+  margin-top: 2px; flex-shrink: 0;
+}
+.p25-fuente-link {
+  font-size: .8rem; font-weight: 600;
+  color: var(--navy); text-decoration: none;
+}
+.p25-fuente-link:hover { text-decoration: underline; }
+.p25-fuente-desc {
+  font-size: .72rem; color: var(--slate);
+  margin: 3px 0 0; line-height: 1.45;
+}
+.p25-fuentes-nota {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: #eaf2fb; border-radius: 3px; padding: 9px 12px;
+  border: 1px solid #c0d8ef;
+}
+.p25-fuentes-nota .ti-info-circle {
+  font-size: 14px; color: var(--navy);
+  margin-top: 2px; flex-shrink: 0;
+}
+.p25-fuentes-nota p {
+  font-size: .75rem; color: var(--navy);
+  margin: 0; line-height: 1.5;
+}
