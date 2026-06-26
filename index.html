@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LID — Estadística · UIS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -1812,6 +1814,176 @@ Tabla de frecuencia → Gráfico circular.</div>
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(23)">← Síntesis final</button>
+          <button class="btn-nav next" onclick="irAPagina(25)">Tu propio estudio →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PÁGINA 25 — TU PROPIO ESTUDIO ESTADÍSTICO ══════════ -->
+    <div class="page" id="page-25">
+      <div class="page-inner page-problems">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo III · Aplicación Libre</span>
+          <span class="phase-indicator"><span class="phase-dot phase-done"></span><span class="phase-label">Tu propio estudio estadístico</span></span>
+          <span class="page-num">24</span>
+        </div>
+
+        <div class="p25-layout">
+
+          <!-- ── COLUMNA IZQUIERDA: flujo del ejercicio ── -->
+          <div class="p25-left">
+
+            <!-- ETAPA 1: definir el problema antes de subir datos -->
+            <div class="p25-etapa" id="p25-etapa1">
+              <div class="p25-etapa-header">
+                <span class="p25-etapa-num">1</span>
+                <span class="p25-etapa-titulo">Define tu problema estadístico</span>
+              </div>
+              <p class="p25-intro">Antes de subir cualquier dato, reflexiona sobre lo que quieres investigar. El análisis estadístico comienza con una pregunta, no con una tabla.</p>
+              <div class="p25-campo-group">
+                <label class="p25-label">¿De dónde vienen tus datos? (describe el contexto real)</label>
+                <textarea id="p25-contexto" class="p5d-resp-input" rows="2" placeholder="Ej: encuesta a 80 estudiantes de mi colegio sobre hábitos de estudio y rendimiento académico…"></textarea>
+              </div>
+              <div class="p25-campo-group">
+                <label class="p25-label">¿Qué pregunta estadística quieres responder?</label>
+                <textarea id="p25-pregunta" class="p5d-resp-input" rows="2" placeholder="Ej: ¿Existe relación entre el tiempo de estudio diario y el rendimiento académico?"></textarea>
+              </div>
+              <div class="p25-campo-group">
+                <label class="p25-label">¿Qué variables tiene tu tabla y de qué tipo crees que son?</label>
+                <textarea id="p25-variables" class="p5d-resp-input" rows="2" placeholder="Ej: Género (categórica), Horas de estudio (numérica), Rendimiento (categórica: Alto/Medio/Bajo)…"></textarea>
+              </div>
+              <button class="btn-verificar" style="background:var(--navy);" onclick="p25AvanzarEtapa2()">Continuar → Subir mi tabla</button>
+            </div>
+
+            <!-- ETAPA 2: subir el archivo -->
+            <div class="p25-etapa" id="p25-etapa2" style="display:none;">
+              <div class="p25-etapa-header">
+                <span class="p25-etapa-num">2</span>
+                <span class="p25-etapa-titulo">Sube tu tabla de datos</span>
+              </div>
+              <p class="p25-intro">Formatos aceptados: <strong>CSV</strong> o <strong>Excel (.xlsx)</strong>. La primera fila debe tener los nombres de las columnas. Los datos no salen de tu navegador.</p>
+              <div class="p25-upload-zone" id="p25-upload-zone" onclick="document.getElementById('p25-file-input').click()">
+                <div class="p25-upload-icon">📂</div>
+                <div class="p25-upload-txt">Haz clic aquí o arrastra tu archivo</div>
+                <div class="p25-upload-sub">CSV · XLSX · máx. 2 MB</div>
+                <input type="file" id="p25-file-input" accept=".csv,.xlsx,.xls" style="display:none;" onchange="p25LeerArchivo(this)">
+              </div>
+              <div id="p25-upload-feedback" class="prob-feedback" style="display:none;"></div>
+            </div>
+
+            <!-- ETAPA 3: vista previa + gráfica -->
+            <div class="p25-etapa" id="p25-etapa3" style="display:none;">
+              <div class="p25-etapa-header">
+                <span class="p25-etapa-num">3</span>
+                <span class="p25-etapa-titulo">Explora tus datos</span>
+              </div>
+
+              <!-- Resumen de la tabla -->
+              <div class="p25-resumen" id="p25-resumen"></div>
+
+              <!-- Vista previa -->
+              <div class="p25-preview-wrap">
+                <div class="p25-preview-title">Vista previa (primeras 5 filas)</div>
+                <div id="p25-preview-tabla" class="p25-preview-tabla-scroll"></div>
+              </div>
+
+              <!-- Selector de variables para graficar -->
+              <div class="p25-grafica-controles">
+                <div class="p25-label" style="margin-bottom:6px;">Selecciona las variables para graficar:</div>
+                <div class="p25-sel-row">
+                  <div>
+                    <label class="p25-sel-label">Variable principal (eje X / categorías):</label>
+                    <select id="p25-sel-var1" class="p25-select" onchange="p25ActualizarGrafica()"></select>
+                  </div>
+                  <div>
+                    <label class="p25-sel-label">Segunda variable (color / grupos) — opcional:</label>
+                    <select id="p25-sel-var2" class="p25-select" onchange="p25ActualizarGrafica()">
+                      <option value="">— ninguna —</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="p25-sel-label">Tipo de gráfica:</label>
+                    <select id="p25-sel-tipo" class="p25-select" onchange="p25ActualizarGrafica()">
+                      <option value="bar">Barras</option>
+                      <option value="pie">Pastel</option>
+                      <option value="barAgrupado">Barras agrupadas</option>
+                      <option value="heatmap">Mapa de calor</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="p25-canvas-wrap">
+                  <canvas id="p25-canvas" style="max-height:320px;"></canvas>
+                </div>
+              </div>
+
+              <!-- Interpretación de la gráfica (N1→N3) -->
+              <div class="chi3-preg-card chi3-inline-preg" style="margin-top:10px;">
+                <p class="chi3-preg-num" style="color:var(--sky);">Antes de continuar — interpreta lo que ves (N1→N3)</p>
+                <p class="chi3-preg-text">¿Qué patrón observas en la gráfica? ¿Hay algún grupo que se destaque? ¿Qué te llama la atención en relación con tu pregunta estadística?</p>
+                <textarea class="p5d-resp-input" id="p25-interp-grafica" rows="3" placeholder="Describe lo que observas y qué te sugiere sobre la pregunta que planteaste…"></textarea>
+              </div>
+
+              <button class="btn-verificar" style="background:var(--navy);margin-top:8px;" onclick="p25AvanzarEtapa4()">Continuar → Elegir análisis</button>
+            </div>
+
+            <!-- ETAPA 4: el estudiante decide el análisis -->
+            <div class="p25-etapa" id="p25-etapa4" style="display:none;">
+              <div class="p25-etapa-header">
+                <span class="p25-etapa-num">4</span>
+                <span class="p25-etapa-titulo">¿Qué análisis corresponde?</span>
+              </div>
+              <p class="p25-intro">Con tus datos cargados y tu pregunta clara — <strong>sin que el tutor te lo diga</strong> — decide qué herramienta del libro es la adecuada y justifica por qué.</p>
+              <div class="p25-analisis-opciones">
+                <button class="p25-anal-btn" data-anal="frecuencias"   onclick="p25SelAnalisis('frecuencias')">📊 Tabla de frecuencias<br><small>1 variable categórica</small></button>
+                <button class="p25-anal-btn" data-anal="contingencia"  onclick="p25SelAnalisis('contingencia')">🔢 Tabla de contingencia<br><small>2 variables categóricas</small></button>
+                <button class="p25-anal-btn" data-anal="chi2"          onclick="p25SelAnalisis('chi2')">χ² Prueba chi-cuadrado<br><small>¿asociación significativa?</small></button>
+                <button class="p25-anal-btn" data-anal="libre"         onclick="p25SelAnalisis('libre')">🔍 Exploración libre<br><small>decido sobre la marcha</small></button>
+              </div>
+              <div id="p25-anal-feedback" class="pts-feedback" style="display:none;"></div>
+              <div class="p25-campo-group" id="p25-justif-wrap" style="display:none;">
+                <label class="p25-label">Justifica tu elección — ¿por qué esa herramienta responde tu pregunta?</label>
+                <textarea id="p25-justif-analisis" class="p5d-resp-input" rows="2" placeholder="Porque mis variables son… y mi pregunta busca…"></textarea>
+              </div>
+              <button class="btn-verificar" id="p25-btn-tutor" style="background:var(--navy);display:none;" onclick="p25EnviarAlTutor()">💬 Iniciar análisis con el tutor</button>
+            </div>
+
+          </div><!-- /p25-left -->
+
+          <!-- ── COLUMNA DERECHA: tutor IA ── -->
+          <div class="p25-right">
+            <div class="tutor-panel p5d-tutor-panel" id="p25-tutor-panel" style="display:none;">
+              <div class="tutor-header" style="background:#1a3a5a;">
+                <div class="tutor-avatar">🎓</div>
+                <div class="tutor-info">
+                  <div class="tutor-name">Tutor Virtual UIS</div>
+                  <div class="tutor-status"><span class="status-dot"></span><span id="ts-p25">En espera…</span></div>
+                </div>
+                <button class="audio-toggle-btn" id="audio-btn-p25" onclick="toggleAudio('p25')" title="Activar voz">
+                  <span class="audio-icon">🔇</span>
+                  <span class="audio-waves" id="audio-waves-p25"><span></span><span></span><span></span></span>
+                </button>
+              </div>
+              <div class="tutor-context-strip" style="border-left-color:var(--gold);">
+                🔬 El tutor usa tus propios datos para guiarte. No calculará por ti — cuestionará tu razonamiento para que llegues más lejos.
+              </div>
+              <div id="chat-p25" class="chat-box p5d-chat-box"></div>
+              <div class="chat-input-area">
+                <input type="text" id="input-p25" class="chat-input" placeholder="Continúa el diálogo…"
+                       onkeydown="if(event.key==='Enter') p25ChatLibre()">
+                <button class="btn-send" onclick="p25ChatLibre()">Enviar <span class="send-icon">↑</span></button>
+              </div>
+            </div>
+            <!-- Placeholder mientras no hay tutor activo -->
+            <div class="p25-tutor-placeholder" id="p25-tutor-placeholder">
+              <div class="p25-ph-icon">🎓</div>
+              <div class="p25-ph-txt">El tutor aparecerá aquí cuando inicies el análisis en el paso 4.</div>
+            </div>
+          </div><!-- /p25-right -->
+
+        </div><!-- /p25-layout -->
+
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(24)">← Situación libre</button>
         </div>
       </div>
     </div>
@@ -1847,6 +2019,7 @@ Tabla de frecuencia → Gráfico circular.</div>
     <span class="pi-dot" onclick="irAPagina(22)"  title="Cap III · Causalidad"></span>
     <span class="pi-dot" onclick="irAPagina(23)"  title="Cap III · Síntesis final"></span>
     <span class="pi-dot" onclick="irAPagina(24)"  title="Cap III · Situación libre"></span>
+    <span class="pi-dot" onclick="irAPagina(25)"  title="Cap III · Tu propio estudio"></span>
   </div>
 
 </div><!-- /book-shell -->
