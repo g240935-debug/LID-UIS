@@ -155,7 +155,7 @@ let datosGrafico = {
 ════════════════════════════════ */
 
 // Orden lógico de páginas para determinar dirección de animación
-const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14,'14b',15,16,17,18,19,20,21,22,23,24];
+const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14,'14b',15,16,17,18,19,20,21,22,23,24,25];
 
 function irAPagina(n) {
   if (n === paginaActual) return;
@@ -254,6 +254,7 @@ function irAPagina(n) {
   if (n === 22) setTimeout(chi3P22Render, 300);
   if (n === 23) setTimeout(chi3P23Render, 300);
   if (n === 24) setTimeout(chi3P24Render, 300);
+  if (n === 25) setTimeout(p25Init,       300);
 }
 
 function actualizarIndicadores() {
@@ -3779,4 +3780,337 @@ P1 (causalidad/variable oculta): ${q1}
 P2 (implicaciones para política educativa): ${q2}
 Evalúa el ciclo completo. Clasifica el nivel de Curcio de la conclusión y las respuestas N4. Cuestiona lo que esté superficial. Si todo está en N4, valida y cierra el capítulo.`;
   await chi3Enviar('p24',ctx,true);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PÁGINA 25 — TU PROPIO ESTUDIO ESTADÍSTICO
+   Flujo: definir problema → subir tabla → explorar + gráfica
+          → elegir análisis → tutor IA guiado con datos reales
+   Sesión IA: p25_<sessionId>
+══════════════════════════════════════════════════════════════ */
+
+// ── Registro de audio ──
+AUDIO_MAP['p25'] = { btn:'audio-btn-p25', waves:'audio-waves-p25' };
+BOX_TO_AUDIO['chat-p25'] = 'p25';
+audioState['p25'] = false;
+
+// ── Estado de la página ──
+let p25Datos = {
+  contexto: '', pregunta: '', variables: '',
+  cols: [], tipos: {}, filas: [], nFilas: 0,
+  analisis: null, justif: '',
+  interpGrafica: '',
+  nombreArchivo: '',
+};
+let p25Chart = null;
+
+// ── Init al entrar a la página ──
+function p25Init() {
+  // Resetear estado
+  p25Datos = { contexto:'', pregunta:'', variables:'', cols:[], tipos:{}, filas:[], nFilas:0, analisis:null, justif:'', interpGrafica:'', nombreArchivo:'' };
+  if(p25Chart){ p25Chart.destroy(); p25Chart=null; }
+  // Resetear etapas
+  ['p25-etapa1','p25-etapa2','p25-etapa3','p25-etapa4'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = i===0?'block':'none';
+  });
+  // Resetear tutor
+  const chat=document.getElementById('chat-p25');
+  if(chat) chat.innerHTML='';
+  const panel=document.getElementById('p25-tutor-panel');
+  if(panel) panel.style.display='none';
+  const ph=document.getElementById('p25-tutor-placeholder');
+  if(ph) ph.style.display='flex';
+  // Limpiar campos
+  ['p25-contexto','p25-pregunta','p25-variables','p25-interp-grafica','p25-justif-analisis'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.querySelectorAll('.p25-anal-btn').forEach(b=>b.classList.remove('selected'));
+  const af=document.getElementById('p25-anal-feedback'); if(af) af.style.display='none';
+  const jw=document.getElementById('p25-justif-wrap'); if(jw) jw.style.display='none';
+  const bb=document.getElementById('p25-btn-tutor'); if(bb) bb.style.display='none';
+}
+
+// ── ETAPA 1 → 2 ──
+function p25AvanzarEtapa2() {
+  const ctx = document.getElementById('p25-contexto')?.value.trim();
+  const prg = document.getElementById('p25-pregunta')?.value.trim();
+  const vrs = document.getElementById('p25-variables')?.value.trim();
+  if(!ctx||!prg||!vrs){
+    alert('Por favor completa los tres campos antes de continuar.'); return;
+  }
+  p25Datos.contexto  = ctx;
+  p25Datos.pregunta  = prg;
+  p25Datos.variables = vrs;
+  document.getElementById('p25-etapa2').style.display='block';
+  setTimeout(()=>document.getElementById('p25-etapa2')?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
+}
+
+// ── Leer archivo (CSV o XLSX) ──
+function p25LeerArchivo(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  p25Datos.nombreArchivo = file.name;
+  const fb = document.getElementById('p25-upload-feedback');
+  fb.style.display='block'; fb.className='prob-feedback parcial';
+  fb.textContent='Leyendo archivo…';
+
+  const reader = new FileReader();
+  if(ext==='csv'){
+    reader.onload = e => {
+      try {
+        const result = Papa.parse(e.target.result, { header:true, skipEmptyLines:true, dynamicTyping:false });
+        p25ProcesarDatos(result.data, result.meta.fields, file.name);
+      } catch(err) { fb.className='prob-feedback error'; fb.textContent='Error al leer CSV: '+err.message; }
+    };
+    reader.readAsText(file, 'UTF-8');
+  } else if(ext==='xlsx'||ext==='xls'){
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws, {defval:''});
+        const cols = Object.keys(data[0]||{});
+        p25ProcesarDatos(data, cols, file.name);
+      } catch(err) { fb.className='prob-feedback error'; fb.textContent='Error al leer Excel: '+err.message; }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    fb.className='prob-feedback error'; fb.textContent='Formato no soportado. Usa CSV o XLSX.';
+  }
+}
+
+// ── Inferir tipo de columna ──
+function p25InferirTipo(col, filas) {
+  const vals = filas.map(r=>r[col]).filter(v=>v!==''&&v!=null);
+  const numVals = vals.filter(v=>!isNaN(parseFloat(v))&&isFinite(v));
+  const unicos = [...new Set(vals)];
+  if(numVals.length/vals.length > 0.8 && unicos.length > 8) return 'numérica';
+  if(unicos.length <= 20) return 'categórica';
+  return 'texto';
+}
+
+// ── Procesar datos cargados ──
+function p25ProcesarDatos(filas, cols, nombre) {
+  const fb = document.getElementById('p25-upload-feedback');
+  if(!filas||filas.length===0||!cols||cols.length===0){
+    fb.className='prob-feedback error'; fb.textContent='El archivo está vacío o no tiene encabezados.'; return;
+  }
+  // Inferir tipos
+  const tipos = {};
+  cols.forEach(c=>{ tipos[c]=p25InferirTipo(c,filas); });
+  p25Datos.cols  = cols;
+  p25Datos.tipos = tipos;
+  p25Datos.filas = filas;
+  p25Datos.nFilas = filas.length;
+
+  fb.className='prob-feedback ok';
+  fb.textContent=`✅ Tabla cargada: ${filas.length} filas · ${cols.length} columnas — ${nombre}`;
+
+  // Mostrar etapa 3
+  document.getElementById('p25-etapa3').style.display='block';
+  p25RenderResumen();
+  p25RenderPreview();
+  p25InicializarSelectores();
+  p25ActualizarGrafica();
+  setTimeout(()=>document.getElementById('p25-etapa3')?.scrollIntoView({behavior:'smooth',block:'nearest'}),300);
+}
+
+// ── Resumen de la tabla ──
+function p25RenderResumen() {
+  const el=document.getElementById('p25-resumen'); if(!el) return;
+  const cats=Object.entries(p25Datos.tipos).filter(([,t])=>t==='categórica').map(([c])=>c);
+  const nums=Object.entries(p25Datos.tipos).filter(([,t])=>t==='numérica').map(([c])=>c);
+  el.innerHTML=`<div class="p25-resumen-grid">
+    <div class="p25-res-item"><span class="p25-res-val">${p25Datos.nFilas}</span><span class="p25-res-lbl">observaciones (N)</span></div>
+    <div class="p25-res-item"><span class="p25-res-val">${p25Datos.cols.length}</span><span class="p25-res-lbl">variables</span></div>
+    <div class="p25-res-item"><span class="p25-res-val">${cats.length}</span><span class="p25-res-lbl">categóricas</span></div>
+    <div class="p25-res-item"><span class="p25-res-val">${nums.length}</span><span class="p25-res-lbl">numéricas</span></div>
+  </div>
+  <div class="p25-cols-list">${p25Datos.cols.map(c=>`<span class="p25-col-badge p25-col-${p25Datos.tipos[c]==='categórica'?'cat':'num'}">${c} <em>(${p25Datos.tipos[c]})</em></span>`).join('')}</div>`;
+}
+
+// ── Vista previa (primeras 5 filas) ──
+function p25RenderPreview() {
+  const el=document.getElementById('p25-preview-tabla'); if(!el) return;
+  const cols=p25Datos.cols; const filas=p25Datos.filas.slice(0,5);
+  let h=`<table class="chi3-tbl p25-preview-tbl"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+  filas.forEach(f=>{ h+=`<tr>${cols.map(c=>`<td>${f[c]??''}</td>`).join('')}</tr>`; });
+  h+='</tbody></table>';
+  el.innerHTML=h;
+}
+
+// ── Inicializar selectores de variables ──
+function p25InicializarSelectores() {
+  const sel1=document.getElementById('p25-sel-var1');
+  const sel2=document.getElementById('p25-sel-var2');
+  if(!sel1||!sel2) return;
+  const cats=p25Datos.cols.filter(c=>p25Datos.tipos[c]==='categórica');
+  const todas=p25Datos.cols;
+  sel1.innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel2.innerHTML='<option value="">— ninguna —</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+
+// ── Conteos ──
+function p25ContarUna(col){
+  const counts={};
+  p25Datos.filas.forEach(f=>{ const v=String(f[col]??'(vacío)'); counts[v]=(counts[v]||0)+1; });
+  return counts;
+}
+function p25ContarCruzado(col1,col2){
+  const c1vals=[...new Set(p25Datos.filas.map(f=>String(f[col1]??'(vacío)')))].sort();
+  const c2vals=[...new Set(p25Datos.filas.map(f=>String(f[col2]??'(vacío)')))].sort();
+  const matrix={};
+  c1vals.forEach(v1=>{ matrix[v1]={}; c2vals.forEach(v2=>{ matrix[v1][v2]=0; }); });
+  p25Datos.filas.forEach(f=>{ const v1=String(f[col1]??'(vacío)'); const v2=String(f[col2]??'(vacío)'); if(matrix[v1]) matrix[v1][v2]=(matrix[v1][v2]||0)+1; });
+  return {c1vals,c2vals,matrix};
+}
+
+// ── Paleta de colores ──
+const P25_COLORS=['#2d4a6e','#5b8db8','#4a7c59','#8ab4a0','#c9a84c','#e8c97a','#7a4a6e','#b48aaa'];
+
+// ── Actualizar gráfica ──
+function p25ActualizarGrafica() {
+  const v1=document.getElementById('p25-sel-var1')?.value;
+  const v2=document.getElementById('p25-sel-var2')?.value;
+  const tipo=document.getElementById('p25-sel-tipo')?.value||'bar';
+  if(!v1||!p25Datos.filas.length) return;
+  const canvas=document.getElementById('p25-canvas'); if(!canvas) return;
+  if(p25Chart){ p25Chart.destroy(); p25Chart=null; }
+
+  let cfg;
+  if(!v2||(tipo==='bar'||tipo==='pie')){
+    const counts=p25ContarUna(v1);
+    const labels=Object.keys(counts); const data=Object.values(counts);
+    if(tipo==='pie'){
+      cfg={type:'pie',data:{labels,datasets:[{data,backgroundColor:P25_COLORS,borderWidth:2}]},
+        options:{responsive:true,plugins:{legend:{position:'right'},title:{display:true,text:`Distribución de "${v1}"`}}}};
+    } else {
+      cfg={type:'bar',data:{labels,datasets:[{label:v1,data,backgroundColor:P25_COLORS[0],borderRadius:4}]},
+        options:{responsive:true,plugins:{title:{display:true,text:`Frecuencias de "${v1}"`}},scales:{y:{beginAtZero:true}}}};
+    }
+  } else if(tipo==='barAgrupado'&&v2){
+    const {c1vals,c2vals,matrix}=p25ContarCruzado(v1,v2);
+    cfg={type:'bar',
+      data:{labels:c1vals,datasets:c2vals.map((v,i)=>({label:v,data:c1vals.map(r=>matrix[r][v]||0),backgroundColor:P25_COLORS[i%P25_COLORS.length],borderRadius:3}))},
+      options:{responsive:true,plugins:{title:{display:true,text:`"${v1}" × "${v2}"`}},scales:{x:{stacked:false},y:{beginAtZero:true}}}};
+  } else if(tipo==='heatmap'&&v2){
+    // Heatmap como barras apiladas con intensidad
+    const {c1vals,c2vals,matrix}=p25ContarCruzado(v1,v2);
+    cfg={type:'bar',
+      data:{labels:c1vals,datasets:c2vals.map((v,i)=>({label:v,data:c1vals.map(r=>matrix[r][v]||0),backgroundColor:P25_COLORS[i%P25_COLORS.length]+'CC',borderRadius:2}))},
+      options:{responsive:true,plugins:{title:{display:true,text:`Mapa de calor: "${v1}" × "${v2}"`}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}};
+  } else {
+    const counts=p25ContarUna(v1);
+    const labels=Object.keys(counts); const data=Object.values(counts);
+    cfg={type:'bar',data:{labels,datasets:[{label:v1,data,backgroundColor:P25_COLORS[0],borderRadius:4}]},
+      options:{responsive:true,plugins:{title:{display:true,text:`Frecuencias de "${v1}"`}},scales:{y:{beginAtZero:true}}}};
+  }
+  p25Chart=new Chart(canvas,cfg);
+}
+
+// ── ETAPA 3 → 4 ──
+function p25AvanzarEtapa4() {
+  const interp=document.getElementById('p25-interp-grafica')?.value.trim();
+  if(!interp){ alert('Escribe tu interpretación de la gráfica antes de continuar.'); return; }
+  p25Datos.interpGrafica=interp;
+  document.getElementById('p25-etapa4').style.display='block';
+  setTimeout(()=>document.getElementById('p25-etapa4')?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
+}
+
+// ── Selección de análisis ──
+function p25SelAnalisis(tipo) {
+  p25Datos.analisis=tipo;
+  document.querySelectorAll('.p25-anal-btn').forEach(b=>b.classList.toggle('selected',b.dataset.anal===tipo));
+  const fb=document.getElementById('p25-anal-feedback');
+  fb.style.display='block'; fb.className='pts-feedback';
+  const msgs={
+    frecuencias:'Has elegido tabla de frecuencias (1 variable). Antes de que el tutor comente, justifica por qué esa herramienta responde tu pregunta.',
+    contingencia:'Has elegido tabla de contingencia (2 variables). Justifica por qué ese análisis es adecuado para tu pregunta.',
+    chi2:'Has elegido la prueba chi-cuadrado. Justifica por qué necesitas ir más allá de la contingencia.',
+    libre:'Exploración libre. Describe brevemente qué quieres explorar y por qué.',
+  };
+  fb.textContent=msgs[tipo]||'';
+  document.getElementById('p25-justif-wrap').style.display='block';
+  document.getElementById('p25-btn-tutor').style.display='block';
+}
+
+// ── Construir contexto para el tutor ──
+function p25ConstruirContexto() {
+  const {contexto,pregunta,variables,cols,tipos,filas,nFilas,analisis,justif,interpGrafica,nombreArchivo}=p25Datos;
+  // Calcular distribución de cada columna categórica (conteos)
+  const catCols=cols.filter(c=>tipos[c]==='categórica');
+  let distrib='';
+  catCols.forEach(c=>{
+    const counts=p25ContarUna(c);
+    const resumen=Object.entries(counts).map(([v,n])=>`${v}:${n}`).join(', ');
+    distrib+=`  "${c}" → ${resumen}\n`;
+  });
+  const v1=document.getElementById('p25-sel-var1')?.value;
+  const v2=document.getElementById('p25-sel-var2')?.value;
+  return `[CONTEXTO P25 — Estudio propio del estudiante]
+Archivo: ${nombreArchivo}
+N = ${nFilas} observaciones · ${cols.length} variables
+
+Pregunta estadística del estudiante: ${pregunta}
+Contexto de los datos: ${contexto}
+Variables que el estudiante identificó: ${variables}
+
+Estructura real de la tabla:
+${cols.map(c=>`  "${c}" (${tipos[c]})`).join('\n')}
+
+Distribución de variables categóricas:
+${distrib||'(sin variables categóricas detectadas)'}
+
+Variable graficada: ${v1}${v2?` × ${v2}`:''}
+Interpretación de la gráfica del estudiante: ${interpGrafica}
+
+Herramienta elegida: ${analisis}
+Justificación del estudiante: ${justif||'(sin justificación)'}`;
+}
+
+// ── Enviar al tutor (primera vez) ──
+async function p25EnviarAlTutor() {
+  const justif=document.getElementById('p25-justif-analisis')?.value.trim();
+  if(!justif){ alert('Escribe tu justificación antes de iniciar el análisis.'); return; }
+  p25Datos.justif=justif;
+  // Mostrar tutor y ocultar placeholder
+  document.getElementById('p25-tutor-panel').style.display='flex';
+  document.getElementById('p25-tutor-placeholder').style.display='none';
+  const ctx=p25ConstruirContexto();
+  agregarMensajeGen('chat-p25','📋 Enviando mi problema y datos al tutor…','user');
+  const tid=agregarTypingGen('chat-p25');
+  setStatusGen('ts-p25','Analizando tus datos…');
+  try {
+    const res=await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:ctx,session_id:`p25_${sessionId}`})});
+    const data=await res.json();
+    quitarTypingGen(tid); setStatusGen('ts-p25','En línea');
+    if(data.reply) agregarMensajeGen('chat-p25',data.reply,'tutor');
+  } catch(e){
+    quitarTypingGen(tid); setStatusGen('ts-p25','En línea');
+    agregarMensajeGen('chat-p25','Problema de conexión. Intenta de nuevo.','tutor');
+  }
+  setTimeout(()=>document.getElementById('p25-tutor-panel')?.scrollIntoView({behavior:'smooth',block:'nearest'}),300);
+}
+
+// ── Chat libre p25 ──
+async function p25ChatLibre() {
+  const inp=document.getElementById('input-p25');
+  if(!inp?.value.trim()) return;
+  const txt=inp.value.trim(); inp.value='';
+  agregarMensajeGen('chat-p25',txt,'user');
+  const tid=agregarTypingGen('chat-p25');
+  setStatusGen('ts-p25','Escribiendo…');
+  try {
+    const res=await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:txt,session_id:`p25_${sessionId}`})});
+    const data=await res.json();
+    quitarTypingGen(tid); setStatusGen('ts-p25','En línea');
+    if(data.reply) agregarMensajeGen('chat-p25',data.reply,'tutor');
+  } catch(e){
+    quitarTypingGen(tid); setStatusGen('ts-p25','En línea');
+    agregarMensajeGen('chat-p25','Problema de conexión.','tutor');
+  }
 }
