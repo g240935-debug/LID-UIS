@@ -4114,3 +4114,13 @@ async function p25ChatLibre() {
     agregarMensajeGen('chat-p25','Problema de conexión.','tutor');
   }
 }
+
+// ── Toggle fuentes de datos (pág 25) ──
+function p25ToggleFuentes() {
+  const body = document.getElementById('p25-fuentes-body');
+  const chevron = document.getElementById('p25-chevron');
+  if (!body || !chevron) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
