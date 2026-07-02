@@ -196,9 +196,10 @@ function irAPagina(n) {
   // ── Inicialización de tutores al llegar a cada página ──
 
   // Cap I — Actividad unificada (pág 3): construye tabla completa en un solo chat
-  if (n === 3 && !chatFreqUnifIniciado) {
-    chatFreqUnifIniciado = true;
-    setTimeout(() => { renderizarP3Tabla(); inicializarChatFreqUnif(); }, 400);
+  // Se difiere hasta que el estudiante complete la exploración inicial de datos libres
+  // (ver p3PrepararPagina / p3ExploracionContinuar2).
+  if (n === 3) {
+    setTimeout(p3PrepararPagina, 200);
   }
 
   // Cap I — Ejemplos Dinámicos (pág 5b)
@@ -4345,8 +4346,9 @@ const P1_GLOSARIO = {
 };
 let p1GlosarioActivo = null;
 
-function p1ToggleGlosario(termino, el) {
-  const panel = document.getElementById('p1-glosario-panel');
+function p1ToggleGlosario(termino, el, panelId) {
+  panelId = panelId || 'p1-glosario-panel';
+  const panel = document.getElementById(panelId);
   if (!panel) return;
   // Si se hace clic en el mismo término que ya está activo, se cierra
   if (p1GlosarioActivo === termino) {
@@ -4499,4 +4501,85 @@ function ctxExplorerVerCondicionada(i, j) {
     <div class="ctx-ep-cond-row"><span class="ctx-ep-cond-lbl">Sobre la columna ${cols[j]} (${colTot})</span><span class="ctx-ep-cond-val">${pCol}%</span></div>
     <p class="ctx-ep-desc" style="margin-top:6px;">El mismo dato (${M[i][j]}) cuenta tres historias distintas — por eso la frecuencia condicionada siempre depende de <em>a qué total la refieres</em>.</p>
   `;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PÁGINA 3 — EXPLORACIÓN PREVIA: datos libres antes de la tabla
+   Situación a-didáctica: el estudiante enfrenta las 40 respuestas
+   sin procesar y experimenta la dificultad real de leerlas antes
+   de que se le ofrezca ninguna herramienta de resumen. Solo tras
+   completar esta exploración se revela la actividad guiada de
+   construcción de la tabla (activity-layout + tutor).
+══════════════════════════════════════════════════════════════ */
+
+// Secuencia fija (no aleatoria en cada carga) de las 40 respuestas, respetando
+// los conteos reales: Café Negro=18, Té/Aromática=10, Jugo Natural=8, Energizante=4.
+const P3_DATOS_LIBRES = [
+  ['Café Negro','Jugo Natural','Café Negro','Té / Aromática','Café Negro','Café Negro','Jugo Natural','Té / Aromática','Café Negro','Café Negro'],
+  ['Bebida Energizante','Café Negro','Jugo Natural','Café Negro','Bebida Energizante','Té / Aromática','Té / Aromática','Jugo Natural','Té / Aromática','Té / Aromática'],
+  ['Café Negro','Jugo Natural','Café Negro','Té / Aromática','Bebida Energizante','Café Negro','Café Negro','Café Negro','Jugo Natural','Café Negro'],
+  ['Jugo Natural','Bebida Energizante','Té / Aromática','Café Negro','Jugo Natural','Café Negro','Café Negro','Té / Aromática','Café Negro','Té / Aromática'],
+];
+
+function p3RenderLibresGrid() {
+  const el = document.getElementById('p3-libres-grid');
+  if (!el || el.dataset.init) return;
+  el.dataset.init = '1';
+  let html = '';
+  let n = 1;
+  P3_DATOS_LIBRES.forEach(col => {
+    html += '<div class="p3-libres-col">';
+    col.forEach(val => {
+      html += `<div class="p3-libres-item"><span class="p3-libres-num">${n}</span><span class="p3-libres-val">${val}</span></div>`;
+      n++;
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+// Prepara la página 3 al entrar: si el estudiante ya completó la exploración
+// en una visita previa (chatFreqUnifIniciado === true), va directo a la actividad.
+// Si no, muestra la exploración de datos libres primero.
+function p3PrepararPagina() {
+  p3RenderLibresGrid();
+  const exploracion = document.getElementById('p3-exploracion');
+  const actividad    = document.getElementById('p3-activity-wrap');
+  if (chatFreqUnifIniciado) {
+    if (exploracion) exploracion.style.display = 'none';
+    if (actividad)   actividad.style.display = 'grid';
+  } else {
+    if (exploracion) exploracion.style.display = 'block';
+    if (actividad)   actividad.style.display = 'none';
+  }
+}
+
+// Paso 1 → 2: el estudiante debe escribir su conclusión antes de ver el comentario de transición
+function p3ExploracionContinuar1() {
+  const resp = document.getElementById('p3-exp-respuesta');
+  if (!resp || !resp.value.trim()) {
+    alert('Escribe tu conclusión antes de continuar — no hay respuesta correcta o incorrecta, es tu primera impresión sobre los datos.');
+    return;
+  }
+  const btn1 = document.getElementById('p3-exp-btn1');
+  if (btn1) { btn1.style.display = 'none'; }
+  const comentario = document.getElementById('p3-exp-comentario');
+  if (comentario) {
+    comentario.style.display = 'block';
+    setTimeout(() => comentario.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 150);
+  }
+}
+
+// Paso 2 → actividad: revela la construcción guiada de la tabla e inicia el tutor
+function p3ExploracionContinuar2() {
+  const exploracion = document.getElementById('p3-exploracion');
+  const actividad    = document.getElementById('p3-activity-wrap');
+  if (exploracion) exploracion.style.display = 'none';
+  if (actividad)   actividad.style.display = 'grid';
+  if (!chatFreqUnifIniciado) {
+    chatFreqUnifIniciado = true;
+    renderizarP3Tabla();
+    inicializarChatFreqUnif();
+  }
+  setTimeout(() => actividad?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
 }
