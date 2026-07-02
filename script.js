@@ -1897,15 +1897,33 @@ const EJF_DATA_CUANT = [
 ];
 
 const EJF_PREGUNTAS_CUALI = [
-  'Usa la Vista personalizada y muestra solo <strong>fᵢ</strong> filtrando únicamente Café y Té. ¿Qué porcentaje del total de encuestados representan esas dos bebidas juntas? Calcúlalo tú mismo con la tabla.',
-  'Activa solo las columnas <strong>fᵣ</strong> y <strong>Fᵣ</strong>. ¿En qué categoría se supera el 50% acumulado? ¿Qué significa eso sobre las preferencias del grupo?',
-  'Compara el gráfico de Barras con el de Pastel usando la misma información. ¿Cuál te permite ver más rápido cuál es la bebida más popular? ¿Cuál te permite ver mejor qué proporción representa cada una del total?',
+  {
+    texto: 'Usa la Vista personalizada y muestra solo <strong>fᵢ</strong> filtrando únicamente Café y Té. ¿Qué porcentaje del total de encuestados representan esas dos bebidas juntas? Calcúlalo tú mismo con la tabla.',
+    modelo: 'Café: fᵢ=18, Té: fᵢ=10. Juntas suman 28 de 40 encuestados → fᵣ = 28/40 = 0.70 (70%). Compara este cálculo con el tuyo: ¿coincide el 70%?',
+  },
+  {
+    texto: 'Activa solo las columnas <strong>fᵣ</strong> y <strong>Fᵣ</strong>. ¿En qué categoría se supera el 50% acumulado? ¿Qué significa eso sobre las preferencias del grupo?',
+    modelo: 'Orden de la tabla: Café(0.45) → Té(0.70 acumulado) → Jugo(0.90) → Energizante(1.00). El 50% se supera en la 2ª categoría (Té), ya que Fᵣ pasa de 0.45 a 0.70. Esto significa que más de la mitad del grupo prefiere Café o Té.',
+  },
+  {
+    texto: 'Compara el gráfico de Barras con el de Pastel usando la misma información. ¿Cuál te permite ver más rápido cuál es la bebida más popular? ¿Cuál te permite ver mejor qué proporción representa cada una del total?',
+    modelo: 'El gráfico de Barras facilita comparar magnitudes exactas entre categorías (¿cuál es más alta?). El gráfico de Pastel facilita ver la proporción de cada categoría respecto al total (¿qué fracción del círculo ocupa?). Ninguno es "mejor" en general — depende de la pregunta que quieras responder.',
+  },
 ];
 
 const EJF_PREGUNTAS_CUANT = [
-  'Usa la Vista personalizada y filtra solo los intervalos donde la conexión diaria supera las 4 horas. ¿Qué porcentaje del total de estudiantes representa ese grupo? Súmalo con los datos filtrados.',
-  'Activa únicamente <strong>fᵣ</strong> y <strong>Fᵣ</strong>. ¿En qué intervalo se acumula el 50% de los estudiantes? ¿Qué te dice eso sobre el uso típico de internet en este grupo?',
-  'Compara el Histograma de relativas con el Histograma de acumuladas (Ojiva). ¿Qué pregunta responde mejor cada uno: "¿cuál es el intervalo más común?" o "¿qué proporción de estudiantes está por debajo de cierto número de horas?"',
+  {
+    texto: 'Usa la Vista personalizada y filtra solo los intervalos donde la conexión diaria supera las 4 horas. ¿Qué porcentaje del total de estudiantes representa ese grupo? Súmalo con los datos filtrados.',
+    modelo: 'Intervalos [4-6), [6-8) y [8-10]: fᵢ = 18+9+3 = 30 de 50 estudiantes → fᵣ = 30/50 = 0.60 (60%). Compara este cálculo con el tuyo.',
+  },
+  {
+    texto: 'Activa únicamente <strong>fᵣ</strong> y <strong>Fᵣ</strong>. ¿En qué intervalo se acumula el 50% de los estudiantes? ¿Qué te dice eso sobre el uso típico de internet en este grupo?',
+    modelo: 'Fᵣ acumulada: [0-2)=0.12 → [2-4)=0.40 → [4-6)=0.76. El 50% se supera en el intervalo [4-6), ya que Fᵣ pasa de 0.40 a 0.76. Esto indica que el uso "típico" (la mitad del grupo) está entre 4 y 6 horas diarias.',
+  },
+  {
+    texto: 'Compara el Histograma de relativas con el Histograma de acumuladas (Ojiva). ¿Qué pregunta responde mejor cada uno: "¿cuál es el intervalo más común?" o "¿qué proporción de estudiantes está por debajo de cierto número de horas?"',
+    modelo: 'El Histograma de relativas responde mejor "¿cuál es el intervalo más común?" (la barra más alta, en este caso [4-6) con fᵣ=0.36). El Histograma de acumuladas responde mejor "¿qué proporción está por debajo de cierto valor?" (por ejemplo, leyendo la barra de [6-8) sabes que el 94% conecta menos de 8h).',
+  },
 ];
 
 let ejfModoActual    = 'completa';   // 'completa' | 'personalizada'
@@ -1927,7 +1945,7 @@ function inicializarEjemplosDinamicos() {
   ejfRenderTabsGrafico();
   EJF_PREGUNTAS_CUALI.forEach((p, i) => {
     const el = document.getElementById(`ejf-preg-${i+1}`);
-    if (el) el.innerHTML = p;
+    if (el) el.innerHTML = p.texto;
   });
   ejfActualizarVista();
 }
@@ -1949,14 +1967,37 @@ function ejfCambiarVariable(variable) {
   // Reconstruir pestañas de gráfico según el tipo de variable
   ejfRenderTabsGrafico();
 
-  // Actualizar preguntas de reflexión
+  // Actualizar preguntas de reflexión y resetear respuestas/feedback previos
   const preguntas = variable === 'cualitativa' ? EJF_PREGUNTAS_CUALI : EJF_PREGUNTAS_CUANT;
   preguntas.forEach((p, i) => {
     const el = document.getElementById(`ejf-preg-${i+1}`);
-    if (el) el.innerHTML = p;
+    if (el) el.innerHTML = p.texto;
+    const resp = document.getElementById(`ejf-resp-${i+1}`);
+    if (resp) resp.value = '';
+    const fb = document.getElementById(`ejf-verif-fb-${i+1}`);
+    if (fb) { fb.style.display = 'none'; fb.innerHTML = ''; }
   });
 
   ejfActualizarVista();
+}
+
+// Verificación de las preguntas de reflexión: revela la consecuencia matemática
+// esperada para que el estudiante compare con su propio razonamiento (no un veredicto).
+function ejfVerificarPregunta(n) {
+  const preguntas = ejfVariableActual === 'cualitativa' ? EJF_PREGUNTAS_CUALI : EJF_PREGUNTAS_CUANT;
+  const p = preguntas[n - 1];
+  const resp = document.getElementById(`ejf-resp-${n}`);
+  const fb = document.getElementById(`ejf-verif-fb-${n}`);
+  if (!p || !fb) return;
+  if (!resp || !resp.value.trim()) {
+    fb.style.display = 'block';
+    fb.className = 'ejf-verif-fb ejf-verif-fb-warn';
+    fb.innerHTML = 'Escribe tu respuesta antes de verificar, así puedes comparar tu propio razonamiento con el esperado.';
+    return;
+  }
+  fb.style.display = 'block';
+  fb.className = 'ejf-verif-fb ejf-verif-fb-ok';
+  fb.innerHTML = `<strong>Así se resuelve:</strong> ${p.modelo}<br><em>Compara este razonamiento con el tuyo — ¿coincide la idea central, aunque lo hayas explicado con otras palabras?</em>`;
 }
 
 function ejfRenderTabsGrafico() {
@@ -2312,6 +2353,19 @@ const P5C_PROBLEMAS = [
     ],
     pista: 'Fᵣ = Fᵢ / N. La última fila siempre tendrá Fᵣ = 1.00 y Fᵢ = N.',
   },
+  {
+    titulo: 'Problema 4',
+    enunciado: 'Se cronometró el tiempo (en minutos) que tardaron 60 estudiantes en resolver un examen de estadística. Los datos, agrupados en intervalos, fueron: [30-40) → 6 estudiantes, [40-50) → 18, [50-60) → 20, [60-70) → 12, [70-80] → 4. A diferencia de los problemas anteriores, aquí la variable es cuantitativa: cada fila representa un intervalo de tiempo, no una categoría. Completa la tabla de frecuencias.',
+    N: 60,
+    filas: [
+      { cat: '[30-40)', fi: 6  },
+      { cat: '[40-50)', fi: 18 },
+      { cat: '[50-60)', fi: 20 },
+      { cat: '[60-70)', fi: 12 },
+      { cat: '[70-80]', fi: 4  },
+    ],
+    pista: 'Igual que con variables cualitativas: fᵣ = fᵢ / N y Fᵢ se acumula fila a fila. La diferencia es que aquí el orden de las filas NO es arbitrario — los intervalos van de menor a mayor tiempo.',
+  },
 ];
 
 // Celdas que se ocultan en cada problema (índices: fila,col donde col: 0=fi,1=hi,2=Fi,3=Hi)
@@ -2319,6 +2373,7 @@ const P5C_VACIAS = [
   [[0,1],[1,1],[2,2],[3,2],[4,3],[1,3],[3,1],[0,2]],
   [[0,1],[1,2],[2,1],[3,3],[4,2],[0,3],[2,3],[1,1]],
   [[1,1],[0,3],[2,2],[3,1],[4,3],[0,2],[3,3],[2,1]],
+  [[0,1],[1,1],[2,3],[3,2],[4,1],[0,2],[2,1],[3,3]],
 ];
 
 function p5cValoresCorrectos(prob) {
@@ -2356,8 +2411,9 @@ function p5cCargarProblema(idx) {
   const wrap = document.getElementById('p5c-tabla-wrap');
   const cols = ['fᵢ','fᵣ','Fᵢ','Fᵣ'];
   const keys = ['fi','hi','Fi','Hi'];
+  const colEtiqueta = idx === 3 ? 'Intervalo (min)' : 'Categoría';
   let html = `<table class="p5c-tabla"><thead><tr>
-    <th>Categoría</th>
+    <th>${colEtiqueta}</th>
     ${cols.map(c=>`<th>${c}</th>`).join('')}
   </tr></thead><tbody>`;
 
@@ -2530,6 +2586,43 @@ const P5D_SITUACIONES = [
       },
     ],
   },
+  {
+    titulo: 'Situación 3',
+    badge: 'Situación 3',
+    cuantitativa: true,
+    enunciado: 'Una empresa midió los minutos diarios que dedican a hacer ejercicio 100 de sus empleados. Los datos, agrupados en intervalos, fueron: [0-15) → 20 empleados, [15-30) → 35, [30-45) → 25, [45-60) → 15, [60-75] → 5. A diferencia de las situaciones anteriores, aquí la variable es cuantitativa: cada fila es un intervalo de tiempo, no una categoría libre.',
+    N: 100,
+    categorias: [
+      { cat: '[0-15)',  fi: 20 },
+      { cat: '[15-30)', fi: 35 },
+      { cat: '[30-45)', fi: 25 },
+      { cat: '[45-60)', fi: 15 },
+      { cat: '[60-75]', fi: 5  },
+    ],
+    preguntas: [
+      {
+        id: 'p5d-q1',
+        tipo: 'hi',
+        texto: '¿Qué proporción de empleados hace ejercicio menos de 30 minutos diarios? Suma las frecuencias relativas de los intervalos correspondientes. ¿Por qué sería relevante ese dato para un programa de bienestar laboral?',
+        respClave: ['0.55','55%','menos de 30','primeros dos intervalos'],
+        retroalimentacion: 'fᵣ[0-15) = 20/100 = 0.20 y fᵣ[15-30) = 35/100 = 0.35. Juntos: 0.55 (55%). Más de la mitad de los empleados hace menos de 30 minutos diarios, lo que podría orientar a la empresa a diseñar incentivos para aumentar esos minutos.',
+      },
+      {
+        id: 'p5d-q2',
+        tipo: 'Fi',
+        texto: '¿Cuántos empleados acumulan hasta el intervalo [30-45), es decir, hasta 45 minutos de ejercicio diario (Fᵢ)? ¿Qué proporción de la empresa representa ese grupo?',
+        respClave: ['80','80 empleados','ochenta','0.8','80%'],
+        retroalimentacion: 'Fᵢ hasta [30-45) = 20+35+25 = 80 de 100 empleados. Eso representa el 80% de la empresa — solo el 20% restante supera los 45 minutos diarios de ejercicio.',
+      },
+      {
+        id: 'p5d-q3',
+        tipo: 'Hi',
+        texto: 'A diferencia de las categorías de las Situaciones 1 y 2 (que podías reordenar libremente arrastrando las filas), estos intervalos representan minutos de ejercicio de menor a mayor. Intenta arrastrar la tabla para invertir el orden, colocando primero [60-75] y al final [0-15). ¿Qué le pasa al significado de Fᵢ y Fᵣ cuando inviertes el orden? ¿Sigue teniendo sentido llamarlo "frecuencia acumulada"?',
+        respClave: ['pierde sentido','orden natural','no tiene sentido','intervalos tienen un orden','no se puede reordenar libremente','va de menor a mayor'],
+        retroalimentacion: 'Cuando una variable es cuantitativa y sus datos están agrupados en intervalos, el orden NO es arbitrario: los intervalos tienen una secuencia numérica natural (de menor a mayor). Acumular en ese orden permite interpretar Fᵢ como "cuántos empleados hacen ejercicio hasta cierto tiempo". Si inviertes el orden, Fᵢ pasaría a significar "cuántos hacen ejercicio desde el tiempo más alto hacia abajo" — sigue siendo una acumulación matemáticamente válida, pero cambia por completo lo que representa, y ya no correspondería al concepto usual de "frecuencia acumulada creciente" que se usa para leer percentiles o medianas.',
+      },
+    ],
+  },
 ];
 
 function p5dValoresCorrectos(sit) {
@@ -2585,10 +2678,11 @@ function p5dCargarSituacion(idx) {
 
 function p5dRenderTabla(sit) {
   const wrap = document.getElementById('p5d-tabla-wrap');
+  const colEtiqueta = sit.cuantitativa ? 'Intervalo (min)' : 'Categoría';
   let html = `<table class="p5c-tabla p5d-tabla">
     <thead><tr>
       <th class="p5d-th-drag">☰</th>
-      <th>Categoría</th><th>fᵢ</th><th>fᵣ</th><th>Fᵢ</th><th>Fᵣ</th>
+      <th>${colEtiqueta}</th><th>fᵢ</th><th>fᵣ</th><th>Fᵢ</th><th>Fᵣ</th>
     </tr></thead>
     <tbody id="p5d-tbody">`;
 
@@ -4232,19 +4326,19 @@ function p25ToggleFuentes() {
 // ── Glosario interactivo pág 1 (Exploración: datos libres vs agrupados) ──
 const P1_GLOSARIO = {
   cualitativa: {
-    titulo: 'Variable cualitativa',
+    titulo: '🏷️ Variable cualitativa',
     texto: 'Describe una cualidad o categoría, no una cantidad. Sus valores no son números que se puedan sumar o promediar con sentido. Por ejemplo: la bebida favorita (café, té, jugo…), el género, o el tipo de vivienda. Se organiza en categorías, no en un rango numérico.'
   },
   cuantitativa: {
-    titulo: 'Variable cuantitativa',
+    titulo: '🔢 Variable cuantitativa',
     texto: 'Se expresa mediante números que sí tienen significado matemático: se pueden sumar, promediar o comparar en magnitud. Por ejemplo: la edad, el número de horas de estudio, o el ingreso mensual. Puede ser discreta (valores contables, como el número de hijos) o continua (cualquier valor dentro de un rango, como la estatura).'
   },
   libres: {
-    titulo: 'Datos libres',
+    titulo: '📋 Datos libres',
     texto: 'Es la lista completa de observaciones tal como se recolectaron, sin resumir. Por ejemplo: cada respuesta individual de los 40 estudiantes encuestados, una por una. Se usan cuando el número de datos es manejable y se quiere trabajar con el detalle completo antes de resumir.'
   },
   agrupados: {
-    titulo: 'Datos agrupados',
+    titulo: '📦 Datos agrupados',
     texto: 'Es cuando las observaciones ya vienen organizadas en categorías o intervalos, con su conteo correspondiente. Por ejemplo: en vez de ver las 40 respuestas una a una, ya se sabe que "18 prefieren café, 10 té…". Se usan cuando hay muchos datos o cuando la fuente ya entrega la información resumida.'
   }
 };
