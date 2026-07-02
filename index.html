@@ -351,22 +351,8 @@
           <button class="ejf-var-btn" id="ejf-var-cuant" onclick="ejfCambiarVariable('cuantitativa')">📈 Cuantitativa — Horas de conexión a internet</button>
         </div>
 
-        <!-- Controles superiores -->
-        <div class="ejf-controls-row">
-          <!-- Modo: tabla completa o personalizada -->
-          <div class="ejf-mode-toggle">
-            <button class="ejf-mode-btn active" id="ejf-btn-completa" onclick="ejfCambiarModo('completa')">📋 Tabla completa</button>
-            <button class="ejf-mode-btn" id="ejf-btn-personalizada" onclick="ejfCambiarModo('personalizada')">🎛️ Vista personalizada</button>
-          </div>
-          <!-- Vista: tabla o gráfico -->
-          <div class="ejf-view-toggle">
-            <button class="ejf-view-btn active" id="ejf-vbtn-tabla" onclick="ejfCambiarVista('tabla')">📊 Tabla</button>
-            <button class="ejf-view-btn" id="ejf-vbtn-grafico" onclick="ejfCambiarVista('grafico')">📈 Gráfico</button>
-          </div>
-        </div>
-
-        <!-- Selector de columnas (modo personalizado) -->
-        <div class="ejf-custom-panel" id="ejf-custom-panel" style="display:none;">
+        <!-- Selector de columnas (siempre visible) -->
+        <div class="ejf-custom-panel" id="ejf-custom-panel">
           <div class="ejf-custom-label">Elige qué columnas mostrar:</div>
           <div class="ejf-col-checks">
             <label class="ejf-check"><input type="checkbox" id="ejf-chk-fi" checked onchange="ejfActualizarVista()"><span>fᵢ (absoluta)</span></label>
@@ -380,34 +366,35 @@
           </div>
         </div>
 
-        <!-- Área principal: tabla o gráfico -->
-        <div class="ejf-main-area">
+        <!-- Área principal: tabla y gráfico lado a lado -->
+        <div class="ejf-main-area ejf-main-area-split">
           <div id="ejf-tabla-area" class="ejf-area-block">
-            <div class="ejf-tabla-label" id="ejf-tabla-title">Tabla de frecuencias completa — Bebidas para estudiar (N = 40)</div>
+            <div class="ejf-tabla-label" id="ejf-tabla-title">Tabla de frecuencias — Bebidas para estudiar (N = 40)</div>
             <div id="ejf-tabla-wrapper"></div>
           </div>
-          <div id="ejf-grafico-area" class="ejf-area-block" style="display:none;">
+          <div id="ejf-grafico-area" class="ejf-area-block">
             <div class="ejf-grafico-tabs" id="ejf-grafico-tabs"></div>
-            <div style="max-height:320px;position:relative;">
+            <div id="ejf-grafico-canvas-wrap" style="max-height:320px;position:relative;">
               <canvas id="ejf-canvas" style="max-height:300px;"></canvas>
             </div>
+            <div id="ejf-grafico-vacio" class="ejf-grafico-vacio" style="display:none;"></div>
           </div>
         </div>
 
         <!-- Recuadro informativo dinámico -->
         <div class="ejf-info-bar" id="ejf-info-bar">
-          <span id="ejf-info-text">Tabla completa con las 4 frecuencias. Usa el modo personalizado para explorar columnas por separado.</span>
+          <span id="ejf-info-text">Elige columnas para explorar la tabla y ver el gráfico correspondiente actualizarse automáticamente.</span>
         </div>
 
         <!-- Preguntas de reflexión con Vista personalizada -->
         <div class="ejf-reflexion-wrap" id="ejf-reflexion-wrap">
-          <div class="ejf-reflexion-titulo">🎛️ Ponlo a prueba con la Vista personalizada</div>
+          <div class="ejf-reflexion-titulo">🎛️ Ponlo a prueba seleccionando columnas</div>
           <div class="ejf-reflexion-item">
             <span class="ejf-reflexion-num">1</span>
             <div class="ejf-reflexion-body">
               <p id="ejf-preg-1"></p>
               <textarea class="p5d-resp-input" id="ejf-resp-1" rows="2" placeholder="Escribe tu respuesta…"></textarea>
-              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(1)">🔍 Verificar</button>
+              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(1)">⚖️ Comparar</button>
               <div class="ejf-verif-fb" id="ejf-verif-fb-1" style="display:none;"></div>
             </div>
           </div>
@@ -416,17 +403,8 @@
             <div class="ejf-reflexion-body">
               <p id="ejf-preg-2"></p>
               <textarea class="p5d-resp-input" id="ejf-resp-2" rows="2" placeholder="Escribe tu respuesta…"></textarea>
-              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(2)">🔍 Verificar</button>
+              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(2)">⚖️ Comparar</button>
               <div class="ejf-verif-fb" id="ejf-verif-fb-2" style="display:none;"></div>
-            </div>
-          </div>
-          <div class="ejf-reflexion-item">
-            <span class="ejf-reflexion-num">3</span>
-            <div class="ejf-reflexion-body">
-              <p id="ejf-preg-3"></p>
-              <textarea class="p5d-resp-input" id="ejf-resp-3" rows="2" placeholder="Escribe tu respuesta…"></textarea>
-              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(3)">🔍 Verificar</button>
-              <div class="ejf-verif-fb" id="ejf-verif-fb-3" style="display:none;"></div>
             </div>
           </div>
         </div>
