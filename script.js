@@ -2263,6 +2263,9 @@ document.addEventListener('DOMContentLoaded', () => {
 ════════════════════════════════════════════════════════════ */
 
 let p5cProblemaActual = 0;
+// Guarda el estado (valores ingresados + feedback) de cada problema por separado,
+// para que no se pierda al cambiar de pestaña.
+let p5cEstadoPorProblema = {};
 
 const P5C_PROBLEMAS = [
   {
@@ -2394,65 +2397,99 @@ function p5cCargarProblema(idx) {
   </tr></tbody></table>`;
 
   wrap.innerHTML = html;
+
+  // Restaurar valores guardados de una visita anterior a este problema (si existen)
+  const estadoGuardado = p5cEstadoPorProblema[idx];
+  if (estadoGuardado && estadoGuardado.valores) {
+    Object.entries(estadoGuardado.valores).forEach(([key, val]) => {
+      if (val === '') return;
+      const inp = document.getElementById(`p5c-${key}`);
+      if (inp) inp.value = val;
+    });
+  }
+
+  // Restaurar colores y mensaje SOLO si ya hubo una verificación explícita previa
+  // (el coloreo nunca se aplica automáticamente por escribir, solo por pulsar "Verificar").
+  if (estadoGuardado && estadoGuardado.feedback) {
+    document.querySelectorAll('#p5c-tabla-wrap .p5c-cell').forEach(inp => {
+      if (inp.value === '') return;
+      const v = parseFloat(inp.value);
+      const c = parseFloat(inp.dataset.correct);
+      if (Math.abs(v - c) < 0.011) inp.classList.add('p5c-ok');
+      else inp.classList.add('p5c-err');
+    });
+    fb.style.display = 'block';
+    fb.className = estadoGuardado.feedback.clase;
+    fb.textContent = estadoGuardado.feedback.texto;
+  }
+
   p5cActualizarProgreso();
 }
 
 function p5cActualizarProgreso() {
-  const inputs = document.querySelectorAll('.p5c-cell');
-  let correctas = 0;
+  // Durante la escritura NO se evalúa correctitud ni se colorea — eso solo ocurre al
+  // pulsar "Verificar". Aquí solo se cuenta cuántas celdas están completadas y se
+  // guarda el valor actual para que persista al cambiar de problema.
+  const inputs = document.querySelectorAll('#p5c-tabla-wrap .p5c-cell');
+  let llenas = 0;
+  const estado = {};
   inputs.forEach(inp => {
-    const v = parseFloat(inp.value);
-    const c = parseFloat(inp.dataset.correct);
-    if (!isNaN(v) && Math.abs(v - c) < 0.011) {
-      correctas++;
-      inp.classList.add('p5c-ok');
-      inp.classList.remove('p5c-err');
-    } else if (inp.value !== '') {
-      inp.classList.remove('p5c-ok');
-      inp.classList.add('p5c-err');
-    } else {
-      inp.classList.remove('p5c-ok','p5c-err');
-    }
+    if (inp.value !== '') llenas++;
+    estado[`${inp.dataset.row}-${inp.dataset.col}`] = inp.value;
   });
+  if (!p5cEstadoPorProblema[p5cProblemaActual]) p5cEstadoPorProblema[p5cProblemaActual] = {};
+  p5cEstadoPorProblema[p5cProblemaActual].valores = estado;
+
   const total = inputs.length;
   const bar   = document.getElementById('p5c-progress-bar');
   const lbl   = document.getElementById('p5c-progress-label');
-  if (bar) bar.style.width = total ? `${(correctas/total)*100}%` : '0%';
-  if (lbl) lbl.textContent = `${correctas} / ${total} celdas correctas`;
+  if (bar) bar.style.width = total ? `${(llenas/total)*100}%` : '0%';
+  if (lbl) lbl.textContent = `${llenas} / ${total} celdas completadas`;
 }
 
 function p5cVerificar() {
-  const inputs  = document.querySelectorAll('.p5c-cell');
+  const inputs  = document.querySelectorAll('#p5c-tabla-wrap .p5c-cell');
   let correctas = 0, vacias = 0, incorrectas = 0;
+  const estado = {};
   inputs.forEach(inp => {
     const v = parseFloat(inp.value);
     const c = parseFloat(inp.dataset.correct);
+    estado[`${inp.dataset.row}-${inp.dataset.col}`] = inp.value;
     if (inp.value === '') { vacias++; return; }
     if (Math.abs(v - c) < 0.011) { correctas++; inp.classList.add('p5c-ok'); inp.classList.remove('p5c-err'); }
     else { incorrectas++; inp.classList.add('p5c-err'); inp.classList.remove('p5c-ok'); }
   });
   const fb = document.getElementById('p5c-feedback');
   fb.style.display = 'block';
+  let claseFb, textoFb;
   if (vacias > 0) {
-    fb.className = 'prob-feedback parcial';
-    fb.textContent = `Hay ${vacias} celda(s) sin completar. Revisa la tabla e intenta de nuevo.`;
+    claseFb = 'prob-feedback parcial';
+    textoFb = `Hay ${vacias} celda(s) sin completar. Revisa la tabla e intenta de nuevo.`;
   } else if (incorrectas > 0) {
-    fb.className = 'prob-feedback error';
-    fb.textContent = `${incorrectas} celda(s) incorrecta(s) (marcadas en rojo). Revisa las fórmulas y vuelve a intentarlo.`;
+    claseFb = 'prob-feedback error';
+    textoFb = `${incorrectas} celda(s) incorrecta(s) (marcadas en rojo). Revisa las fórmulas y vuelve a intentarlo.`;
   } else {
-    fb.className = 'prob-feedback ok';
-    fb.textContent = `✅ ¡Perfecto! Todas las celdas son correctas. La tabla está completa.`;
+    claseFb = 'prob-feedback ok';
+    textoFb = `✅ ¡Perfecto! Todas las celdas son correctas. La tabla está completa.`;
   }
+  fb.className = claseFb;
+  fb.textContent = textoFb;
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Guardar valores y resultado de la verificación para restaurarlos si el estudiante vuelve a este problema
+  if (!p5cEstadoPorProblema[p5cProblemaActual]) p5cEstadoPorProblema[p5cProblemaActual] = {};
+  p5cEstadoPorProblema[p5cProblemaActual].valores  = estado;
+  p5cEstadoPorProblema[p5cProblemaActual].feedback = { clase: claseFb, texto: textoFb };
 }
 
 function p5cReset() {
-  document.querySelectorAll('.p5c-cell').forEach(inp => {
+  document.querySelectorAll('#p5c-tabla-wrap .p5c-cell').forEach(inp => {
     inp.value = '';
     inp.classList.remove('p5c-ok','p5c-err');
   });
   const fb = document.getElementById('p5c-feedback');
   fb.style.display = 'none';
+  delete p5cEstadoPorProblema[p5cProblemaActual];
   p5cActualizarProgreso();
 }
 
