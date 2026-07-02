@@ -4127,6 +4127,14 @@ function p25ToggleFuentes() {
 
 // ── Glosario interactivo pág 1 (Exploración: datos libres vs agrupados) ──
 const P1_GLOSARIO = {
+  cualitativa: {
+    titulo: '🏷️ Variable cualitativa',
+    texto: 'Describe una cualidad o categoría, no una cantidad. Sus valores no son números que se puedan sumar o promediar con sentido. Por ejemplo: la bebida favorita (café, té, jugo…), el género, o el tipo de vivienda. Se organiza en categorías, no en un rango numérico.'
+  },
+  cuantitativa: {
+    titulo: '🔢 Variable cuantitativa',
+    texto: 'Se expresa mediante números que sí tienen significado matemático: se pueden sumar, promediar o comparar en magnitud. Por ejemplo: la edad, el número de horas de estudio, o el ingreso mensual. Puede ser discreta (valores contables, como el número de hijos) o continua (cualquier valor dentro de un rango, como la estatura).'
+  },
   libres: {
     titulo: '📋 Datos libres',
     texto: 'Es la lista completa de observaciones tal como se recolectaron, sin resumir. Por ejemplo: cada respuesta individual de los 40 estudiantes encuestados, una por una. Se usan cuando el número de datos es manejable y se quiere trabajar con el detalle completo antes de resumir.'
