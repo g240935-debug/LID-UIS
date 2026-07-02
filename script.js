@@ -2003,8 +2003,12 @@ function _ejfDetectarGrafico(cols) {
     if (cols.hi && !cols.fi) return { tipo: 'pie', motivo: null };
     return { tipo: 'barras', motivo: null }; // fi solo, o fi+hi juntas (proporcionales)
   }
-  // familia acumulada
-  return { tipo: 'ojiva', motivo: null, usaHi: cols.Hi && !cols.Fi };
+  // familia acumulada: histograma (barras contiguas) tiene sentido con intervalos (cuantitativa).
+  // Para cualitativa no hay intervalos, así que no se puede graficar de forma estándar.
+  if (ejfVariableActual === 'cuantitativa') {
+    return { tipo: 'histAcum', motivo: null, usaHi: cols.Hi && !cols.Fi };
+  }
+  return { tipo: null, motivo: 'Las frecuencias acumuladas se grafican habitualmente con un histograma, que necesita intervalos (datos agrupados). Como "Bebida favorita" es una variable categórica sin intervalos, este gráfico no está disponible aquí — puedes leer los valores acumulados directamente en la tabla, o cambiar a la variable cuantitativa para verlo graficado.' };
 }
 
 function ejfRenderTabsGrafico() {
@@ -2014,7 +2018,7 @@ function ejfRenderTabsGrafico() {
   if (!tabs) return;
   const cols = _ejfGetColumnas();
   const det = _ejfDetectarGrafico(cols);
-  const nombres = { barras: 'Barras', pie: 'Circular', ojiva: 'Ojiva (acumulada)' };
+  const nombres = { barras: 'Barras', pie: 'Circular', histAcum: 'Histograma (acumuladas)' };
   tabs.innerHTML = det.tipo
     ? `<div class="ejf-auto-label">📊 Gráfico automático: <strong>${nombres[det.tipo]}</strong></div>`
     : `<div class="ejf-auto-label ejf-auto-label-muted">📊 Sin gráfico disponible con esta selección</div>`;
@@ -2188,39 +2192,41 @@ function ejfRenderizarGrafico() {
     };
     if (info) info.textContent = 'Gráfico circular: muestra la proporción relativa (fᵣ) de cada categoría respecto al total.';
 
-  } else if (det.tipo === 'ojiva') {
-    // Acumulada (Fᵢ y/o Fᵣ, son proporcionales entre sí): línea/ojiva de acumulación.
+  } else if (det.tipo === 'histAcum') {
+    // Acumulada (Fᵢ y/o Fᵣ, son proporcionales entre sí): histograma de barras contiguas,
+    // solo disponible para variable cuantitativa porque necesita intervalos.
     const usaHi = det.usaHi;
     const valores = filas.map(r => usaHi ? r.Hi : r.Fi);
     config = {
-      type: 'line',
+      type: 'bar',
       data: {
         labels,
         datasets: [{
           label: usaHi ? 'Fᵣ (relativa acumulada)' : 'Fᵢ (absoluta acumulada)',
           data: valores,
+          backgroundColor: 'rgba(200,168,75,.8)',
           borderColor: 'rgba(200,168,75,1)',
-          backgroundColor: 'rgba(200,168,75,.15)',
-          fill: true, tension: 0, pointRadius: 5, pointBackgroundColor: 'rgba(200,168,75,1)',
-          borderWidth: 2,
+          borderWidth: 1,
+          barPercentage: 1.0,
+          categoryPercentage: 1.0,
         }]
       },
       options: {
         responsive: true,
         plugins: {
           legend: { display: false },
-          title: { display: true, text: `Ojiva — ${usaHi ? 'Frecuencia Relativa' : 'Frecuencia Absoluta'} Acumulada`, font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+          title: { display: true, text: `Histograma — ${usaHi ? 'Frecuencia Relativa' : 'Frecuencia Absoluta'} Acumulada`, font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
         },
         scales: {
           y: { beginAtZero: true, max: usaHi ? 1 : undefined, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
-          x: { ticks: { font: { family: 'Inter', size: 10 } } }
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
         },
         animation: { duration: 500, easing: 'easeOutQuart' }
       }
     };
     if (info) info.textContent = cols.Fi && cols.Hi
-      ? 'Ojiva: Fᵢ y Fᵣ comparten la misma forma acumulada (Fᵣ = Fᵢ/N), así que una sola línea representa ambas.'
-      : 'Ojiva: cada punto muestra cuánto se ha acumulado hasta esa categoría. El orden de las categorías importa para leerla correctamente.';
+      ? 'Histograma: Fᵢ y Fᵣ comparten la misma forma acumulada (Fᵣ = Fᵢ/N), así que un solo gráfico representa ambas.'
+      : 'Histograma acumulado: cada barra muestra cuánto se ha acumulado hasta ese intervalo. Las barras van contiguas porque representan un rango continuo.';
   }
 
   ejfChart = new Chart(ctx, config);
