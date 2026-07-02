@@ -3,8 +3,8 @@
    Conexión al backend: https://lid-uis.onrender.com/api/chat
    No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINAS:
-   0  → Portada 
+   MAPA DE PÁGINAS
+   0  → Portada
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
    3  → Cap I · Actividad: Curcio N3/N4               (IA: freq_B_*)
