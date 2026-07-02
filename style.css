@@ -2561,3 +2561,34 @@ html, body {
   font-size: .75rem; color: var(--navy);
   margin: 0; line-height: 1.5;
 }
+
+/* ── Pág 1: glosario interactivo (datos libres vs agrupados) ── */
+.p1-glosario {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color .15s;
+}
+.p1-glosario:hover { color: var(--gold); }
+.p1-glosario.activo { color: var(--gold); }
+.p1-glosario-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height .25s ease, opacity .2s ease, margin .25s ease;
+  background: #fdf6e3;
+  border: 1px solid #e0c870;
+  border-radius: 4px;
+  font-size: .78rem;
+  line-height: 1.55;
+}
+.p1-glosario-panel.activo {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 8px;
+  padding: 10px 12px;
+}
+.p1-glosario-panel strong { color: #6a5410; font-size: .8rem; }
+.p1-glosario-panel p { margin: 4px 0 0; color: var(--ink); }
