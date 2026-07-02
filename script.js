@@ -4,8 +4,8 @@
    No modificar URL_BACKEND sin actualizar el servidor.
 
    MAPA DE PÁGINAS:
-   0  → Portada 
-   1  → Cap I · Presentación 
+   0  → Portada
+   1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
    3  → Cap I · Actividad: Curcio N3/N4               (IA: freq_B_*)
    4  → Cap I · Actividad: frec. acumuladas           (IA: freq_C_* + freq_D_*)
@@ -14,11 +14,11 @@
    7  → Cap II · Actividad tablas contingencia        (IA: default)
    8  → Cap II · Síntesis
    9  → Cap III · Formas parciales
-   10 → Cap III · Actividad IA                        (IA: cap3_*)
+   10 → Cap III · Actividad IA                       (IA: cap3_*)
    11 → Cap IV · Ejemplos dinámicos
    12 → Cap IV · Formulación (Problemas A)
    13 → Cap IV · Validación (Problemas B)
-   14 → Cap V  · Exploración libre chi                (IA: chi_*)
+   14 → Cap V  · Exploración libre chi               (IA: chi_*)
 ═══════════════════════════════════════════════════════ */
 
 const URL_BACKEND = 'https://lid-uis.onrender.com/api/chat';
