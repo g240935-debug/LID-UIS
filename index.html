@@ -375,15 +375,30 @@
           <div class="ejf-reflexion-titulo">🎛️ Ponlo a prueba con la Vista personalizada</div>
           <div class="ejf-reflexion-item">
             <span class="ejf-reflexion-num">1</span>
-            <p id="ejf-preg-1"></p>
+            <div class="ejf-reflexion-body">
+              <p id="ejf-preg-1"></p>
+              <textarea class="p5d-resp-input" id="ejf-resp-1" rows="2" placeholder="Escribe tu respuesta…"></textarea>
+              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(1)">🔍 Verificar</button>
+              <div class="ejf-verif-fb" id="ejf-verif-fb-1" style="display:none;"></div>
+            </div>
           </div>
           <div class="ejf-reflexion-item">
             <span class="ejf-reflexion-num">2</span>
-            <p id="ejf-preg-2"></p>
+            <div class="ejf-reflexion-body">
+              <p id="ejf-preg-2"></p>
+              <textarea class="p5d-resp-input" id="ejf-resp-2" rows="2" placeholder="Escribe tu respuesta…"></textarea>
+              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(2)">🔍 Verificar</button>
+              <div class="ejf-verif-fb" id="ejf-verif-fb-2" style="display:none;"></div>
+            </div>
           </div>
           <div class="ejf-reflexion-item">
             <span class="ejf-reflexion-num">3</span>
-            <p id="ejf-preg-3"></p>
+            <div class="ejf-reflexion-body">
+              <p id="ejf-preg-3"></p>
+              <textarea class="p5d-resp-input" id="ejf-resp-3" rows="2" placeholder="Escribe tu respuesta…"></textarea>
+              <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(3)">🔍 Verificar</button>
+              <div class="ejf-verif-fb" id="ejf-verif-fb-3" style="display:none;"></div>
+            </div>
           </div>
         </div>
 
@@ -408,6 +423,7 @@
           <button class="p5c-tab active" onclick="p5cCargarProblema(0)">Problema 1</button>
           <button class="p5c-tab"        onclick="p5cCargarProblema(1)">Problema 2</button>
           <button class="p5c-tab"        onclick="p5cCargarProblema(2)">Problema 3</button>
+          <button class="p5c-tab"        onclick="p5cCargarProblema(3)">Problema 4</button>
         </div>
 
         <div class="p5c-layout">
@@ -469,6 +485,7 @@
         <div class="prob-tabs-row" id="p5d-tabs">
           <button class="p5c-tab active" onclick="p5dCargarSituacion(0)">Situación 1</button>
           <button class="p5c-tab"        onclick="p5dCargarSituacion(1)">Situación 2</button>
+          <button class="p5c-tab"        onclick="p5dCargarSituacion(2)">Situación 3</button>
         </div>
 
         <div class="p5d-layout">
