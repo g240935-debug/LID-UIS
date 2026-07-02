@@ -172,10 +172,39 @@
           </span>
           <span class="page-num">02</span>
         </div>
-        <div class="activity-layout">
+        <!-- ══════════ EXPLORACIÓN: datos libres antes de la tabla ══════════ -->
+        <div class="p3-exploracion" id="p3-exploracion">
+
+          <div class="p3-exp-intro">
+            <span class="sit-badge">Situación · Bucaramanga</span>
+            <h3 class="sit-title">Antes de construir la tabla…</h3>
+            <p class="sit-desc">Se encuestó a 40 estudiantes sobre su bebida favorita al momento de estudiar. Estas son las respuestas <span class="p1-glosario" onclick="p1ToggleGlosario('libres', this, 'p3-glosario-panel')">libres</span> tal como se recolectaron, sin ningún procesamiento.</p>
+            <div class="p1-glosario-panel" id="p3-glosario-panel"></div>
+          </div>
+
+          <div class="p3-libres-grid" id="p3-libres-grid"></div>
+
+          <div class="chi3-preg-card chi3-inline-preg" style="margin-top:14px;">
+            <p class="chi3-preg-num" style="color:var(--sky);">Antes de continuar</p>
+            <p class="chi3-preg-text">¿Qué puedes concluir sobre el comportamiento de la variable <em>Bebida favorita al momento de estudiar</em>, mirando los datos tal como están?</p>
+            <textarea class="p5d-resp-input" id="p3-exp-respuesta" rows="3" placeholder="Escribe lo que logras concluir a partir de esta lista…"></textarea>
+          </div>
+
+          <button class="btn-verificar" id="p3-exp-btn1" style="background:var(--navy);margin-top:10px;" onclick="p3ExploracionContinuar1()">Continuar →</button>
+
+          <!-- Paso 2: comentario de transición (oculto hasta responder) -->
+          <div class="note-card p3-exp-comentario" id="p3-exp-comentario" style="display:none;margin-top:16px;">
+            <div class="note-title">💭 Un momento para reflexionar</div>
+            <p class="note-text">En la medida en que el tamaño de la muestra crece, es difícil extraer información a partir de esta presentación de los datos. Como habrás notado, se hace necesario incorporar recursos de edición —como ordenar la lista— o, como ilustraremos aquí, incorporar recursos estadísticos para <strong>resumir y visualizar</strong> la información.</p>
+            <button class="btn-verificar" style="background:var(--gold);color:var(--ink);margin-top:10px;" onclick="p3ExploracionContinuar2()">Comenzar la construcción de la tabla →</button>
+          </div>
+
+        </div>
+
+        <div class="activity-layout" id="p3-activity-wrap" style="display:none;">
           <div class="vis-panel">
             <div class="situation-header">
-              <span class="sit-badge">Situación</span>
+              <span class="sit-badge">Situación · Bucaramanga</span>
               <h3 class="sit-title">Construyendo la tabla paso a paso</h3>
               <p class="sit-desc">El tutor te guiará para construir la tabla de frecuencias completa. Cada columna aparecerá a medida que el tutor la introduzca: primero <strong>fᵢ</strong>, luego <strong>fᵣ</strong>, después <strong>Fᵢ</strong> y finalmente <strong>Fᵣ</strong>.</p>
             </div>
@@ -599,6 +628,11 @@
                   <div class="st-cell row-hdr marg-hdr">Total</div><div class="st-cell marg">f·₁</div><div class="st-cell marg">f·₂</div><div class="st-cell marg dots">···</div><div class="st-cell grand">N</div>
                 </div>
               </div>
+              <div class="legend-row">
+                <span class="leg-item"><span class="leg-dot joint-dot"></span>Frecuencia conjunta f<sub>ij</sub></span>
+                <span class="leg-item"><span class="leg-dot marg-dot"></span>Frecuencia marginal f<sub>i·</sub> / f<sub>·j</sub></span>
+                <span class="leg-item"><span class="leg-dot grand-dot"></span>Total general N</span>
+              </div>
             </div>
           </div>
           <div class="intro-aside">
@@ -634,7 +668,7 @@
         <div class="activity-layout">
           <div class="vis-panel">
             <div class="situation-header">
-              <span class="sit-badge">Situación</span>
+              <span class="sit-badge">Situación · Bucaramanga</span>
               <h3 class="sit-title">Actividades Extracurriculares en jóvenes</h3>
               <p class="sit-desc">Se encuestaron <strong>100 jóvenes</strong> de Bucaramanga sobre su actividad extracurricular preferida. Los datos se cruzaron con el género para construir la siguiente tabla.</p>
             </div>
