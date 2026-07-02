@@ -637,10 +637,10 @@ html, body {
   background: var(--navy); color: white;
   border-color: var(--navy);
 }
-.accent-syn h4, .accent-syn p, .accent-syn .syn-example { color: rgba(255,255,255,.9); }
-.accent-syn .syn-example { background: rgba(255,255,255,.15); color: #FFFFFF; }
-.syn-card.accent-syn h4 { color: rgba(255,255,255,.95); }
-.syn-card.accent-syn p  { color: rgba(255,255,255,.9); }
+.accent-syn h4, .accent-syn p, .accent-syn .syn-example { color: var(--cream); }
+.accent-syn .syn-example { background: rgba(255,255,255,.12); color: var(--cream); }
+.syn-card.accent-syn h4 { color: var(--cream); }
+.syn-card.accent-syn p  { color: rgba(247,244,238,.85); }
 .syn-tag {
   font-family: 'JetBrains Mono', monospace;
   font-size: .62rem; text-transform: uppercase; letter-spacing: .12em;
