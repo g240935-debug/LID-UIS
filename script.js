@@ -1887,9 +1887,31 @@ const EJF_DATA = [
   { bebida: 'Bebida Energizante', fi:  4, hi: 0.10, Fi: 40, Hi: 1.00 },
 ];
 
+// Variable cuantitativa: horas diarias de conexión a internet, 50 estudiantes UIS (datos agrupados)
+const EJF_DATA_CUANT = [
+  { bebida: '[0 - 2)',  marca: 1, fi: 6,  hi: 0.12, Fi: 6,  Hi: 0.12 },
+  { bebida: '[2 - 4)',  marca: 3, fi: 14, hi: 0.28, Fi: 20, Hi: 0.40 },
+  { bebida: '[4 - 6)',  marca: 5, fi: 18, hi: 0.36, Fi: 38, Hi: 0.76 },
+  { bebida: '[6 - 8)',  marca: 7, fi: 9,  hi: 0.18, Fi: 47, Hi: 0.94 },
+  { bebida: '[8 - 10]', marca: 9, fi: 3,  hi: 0.06, Fi: 50, Hi: 1.00 },
+];
+
+const EJF_PREGUNTAS_CUALI = [
+  'Usa la Vista personalizada y muestra solo <strong>fᵢ</strong> filtrando únicamente Café y Té. ¿Qué porcentaje del total de encuestados representan esas dos bebidas juntas? Calcúlalo tú mismo con la tabla.',
+  'Activa solo las columnas <strong>fᵣ</strong> y <strong>Fᵣ</strong>. ¿En qué categoría se supera el 50% acumulado? ¿Qué significa eso sobre las preferencias del grupo?',
+  'Compara el gráfico de Barras con el de Pastel usando la misma información. ¿Cuál te permite ver más rápido cuál es la bebida más popular? ¿Cuál te permite ver mejor qué proporción representa cada una del total?',
+];
+
+const EJF_PREGUNTAS_CUANT = [
+  'Usa la Vista personalizada y filtra solo los intervalos donde la conexión diaria supera las 4 horas. ¿Qué porcentaje del total de estudiantes representa ese grupo? Súmalo con los datos filtrados.',
+  'Activa únicamente <strong>fᵣ</strong> y <strong>Fᵣ</strong>. ¿En qué intervalo se acumula el 50% de los estudiantes? ¿Qué te dice eso sobre el uso típico de internet en este grupo?',
+  'Compara el Histograma de relativas con el Histograma de acumuladas (Ojiva). ¿Qué pregunta responde mejor cada uno: "¿cuál es el intervalo más común?" o "¿qué proporción de estudiantes está por debajo de cierto número de horas?"',
+];
+
 let ejfModoActual    = 'completa';   // 'completa' | 'personalizada'
 let ejfVistaActual   = 'tabla';      // 'tabla' | 'grafico'
-let ejfGraficoActual = 'barras';     // 'barras' | 'pie' | 'acum'
+let ejfVariableActual= 'cualitativa';// 'cualitativa' | 'cuantitativa'
+let ejfGraficoActual = 'barras';     // 'barras' | 'pie' | 'histRel' | 'histAcum'
 let ejfChart         = null;
 
 function inicializarEjemplosDinamicos() {
@@ -1901,7 +1923,58 @@ function inicializarEjemplosDinamicos() {
       `<label class="ejf-check"><input type="checkbox" class="ejf-cat-chk" data-idx="${i}" checked onchange="ejfActualizarVista()"><span>${r.bebida}</span></label>`
     ).join('');
   }
+  // Pestañas de gráfico y preguntas de reflexión (estado inicial: cualitativa)
+  ejfRenderTabsGrafico();
+  EJF_PREGUNTAS_CUALI.forEach((p, i) => {
+    const el = document.getElementById(`ejf-preg-${i+1}`);
+    if (el) el.innerHTML = p;
+  });
   ejfActualizarVista();
+}
+
+function ejfCambiarVariable(variable) {
+  ejfVariableActual = variable;
+  document.getElementById('ejf-var-cual').classList.toggle('active', variable === 'cualitativa');
+  document.getElementById('ejf-var-cuant').classList.toggle('active', variable === 'cuantitativa');
+
+  // Reconstruir checkboxes de categorías/intervalos para el nuevo dataset
+  const catBox = document.getElementById('ejf-cat-checks');
+  const data = variable === 'cualitativa' ? EJF_DATA : EJF_DATA_CUANT;
+  if (catBox) {
+    catBox.innerHTML = data.map((r, i) =>
+      `<label class="ejf-check"><input type="checkbox" class="ejf-cat-chk" data-idx="${i}" checked onchange="ejfActualizarVista()"><span>${r.bebida}</span></label>`
+    ).join('');
+  }
+
+  // Reconstruir pestañas de gráfico según el tipo de variable
+  ejfRenderTabsGrafico();
+
+  // Actualizar preguntas de reflexión
+  const preguntas = variable === 'cualitativa' ? EJF_PREGUNTAS_CUALI : EJF_PREGUNTAS_CUANT;
+  preguntas.forEach((p, i) => {
+    const el = document.getElementById(`ejf-preg-${i+1}`);
+    if (el) el.innerHTML = p;
+  });
+
+  ejfActualizarVista();
+}
+
+function ejfRenderTabsGrafico() {
+  const tabs = document.getElementById('ejf-grafico-tabs');
+  if (!tabs) return;
+  if (ejfVariableActual === 'cualitativa') {
+    ejfGraficoActual = 'barras';
+    tabs.innerHTML = `
+      <button class="ejf-gtab active" id="ejf-gtab-barras" onclick="ejfCambiarGrafico('barras')">Barras</button>
+      <button class="ejf-gtab" id="ejf-gtab-pie" onclick="ejfCambiarGrafico('pie')">Pastel</button>`;
+  } else {
+    ejfGraficoActual = 'barras';
+    tabs.innerHTML = `
+      <button class="ejf-gtab active" id="ejf-gtab-barras" onclick="ejfCambiarGrafico('barras')">Barras</button>
+      <button class="ejf-gtab" id="ejf-gtab-pie" onclick="ejfCambiarGrafico('pie')">Circular</button>
+      <button class="ejf-gtab" id="ejf-gtab-histRel" onclick="ejfCambiarGrafico('histRel')">Histograma (relativas)</button>
+      <button class="ejf-gtab" id="ejf-gtab-histAcum" onclick="ejfCambiarGrafico('histAcum')">Histograma (acumuladas)</button>`;
+  }
 }
 
 function ejfCambiarModo(modo) {
@@ -1926,7 +1999,7 @@ function ejfCambiarVista(vista) {
 
 function ejfCambiarGrafico(tipo) {
   ejfGraficoActual = tipo;
-  ['barras','pie','acum'].forEach(t => {
+  ['barras','pie','histRel','histAcum'].forEach(t => {
     document.getElementById(`ejf-gtab-${t}`)?.classList.toggle('active', t === tipo);
   });
   ejfRenderizarGrafico();
@@ -1943,9 +2016,10 @@ function _ejfGetColumnas() {
 }
 
 function _ejfGetFilas() {
-  if (ejfModoActual === 'completa') return EJF_DATA;
+  const data = ejfVariableActual === 'cualitativa' ? EJF_DATA : EJF_DATA_CUANT;
+  if (ejfModoActual === 'completa') return data;
   const chks = document.querySelectorAll('.ejf-cat-chk');
-  return EJF_DATA.filter((_, i) => {
+  return data.filter((_, i) => {
     const chk = document.querySelector(`.ejf-cat-chk[data-idx="${i}"]`);
     return chk ? chk.checked : true;
   });
@@ -1963,6 +2037,11 @@ function ejfRenderizarTabla() {
   const titleEl = document.getElementById('ejf-tabla-title');
   if (!wrapper) return;
 
+  const esCuant = ejfVariableActual === 'cuantitativa';
+  const colEtiqueta = esCuant ? 'Intervalo (h/día)' : 'Bebida';
+  const totalN = esCuant ? 50 : 40;
+  const contextoTitulo = esCuant ? 'Horas de conexión a internet (N = 50)' : 'Bebidas para estudiar (N = 40)';
+
   // Titulo
   const colNames = [];
   if (cols.fi) colNames.push('fᵢ');
@@ -1970,10 +2049,10 @@ function ejfRenderizarTabla() {
   if (cols.Fi) colNames.push('Fᵢ');
   if (cols.Hi) colNames.push('Fᵣ');
   if (titleEl) titleEl.textContent = ejfModoActual === 'completa'
-    ? 'Tabla de frecuencias completa — Bebidas para estudiar (N = 40)'
+    ? `Tabla de frecuencias completa — ${contextoTitulo}`
     : `Vista personalizada: ${colNames.join(', ')} — ${filas.length} categoría(s)`;
 
-  let html = '<table><thead><tr><th>Bebida</th>';
+  let html = `<table><thead><tr><th>${colEtiqueta}</th>`;
   if (cols.fi) html += '<th>fᵢ</th>';
   if (cols.hi) html += '<th class="ejf-th-hi">fᵣ</th>';
   if (cols.Fi) html += '<th class="ejf-th-Fi">Fᵢ</th>';
@@ -2010,7 +2089,9 @@ function ejfRenderizarTabla() {
   const info = document.getElementById('ejf-info-text');
   if (info) {
     if (ejfModoActual === 'completa') {
-      info.textContent = 'Tabla completa con las 4 frecuencias. Cambia a "Vista personalizada" para explorar columnas por separado.';
+      info.textContent = esCuant
+        ? 'Tabla completa con las 4 frecuencias, datos agrupados en intervalos. Cambia a "Vista personalizada" para explorar columnas por separado.'
+        : 'Tabla completa con las 4 frecuencias. Cambia a "Vista personalizada" para explorar columnas por separado.';
     } else if (colNames.length === 0) {
       info.textContent = '⚠️ Selecciona al menos una columna para mostrar.';
     } else {
@@ -2033,8 +2114,9 @@ function ejfRenderizarGrafico() {
   const filas = _ejfGetFilas();
   const labels = filas.map(r => r.bebida);
   const tipo = ejfGraficoActual;
+  const esCuant = ejfVariableActual === 'cuantitativa';
 
-  const COLORES = ['rgba(26,58,90,.85)','rgba(46,107,79,.85)','rgba(200,168,75,.85)','rgba(91,141,184,.85)'];
+  const COLORES = ['rgba(26,58,90,.85)','rgba(46,107,79,.85)','rgba(200,168,75,.85)','rgba(91,141,184,.85)','rgba(122,74,110,.85)'];
 
   let config;
   if (tipo === 'barras') {
@@ -2053,7 +2135,7 @@ function ejfRenderizarGrafico() {
         responsive: true,
         plugins: {
           legend: { display: false },
-          title: { display: true, text: 'Frecuencia Absoluta por Bebida', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+          title: { display: true, text: esCuant ? 'Frecuencia Absoluta por Intervalo' : 'Frecuencia Absoluta por Bebida', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
         },
         scales: {
           y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
@@ -2078,46 +2160,67 @@ function ejfRenderizarGrafico() {
         responsive: true,
         plugins: {
           legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12 } },
-          title: { display: true, text: 'Frecuencia Relativa (fᵣ) — Pastel', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+          title: { display: true, text: esCuant ? 'Frecuencia Relativa (fᵣ) — Circular' : 'Frecuencia Relativa (fᵣ) — Pastel', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
         },
         animation: { duration: 500 }
       }
     };
-  } else {
-    // Acumulada (línea)
+  } else if (tipo === 'histRel') {
+    // Histograma de frecuencias relativas: barras contiguas (propio de variable continua agrupada)
     config = {
-      type: 'line',
+      type: 'bar',
       data: {
         labels,
-        datasets: [
-          {
-            label: 'Fᵢ (abs. acumulada)',
-            data: filas.map(r => r.Fi),
-            borderColor: 'rgba(26,58,90,1)',
-            backgroundColor: 'rgba(26,58,90,.08)',
-            fill: true, tension: .3, pointRadius: 5,
-          },
-          {
-            label: 'Fᵣ×40 (rel. acumulada ×N)',
-            data: filas.map(r => +(r.Hi * 40).toFixed(1)),
-            borderColor: 'rgba(200,168,75,1)',
-            backgroundColor: 'rgba(200,168,75,.08)',
-            fill: false, tension: .3, pointRadius: 5,
-            borderDash: [5, 3],
-          }
-        ]
+        datasets: [{
+          label: 'fᵣ (relativa)',
+          data: filas.map(r => r.hi),
+          backgroundColor: 'rgba(46,107,79,.75)',
+          borderColor: 'rgba(46,107,79,1)',
+          borderWidth: 1,
+          barPercentage: 1.0,
+          categoryPercentage: 1.0,
+        }]
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12 } },
-          title: { display: true, text: 'Frecuencias Acumuladas', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+          legend: { display: false },
+          title: { display: true, text: 'Histograma de Frecuencias Relativas (fᵣ)', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
         },
         scales: {
-          y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 10 } } },
-          x: { ticks: { font: { family: 'Inter', size: 10 } } }
+          y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 10 } }, title: { display: true, text: 'fᵣ', font: { size: 10 } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } }, title: { display: true, text: 'Horas/día', font: { size: 10 } } }
         },
-        animation: { duration: 500 }
+        animation: { duration: 500, easing: 'easeOutQuart' }
+      }
+    };
+  } else if (tipo === 'histAcum') {
+    // Histograma de frecuencias relativas acumuladas
+    config = {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Fᵣ (relativa acumulada)',
+          data: filas.map(r => r.Hi),
+          backgroundColor: 'rgba(200,168,75,.75)',
+          borderColor: 'rgba(200,168,75,1)',
+          borderWidth: 1,
+          barPercentage: 1.0,
+          categoryPercentage: 1.0,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Histograma de Frecuencias Relativas Acumuladas (Fᵣ)', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+        },
+        scales: {
+          y: { beginAtZero: true, max: 1, ticks: { font: { family: 'JetBrains Mono', size: 10 } }, title: { display: true, text: 'Fᵣ', font: { size: 10 } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } }, title: { display: true, text: 'Horas/día', font: { size: 10 } } }
+        },
+        animation: { duration: 500, easing: 'easeOutQuart' }
       }
     };
   }
@@ -2128,9 +2231,10 @@ function ejfRenderizarGrafico() {
   const info = document.getElementById('ejf-info-text');
   if (info) {
     const msgs = {
-      barras: 'Diagrama de barras: visualiza las frecuencias absolutas (fᵢ) de cada categoría.',
-      pie:    'Gráfico de pastel (doughnut): muestra la proporción relativa (fᵣ) de cada categoría. ',
-      acum:   'Gráfico de frecuencias acumuladas: Fᵢ crece de 0 a N=40; Fᵣ×40 superpone la misma curva normalizada.',
+      barras:   esCuant ? 'Diagrama de barras: visualiza la frecuencia absoluta (fᵢ) de cada intervalo.' : 'Diagrama de barras: visualiza las frecuencias absolutas (fᵢ) de cada categoría.',
+      pie:      esCuant ? 'Gráfico circular: muestra la proporción relativa (fᵣ) de cada intervalo respecto al total.' : 'Gráfico de pastel (doughnut): muestra la proporción relativa (fᵣ) de cada categoría.',
+      histRel:  'Histograma: al ser una variable cuantitativa continua agrupada, las barras van pegadas (sin espacio) porque representan un rango continuo, no categorías separadas.',
+      histAcum: 'Histograma acumulado: cada barra muestra qué proporción del total se ha acumulado hasta ese intervalo. La última barra siempre llega a 1 (100%).',
     };
     info.textContent = msgs[tipo];
   }
