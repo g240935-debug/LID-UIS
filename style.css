@@ -639,6 +639,8 @@ html, body {
 }
 .accent-syn h4, .accent-syn p, .accent-syn .syn-example { color: rgba(255,255,255,.9); }
 .accent-syn .syn-example { background: rgba(255,255,255,.15); color: #FFFFFF; }
+.syn-card.accent-syn h4 { color: rgba(255,255,255,.95); }
+.syn-card.accent-syn p  { color: rgba(255,255,255,.9); }
 .syn-tag {
   font-family: 'JetBrains Mono', monospace;
   font-size: .62rem; text-transform: uppercase; letter-spacing: .12em;
