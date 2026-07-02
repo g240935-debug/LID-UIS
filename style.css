@@ -2779,3 +2779,39 @@ html, body {
 @media (max-width: 720px) {
   .ctx-explorer-body { grid-template-columns: 1fr; }
 }
+
+/* ── Pág 3 (visible "02"): exploración de datos libres antes de la tabla ── */
+.p3-exploracion {
+  display: flex; flex-direction: column;
+}
+.p3-exp-intro { margin-bottom: 14px; }
+.p3-libres-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0 14px;
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.p3-libres-col {
+  display: flex; flex-direction: column;
+}
+.p3-libres-item {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--rule);
+  font-size: .78rem;
+}
+.p3-libres-item:last-child { border-bottom: none; }
+.p3-libres-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem; color: var(--slate);
+  min-width: 18px;
+}
+.p3-libres-val { color: var(--ink); }
+.p3-exp-comentario .note-text { line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .p3-libres-grid { grid-template-columns: repeat(2, 1fr); gap: 0 10px; }
+}
