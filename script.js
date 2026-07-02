@@ -3,8 +3,8 @@
    Conexión al backend: https://lid-uis.onrender.com/api/chat
    No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINAS
-   0  → Portada
+   MAPA DE PÁGINAS:
+   0  → Portada 
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
    3  → Cap I · Actividad: Curcio N3/N4               (IA: freq_B_*)
@@ -245,6 +245,7 @@ function irAPagina(n) {
   }
 
   // Cap III — Chi-cuadrado (págs 15-24)
+  if (n === 8)  setTimeout(ctxExplorerInit,  200);
   if (n === 16) setTimeout(chi3P16Render, 300);
   if (n === 17) setTimeout(chi3P17Init,   300);
   if (n === 18) setTimeout(chi3P18Render, 300);
@@ -4362,4 +4363,132 @@ function p1ToggleGlosario(termino, el) {
   p1GlosarioActivo = termino;
   document.querySelectorAll('.p1-glosario').forEach(s => s.classList.remove('activo'));
   el.classList.add('activo');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PÁGINA 8 — EXPLORADOR INTERACTIVO DE TIPOS DE FRECUENCIA
+   Reemplaza la tirilla de niveles de Curcio (institucionalización
+   prematura) por una tabla clickeable donde el estudiante descubre
+   por acción qué es frecuencia conjunta, marginal y condicionada.
+   Contexto: Género × Actividad extracurricular (Hombres/Mujeres, N=100)
+══════════════════════════════════════════════════════════════ */
+
+const CTX_EXP_DATA = {
+  filas: ['Hombres', 'Mujeres'],
+  cols:  ['Deportes', 'Danza', 'Música'],
+  M: [[30, 5, 15], [10, 25, 15]],
+  N: 100,
+};
+
+let ctxExplorerModo = null; // null | 'condicionada' (segundo clic sobre marginal tras elegir celda)
+let ctxExplorerCeldaSel = null; // {i,j} celda conjunta seleccionada para modo condicionada
+
+function ctxExplorerInit() {
+  const wrap = document.getElementById('ctx-explorer-tabla');
+  if (!wrap || wrap.dataset.init) { ctxExplorerReset(); return; }
+  wrap.dataset.init = '1';
+
+  const { filas, cols, M, N } = CTX_EXP_DATA;
+  const filaTot = M.map(r => r.reduce((s,v)=>s+v,0));
+  const colTot  = cols.map((_,j) => M.reduce((s,r)=>s+r[j],0));
+
+  let html = '<table class="ctx-exp-tbl"><thead><tr><th></th>';
+  cols.forEach((c,j) => { html += `<th class="ctx-exp-margcell" data-tipo="marginal-col" data-idx="${j}">${c}</th>`; });
+  html += `<th class="ctx-exp-margcell ctx-exp-total" data-tipo="total">Total</th></tr></thead><tbody>`;
+
+  filas.forEach((f,i) => {
+    html += `<tr><th class="ctx-exp-margcell" data-tipo="marginal-fila" data-idx="${i}">${f}</th>`;
+    cols.forEach((c,j) => {
+      html += `<td class="ctx-exp-cell" data-tipo="conjunta" data-i="${i}" data-j="${j}">${M[i][j]}</td>`;
+    });
+    html += `<td class="ctx-exp-margcell" data-tipo="marginal-fila" data-idx="${i}">${filaTot[i]}</td></tr>`;
+  });
+
+  html += `<tr><th class="ctx-exp-margcell ctx-exp-total" data-tipo="total">Total</th>`;
+  cols.forEach((c,j) => { html += `<td class="ctx-exp-margcell" data-tipo="marginal-col" data-idx="${j}">${colTot[j]}</td>`; });
+  html += `<td class="ctx-exp-margcell ctx-exp-total" data-tipo="total">${N}</td></tr>`;
+  html += '</tbody></table>';
+
+  wrap.innerHTML = html;
+
+  // Delegación de eventos: hover (desktop) y click (todos)
+  wrap.querySelectorAll('[data-tipo]').forEach(el => {
+    el.addEventListener('mouseenter', () => ctxExplorerMostrar(el));
+    el.addEventListener('click', () => ctxExplorerMostrar(el, true));
+  });
+}
+
+function ctxExplorerReset() {
+  const panel = document.getElementById('ctx-explorer-panel');
+  if (panel) panel.innerHTML = `<div class="ctx-ep-icon">👆</div><div class="ctx-ep-text">Toca una celda de la tabla para descubrir qué tipo de frecuencia contiene.</div>`;
+  document.querySelectorAll('#ctx-explorer-tabla .ctx-exp-cell, #ctx-explorer-tabla .ctx-exp-margcell').forEach(el => el.classList.remove('ctx-hl','ctx-hl-sec'));
+  ctxExplorerModo = null;
+  ctxExplorerCeldaSel = null;
+}
+
+function ctxExplorerMostrar(el, esClick) {
+  const tipo = el.dataset.tipo;
+  const wrap = document.getElementById('ctx-explorer-tabla');
+  const panel = document.getElementById('ctx-explorer-panel');
+  if (!wrap || !panel) return;
+
+  // Limpiar resaltados previos
+  wrap.querySelectorAll('.ctx-exp-cell, .ctx-exp-margcell').forEach(e => e.classList.remove('ctx-hl','ctx-hl-sec'));
+
+  const { filas, cols, M, N } = CTX_EXP_DATA;
+
+  if (tipo === 'conjunta') {
+    const i = +el.dataset.i, j = +el.dataset.j;
+    el.classList.add('ctx-hl');
+    panel.innerHTML = `
+      <div class="ctx-ep-tag">Frecuencia Conjunta</div>
+      <div class="ctx-ep-formula">f<sub>ij</sub> = ${M[i][j]}</div>
+      <p class="ctx-ep-desc">Es el valor exacto donde se cruzan <strong>${filas[i]}</strong> y <strong>${cols[j]}</strong>: cuántas personas pertenecen a ambas categorías al mismo tiempo.</p>
+      ${esClick ? `<button class="ctx-ep-btn" onclick="ctxExplorerVerCondicionada(${i},${j})">🔗 ¿Y si la comparo con un total? →</button>` : ''}
+    `;
+    ctxExplorerCeldaSel = { i, j };
+  } else if (tipo === 'marginal-fila' || tipo === 'marginal-col') {
+    const idx = +el.dataset.idx;
+    const esFila = tipo === 'marginal-fila';
+    const nombre = esFila ? filas[idx] : cols[idx];
+    const valor = esFila ? M[idx].reduce((s,v)=>s+v,0) : cols.map((_,j)=>M.reduce((s,r)=>s+r[j],0))[idx];
+    el.classList.add('ctx-hl');
+    // Resaltar toda la fila o columna asociada
+    wrap.querySelectorAll(`.ctx-exp-cell[data-${esFila?'i':'j'}="${idx}"]`).forEach(c => c.classList.add('ctx-hl-sec'));
+    panel.innerHTML = `
+      <div class="ctx-ep-tag ctx-ep-tag-marg">Frecuencia Marginal</div>
+      <div class="ctx-ep-formula">${esFila ? `f<sub>${idx===0?'H':'M'}·</sub>` : `f<sub>·${idx+1}</sub>`} = ${valor}</div>
+      <p class="ctx-ep-desc">Es el total de <strong>${nombre}</strong>, sumando todas sus celdas. Se llama "marginal" porque queda en el <em>margen</em> (borde) de la tabla.</p>
+    `;
+  } else if (tipo === 'total') {
+    el.classList.add('ctx-hl');
+    panel.innerHTML = `
+      <div class="ctx-ep-tag ctx-ep-tag-total">Total General</div>
+      <div class="ctx-ep-formula">N = ${N}</div>
+      <p class="ctx-ep-desc">Es la suma de todas las frecuencias marginales — el total de personas encuestadas.</p>
+    `;
+  }
+}
+
+// Al hacer clic en "¿Y si la comparo con un total?" desde una celda conjunta,
+// se revela cómo la MISMA celda produce distintas frecuencias condicionadas
+// según el marginal elegido como referencia.
+function ctxExplorerVerCondicionada(i, j) {
+  const { filas, cols, M, N } = CTX_EXP_DATA;
+  const panel = document.getElementById('ctx-explorer-panel');
+  if (!panel) return;
+  const filaTot = M[i].reduce((s,v)=>s+v,0);
+  const colTot  = cols.map((_,jj)=>M.reduce((s,r)=>s+r[jj],0))[j];
+  const pTotal  = (M[i][j]/N*100).toFixed(1);
+  const pFila   = (M[i][j]/filaTot*100).toFixed(1);
+  const pCol    = (M[i][j]/colTot*100).toFixed(1);
+
+  panel.innerHTML = `
+    <div class="ctx-ep-tag ctx-ep-tag-cond">Frecuencia Condicionada</div>
+    <p class="ctx-ep-desc">La celda <strong>${filas[i]} ∩ ${cols[j]}</strong> (${M[i][j]}) cambia de significado según con qué total la compares:</p>
+    <div class="ctx-ep-cond-row"><span class="ctx-ep-cond-lbl">Sobre el total (N=${N})</span><span class="ctx-ep-cond-val">${pTotal}%</span></div>
+    <div class="ctx-ep-cond-row"><span class="ctx-ep-cond-lbl">Sobre la fila ${filas[i]} (${filaTot})</span><span class="ctx-ep-cond-val">${pFila}%</span></div>
+    <div class="ctx-ep-cond-row"><span class="ctx-ep-cond-lbl">Sobre la columna ${cols[j]} (${colTot})</span><span class="ctx-ep-cond-val">${pCol}%</span></div>
+    <p class="ctx-ep-desc" style="margin-top:6px;">El mismo dato (${M[i][j]}) cuenta tres historias distintas — por eso la frecuencia condicionada siempre depende de <em>a qué total la refieres</em>.</p>
+  `;
 }
