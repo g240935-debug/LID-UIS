@@ -316,6 +316,12 @@
         </div>
         <h2 class="page-title" style="font-size:1.5rem;margin-bottom:12px;">Explora la Tabla de Frecuencias</h2>
 
+        <!-- Selector de variable: cualitativa o cuantitativa -->
+        <div class="ejf-var-toggle">
+          <button class="ejf-var-btn active" id="ejf-var-cual" onclick="ejfCambiarVariable('cualitativa')">📊 Cualitativa — Bebida favorita</button>
+          <button class="ejf-var-btn" id="ejf-var-cuant" onclick="ejfCambiarVariable('cuantitativa')">📈 Cuantitativa — Horas de conexión a internet</button>
+        </div>
+
         <!-- Controles superiores -->
         <div class="ejf-controls-row">
           <!-- Modo: tabla completa o personalizada -->
@@ -352,10 +358,7 @@
             <div id="ejf-tabla-wrapper"></div>
           </div>
           <div id="ejf-grafico-area" class="ejf-area-block" style="display:none;">
-            <div class="ejf-grafico-tabs" id="ejf-grafico-tabs">
-              <button class="ejf-gtab active" id="ejf-gtab-barras" onclick="ejfCambiarGrafico('barras')">Barras</button>
-              <button class="ejf-gtab" id="ejf-gtab-pie" onclick="ejfCambiarGrafico('pie')">Pastel</button>
-            </div>
+            <div class="ejf-grafico-tabs" id="ejf-grafico-tabs"></div>
             <div style="max-height:320px;position:relative;">
               <canvas id="ejf-canvas" style="max-height:300px;"></canvas>
             </div>
@@ -365,6 +368,23 @@
         <!-- Recuadro informativo dinámico -->
         <div class="ejf-info-bar" id="ejf-info-bar">
           <span id="ejf-info-text">Tabla completa con las 4 frecuencias. Usa el modo personalizado para explorar columnas por separado.</span>
+        </div>
+
+        <!-- Preguntas de reflexión con Vista personalizada -->
+        <div class="ejf-reflexion-wrap" id="ejf-reflexion-wrap">
+          <div class="ejf-reflexion-titulo">🎛️ Ponlo a prueba con la Vista personalizada</div>
+          <div class="ejf-reflexion-item">
+            <span class="ejf-reflexion-num">1</span>
+            <p id="ejf-preg-1"></p>
+          </div>
+          <div class="ejf-reflexion-item">
+            <span class="ejf-reflexion-num">2</span>
+            <p id="ejf-preg-2"></p>
+          </div>
+          <div class="ejf-reflexion-item">
+            <span class="ejf-reflexion-num">3</span>
+            <p id="ejf-preg-3"></p>
+          </div>
         </div>
 
         <div class="page-footer">
