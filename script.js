@@ -4382,6 +4382,7 @@ const CTX_EXP_DATA = {
 
 let ctxExplorerModo = null; // null | 'condicionada' (segundo clic sobre marginal tras elegir celda)
 let ctxExplorerCeldaSel = null; // {i,j} celda conjunta seleccionada para modo condicionada
+let ctxExplorerLocked = false; // true solo justo después de clic en celda conjunta, mientras se decide pulsar el botón
 
 function ctxExplorerInit() {
   const wrap = document.getElementById('ctx-explorer-tabla');
@@ -4411,9 +4412,11 @@ function ctxExplorerInit() {
 
   wrap.innerHTML = html;
 
-  // Delegación de eventos: hover (desktop) y click (todos)
+  // Delegación de eventos: hover actualiza el panel normalmente (comportamiento que gustaba),
+  // EXCEPTO cuando está "bloqueado" (justo tras clic en una celda conjunta, mientras el
+  // estudiante decide pulsar el botón de condicionada). El clic siempre funciona y actualiza.
   wrap.querySelectorAll('[data-tipo]').forEach(el => {
-    el.addEventListener('mouseenter', () => ctxExplorerMostrar(el));
+    el.addEventListener('mouseenter', () => { if (!ctxExplorerLocked) ctxExplorerMostrar(el); });
     el.addEventListener('click', () => ctxExplorerMostrar(el, true));
   });
 }
@@ -4432,6 +4435,10 @@ function ctxExplorerMostrar(el, esClick) {
   const panel = document.getElementById('ctx-explorer-panel');
   if (!wrap || !panel) return;
 
+  // Bloqueo: solo se activa al hacer CLIC en una celda conjunta (aparece el botón de
+  // condicionada). Cualquier otro clic (marginal, total, u otra conjunta) libera el bloqueo.
+  if (esClick) ctxExplorerLocked = (tipo === 'conjunta');
+
   // Limpiar resaltados previos
   wrap.querySelectorAll('.ctx-exp-cell, .ctx-exp-margcell').forEach(e => e.classList.remove('ctx-hl','ctx-hl-sec'));
 
@@ -4444,7 +4451,7 @@ function ctxExplorerMostrar(el, esClick) {
       <div class="ctx-ep-tag">Frecuencia Conjunta</div>
       <div class="ctx-ep-formula">f<sub>ij</sub> = ${M[i][j]}</div>
       <p class="ctx-ep-desc">Es el valor exacto donde se cruzan <strong>${filas[i]}</strong> y <strong>${cols[j]}</strong>: cuántas personas pertenecen a ambas categorías al mismo tiempo.</p>
-      ${esClick ? `<button class="ctx-ep-btn" onclick="ctxExplorerVerCondicionada(${i},${j})">🔗 ¿Y si la comparo con un total? →</button>` : ''}
+      ${esClick ? `<p class="ctx-ep-hint">👉 Este número, comparado con distintos totales, cuenta historias diferentes.</p><button class="ctx-ep-btn ctx-ep-btn-pulse" onclick="ctxExplorerVerCondicionada(${i},${j})">🔗 Haz clic para comparar con los totales</button>` : ''}
     `;
     ctxExplorerCeldaSel = { i, j };
   } else if (tipo === 'marginal-fila' || tipo === 'marginal-col') {
@@ -4474,6 +4481,7 @@ function ctxExplorerMostrar(el, esClick) {
 // se revela cómo la MISMA celda produce distintas frecuencias condicionadas
 // según el marginal elegido como referencia.
 function ctxExplorerVerCondicionada(i, j) {
+  ctxExplorerLocked = false; // liberar el bloqueo: el hover vuelve a funcionar normalmente
   const { filas, cols, M, N } = CTX_EXP_DATA;
   const panel = document.getElementById('ctx-explorer-panel');
   if (!panel) return;
