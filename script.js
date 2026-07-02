@@ -1831,7 +1831,7 @@ function _p3ActualizarBadges() {
   if (p3Columnas.hi) cols.push('fᵣ');
   if (p3Columnas.Fi) cols.push('Fᵢ');
   if (p3Columnas.Hi) cols.push('Fᵣ');
-  label.textContent = `Tabla con: ${cols.join(', ')} — Bebidas para estudiar (N = 40)`;
+  label.textContent = `Distribución de la variable Bebida Favorita al momento de estudiar — ${cols.join(', ')} (N = 40)`;
 }
 
 // Detectar institucionalización en respuestas del tutor de página 3
@@ -4123,4 +4123,37 @@ function p25ToggleFuentes() {
   const open = body.style.display === 'block';
   body.style.display = open ? 'none' : 'block';
   chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+// ── Glosario interactivo pág 1 (Exploración: datos libres vs agrupados) ──
+const P1_GLOSARIO = {
+  libres: {
+    titulo: '📋 Datos libres',
+    texto: 'Es la lista completa de observaciones tal como se recolectaron, sin resumir. Por ejemplo: cada respuesta individual de los 40 estudiantes encuestados, una por una. Se usan cuando el número de datos es manejable y se quiere trabajar con el detalle completo antes de resumir.'
+  },
+  agrupados: {
+    titulo: '📦 Datos agrupados',
+    texto: 'Es cuando las observaciones ya vienen organizadas en categorías o intervalos, con su conteo correspondiente. Por ejemplo: en vez de ver las 40 respuestas una a una, ya se sabe que "18 prefieren café, 10 té…". Se usan cuando hay muchos datos o cuando la fuente ya entrega la información resumida.'
+  }
+};
+let p1GlosarioActivo = null;
+
+function p1ToggleGlosario(termino, el) {
+  const panel = document.getElementById('p1-glosario-panel');
+  if (!panel) return;
+  // Si se hace clic en el mismo término que ya está activo, se cierra
+  if (p1GlosarioActivo === termino) {
+    panel.classList.remove('activo');
+    panel.innerHTML = '';
+    p1GlosarioActivo = null;
+    document.querySelectorAll('.p1-glosario').forEach(s => s.classList.remove('activo'));
+    return;
+  }
+  const info = P1_GLOSARIO[termino];
+  if (!info) return;
+  panel.innerHTML = `<strong>${info.titulo}</strong><p>${info.texto}</p>`;
+  panel.classList.add('activo');
+  p1GlosarioActivo = termino;
+  document.querySelectorAll('.p1-glosario').forEach(s => s.classList.remove('activo'));
+  el.classList.add('activo');
 }
