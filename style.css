@@ -2655,3 +2655,115 @@ html, body {
 .ejf-verif-fb-warn {
   background: #fdf6e3; border-left: 3px solid #e0c870; color: #6a5410;
 }
+
+/* ── Pág 8: explorador interactivo de tipos de frecuencia ── */
+.ctx-explorer {
+  margin-top: 18px;
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 16px 18px;
+}
+.ctx-explorer-title {
+  font-size: .9rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 4px;
+}
+.ctx-explorer-sub {
+  font-size: .78rem; color: var(--slate);
+  margin-bottom: 12px; line-height: 1.5;
+}
+.ctx-explorer-body {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 18px;
+  align-items: start;
+}
+.ctx-explorer-tabla-wrap { overflow-x: auto; }
+
+.ctx-exp-tbl {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .82rem;
+}
+.ctx-exp-tbl th, .ctx-exp-tbl td {
+  padding: 9px 12px;
+  text-align: center;
+  border: 1px solid var(--rule);
+}
+.ctx-exp-cell {
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background .15s, transform .1s;
+}
+.ctx-exp-cell:hover { background: #eaf2fb; }
+.ctx-exp-margcell {
+  background: #f4f1eb;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--navy);
+  transition: background .15s;
+}
+.ctx-exp-margcell:hover { background: #e5ded0; }
+.ctx-exp-total {
+  background: #ece4d0;
+  font-weight: 700;
+}
+.ctx-hl {
+  background: var(--gold) !important;
+  color: var(--ink) !important;
+  box-shadow: inset 0 0 0 2px var(--navy);
+}
+.ctx-hl-sec {
+  background: #fdf1c8 !important;
+}
+
+.ctx-explorer-panel {
+  background: white;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 14px;
+  min-height: 160px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.ctx-ep-icon { font-size: 1.6rem; text-align: center; opacity: .4; margin-bottom: 6px; }
+.ctx-ep-text { font-size: .78rem; color: var(--slate); text-align: center; line-height: 1.5; }
+.ctx-ep-tag {
+  display: inline-block;
+  font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  color: white; background: var(--navy);
+  padding: 3px 9px; border-radius: 3px; margin-bottom: 8px; width: fit-content;
+}
+.ctx-ep-tag-marg  { background: var(--moss); }
+.ctx-ep-tag-total { background: var(--slate); }
+.ctx-ep-tag-cond  { background: var(--gold); color: var(--ink); }
+.ctx-ep-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .95rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 8px;
+}
+.ctx-ep-desc {
+  font-size: .78rem; line-height: 1.55; color: var(--ink); margin: 0;
+}
+.ctx-ep-btn {
+  margin-top: 10px;
+  background: var(--navy); color: white;
+  border: none; border-radius: 3px;
+  font-size: .74rem; padding: 7px 10px;
+  cursor: pointer; width: 100%;
+  transition: background .15s;
+}
+.ctx-ep-btn:hover { background: #14304f; }
+.ctx-ep-cond-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 0; border-bottom: 1px solid var(--rule);
+  font-size: .76rem;
+}
+.ctx-ep-cond-row:last-of-type { border-bottom: none; }
+.ctx-ep-cond-lbl { color: var(--slate); }
+.ctx-ep-cond-val { font-weight: 700; color: var(--navy); font-family: 'JetBrains Mono', monospace; }
+
+@media (max-width: 720px) {
+  .ctx-explorer-body { grid-template-columns: 1fr; }
+}
