@@ -94,7 +94,9 @@
             <div class="moment-list">
               <div class="moment-item">
                 <div class="moment-num">1</div>
-                <div class="moment-body"><strong>Exploración</strong> — En esta etapa, antes de construir la tabla se identifica el tipo de información que se tiene a disposición desde el tipo de variable que puede ser <strong>cualitativa o cuantitativa</strong> y la manera en que se presentan los datos, libres o agrupados.</div>
+                <div class="moment-body"><strong>Exploración</strong> — En esta etapa, antes de construir la tabla se identifica el tipo de información que se tiene a disposición desde el tipo de variable que puede ser <strong>cualitativa o cuantitativa</strong> y la manera en que se presentan los datos, <span class="p1-glosario" onclick="p1ToggleGlosario('libres', this)">libres</span> o <span class="p1-glosario" onclick="p1ToggleGlosario('agrupados', this)">agrupados</span>.
+                <div class="p1-glosario-panel" id="p1-glosario-panel"></div>
+                </div>
               </div>
               <div class="moment-item">
                 <div class="moment-num">2</div>
@@ -180,7 +182,7 @@
 
             <!-- Tabla dinámica unificada — columnas aparecen progresivamente -->
             <div class="freq-tabla-display" id="p3-tabla-wrapper">
-              <div class="freq-tabla-label" id="p3-tabla-label">Tabla de referencia</div>
+              <div class="freq-tabla-label" id="p3-tabla-label">Distribución de la variable Bebida Favorita al momento de estudiar</div>
               <div class="p3-tabla-anim" id="p3-tabla-inner">
                 <!-- renderizada por JS -->
               </div>
