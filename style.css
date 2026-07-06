@@ -59,16 +59,8 @@ html, body {
 }
 
 /* ── BOOK SHELL ── */
-/* --book-w controla el tamaño del libro escalando con vmin (el menor entre ancho y
-   alto de pantalla). Así el libro crece en monitores grandes SIN estirarse en
-   portátiles de pantalla corta: ambas dimensiones (ancho y alto) se derivan de la
-   misma referencia y mantienen siempre la proporción original (1140 : 680 ≈ 1.68 : 1). */
-:root {
-  --book-w: clamp(320px, 130vmin, 1600px);
-}
-
 .book-shell {
-  width: var(--book-w);
+  max-width: 1140px;
   margin: 28px auto 56px;
   display: flex;
   position: relative;
@@ -78,7 +70,7 @@ html, body {
 /* ── LOMO ── */
 .book-spine {
   width: 26px;
-  min-height: calc(var(--book-w) * 0.596);
+  min-height: 680px;
   background: linear-gradient(180deg, #0d2034 0%, var(--navy) 100%);
   border-radius: 3px 0 0 3px;
   display: flex; align-items: center; justify-content: center;
@@ -101,7 +93,7 @@ html, body {
   position: relative;
   overflow: hidden;
   border-radius: 0 6px 6px 0;
-  min-height: calc(var(--book-w) * 0.596);
+  min-height: 680px;
 }
 
 .page {
@@ -119,7 +111,7 @@ html, body {
 /* ── PAGE INNER ── */
 .page-inner {
   padding: 36px 44px 24px;
-  min-height: calc(var(--book-w) * 0.596);
+  min-height: 680px;
   display: flex; flex-direction: column;
 }
 .page-activity { padding: 24px 28px 18px; }
@@ -176,7 +168,7 @@ html, body {
 
 /* ── PORTADA ── */
 .cover-page {
-  min-height: calc(var(--book-w) * 0.596);
+  min-height: 680px;
   background: linear-gradient(140deg, #0a1e30 0%, var(--navy) 55%, #1f4a6e 100%);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
