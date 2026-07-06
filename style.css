@@ -61,28 +61,16 @@ html, body {
 /* ── BOOK SHELL ── */
 .book-shell {
   max-width: 1140px;
-  width: 92vw;
   margin: 28px auto 56px;
   display: flex;
   position: relative;
   filter: drop-shadow(var(--shadow-lg));
 }
 
-/* Pantallas grandes de escritorio: el libro crece en vez de quedarse fijo en 1140px */
-@media (min-width: 1440px) {
-  .book-shell { max-width: 1360px; }
-}
-@media (min-width: 1920px) {
-  .book-shell { max-width: 1600px; }
-}
-@media (min-width: 2560px) {
-  .book-shell { max-width: 1900px; }
-}
-
 /* ── LOMO ── */
 .book-spine {
   width: 26px;
-  min-height: min(680px, 78vh);
+  min-height: 680px;
   background: linear-gradient(180deg, #0d2034 0%, var(--navy) 100%);
   border-radius: 3px 0 0 3px;
   display: flex; align-items: center; justify-content: center;
@@ -105,7 +93,7 @@ html, body {
   position: relative;
   overflow: hidden;
   border-radius: 0 6px 6px 0;
-  min-height: min(680px, 78vh);
+  min-height: 680px;
 }
 
 .page {
@@ -123,7 +111,7 @@ html, body {
 /* ── PAGE INNER ── */
 .page-inner {
   padding: 36px 44px 24px;
-  min-height: min(680px, 78vh);
+  min-height: 680px;
   display: flex; flex-direction: column;
 }
 .page-activity { padding: 24px 28px 18px; }
@@ -180,7 +168,7 @@ html, body {
 
 /* ── PORTADA ── */
 .cover-page {
-  min-height: min(680px, 78vh);
+  min-height: 680px;
   background: linear-gradient(140deg, #0a1e30 0%, var(--navy) 55%, #1f4a6e 100%);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
