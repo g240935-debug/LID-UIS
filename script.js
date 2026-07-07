@@ -1439,34 +1439,73 @@ function renderizarEjGrafico(tipo) {
   const { filas, columnas, matriz, N } = EJ_DATA;
   const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
   const totalesFila = matriz.map(r => r.reduce((s, v) => s + v, 0));
+  const COLORES = ['rgba(26,58,90,.8)','rgba(46,107,79,.8)','rgba(200,168,75,.8)'];
 
-  // Facultad en el eje Y (categorías) — Modalidad como series agrupadas en X.
-  // Así se puede comparar visualmente la "forma" de cada fila entre sí: si son
-  // parecidas (independencia) o distintas (asociación), especialmente con % por fila.
-  const datasets = columnas.map((col, j) => ({
-    label: col,
-    data:  filas.map((_, i) => parseFloat(String(calcularCelda(tipo, matriz[i][j], totalesFila[i], totalesCol[j], N)).replace('%',''))),
-    backgroundColor: ['rgba(26,58,90,.8)','rgba(46,107,79,.8)','rgba(200,168,75,.8)'][j],
-    borderRadius: 3
-  }));
+  let config;
 
-  ejGraficoActual = new Chart(ctx, {
-    type: 'bar',
-    data: { labels: filas, datasets },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      animation: { duration: 500, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 10 } },
-        title: { display: true, text: `Facultad × Modalidad — ${tipo}`, font: { size: 11 }, color: '#1A3A5A' }
-      },
-      scales: {
-        x: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 9 } } },
-        y: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+  if (tipo === 'fila' || tipo === 'columna') {
+    // Barras apiladas al 100%: la forma más clara de comparar distribuciones
+    // condicionales. Si las variables son independientes, los límites entre
+    // segmentos quedan a la misma altura en todas las barras; si hay asociación,
+    // se desalinean visiblemente.
+    const porFila = tipo === 'fila';
+    const ejes    = porFila ? filas    : columnas;
+    const series  = porFila ? columnas : filas;
+    const totales = porFila ? totalesFila : totalesCol;
+
+    const datasets = series.map((s, k) => ({
+      label: s,
+      data: ejes.map((_, e) => {
+        const val = porFila ? matriz[e][k] : matriz[k][e];
+        return +(val / totales[e] * 100).toFixed(1);
+      }),
+      backgroundColor: COLORES[k % COLORES.length],
+      borderRadius: 2,
+    }));
+
+    config = {
+      type: 'bar',
+      data: { labels: ejes, datasets },
+      options: {
+        responsive: true,
+        animation: { duration: 500, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 10 } },
+          title: { display: true, text: `Facultad × Modalidad — % por ${porFila ? 'fila' : 'columna'} (apilado)`, font: { size: 11 }, color: '#1A3A5A' }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } },
+          y: { stacked: true, beginAtZero: true, max: 100, ticks: { callback: v => v + '%', font: { family: 'JetBrains Mono', size: 9 } } }
+        }
       }
-    }
-  });
+    };
+  } else {
+    // Absoluta y % sobre el total: barras agrupadas normales.
+    const datasets = filas.map((fila, i) => ({
+      label: fila,
+      data: matriz[i].map((val, j) => parseFloat(String(calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N)).replace('%',''))),
+      backgroundColor: COLORES[i],
+      borderRadius: 3,
+    }));
+    config = {
+      type: 'bar',
+      data: { labels: columnas, datasets },
+      options: {
+        responsive: true,
+        animation: { duration: 500, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { position: 'top', labels: { font: { family: 'Inter', size: 10 }, boxWidth: 10 } },
+          title: { display: true, text: `Facultad × Modalidad — ${tipo}`, font: { size: 11 }, color: '#1A3A5A' }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 9 } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+        }
+      }
+    };
+  }
+
+  ejGraficoActual = new Chart(ctx, config);
 }
 
 /* ════════════════════════════════════════════════
