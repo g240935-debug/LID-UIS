@@ -57,6 +57,7 @@ const AUDIO_MAP = {
   'freq-unif': { btn: 'audio-btn-freq-unif', waves: 'audio-waves-freq-unif' },
   'cap2':      { btn: 'audio-btn-cap2',      waves: 'audio-waves-cap2'      },
   'cap3':      { btn: 'audio-btn-cap3',      waves: 'audio-waves-cap3'      },
+  'cap3b':     { btn: 'audio-btn-cap3b',     waves: 'audio-waves-cap3b'     },
   'chi':       { btn: 'audio-btn-chi',       waves: 'audio-waves-chi'       },
   '5d':        { btn: 'audio-btn-5d',        waves: 'audio-waves-5d'        },
   'contA':     { btn: 'audio-btn-contA',     waves: 'audio-waves-contA'     },
@@ -72,6 +73,7 @@ const BOX_TO_AUDIO = {
   'chat-freq-unif': 'freq-unif',
   'chat-box':       'cap2',
   'chat-box2':      'cap3',
+  'chat-cap3b':     'cap3b',
   'chat-chi':       'chi',
   'chat-5d':        '5d',
   'chat-contA':     'contA',
@@ -155,7 +157,7 @@ let datosGrafico = {
 ════════════════════════════════ */
 
 // Orden lógico de páginas para determinar dirección de animación
-const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,11,12,13,14,'14b',15,16,17,18,19,20,21,22,23,24,25];
+const ORDEN_PAGINAS = [0,1,3,5,'5b','5c','5d',6,7,8,9,10,'10b',11,12,13,14,'14b',15,16,17,18,19,20,21,22,23,24,25];
 
 function irAPagina(n) {
   if (n === paginaActual) return;
@@ -233,10 +235,16 @@ function irAPagina(n) {
     setTimeout(() => { renderizarProbB(); }, 300);
   }
 
-  // Cap III — Formas parciales con IA
-  if (n === 10 && !chatCap3Iniciado) {
-    chatCap3Iniciado = true;
-    setTimeout(inicializarChatCap3, 400);
+  // Cap III — Formas parciales con IA (pág 9 visible / page-10 interno)
+  // El tutor YA NO se inicia automáticamente: espera a que el estudiante
+  // responda las 3 preguntas y las envíe (ver cap3EnviarPreguntasIniciales).
+  if (n === 10) {
+    setTimeout(renderizarCap3ActTable, 300);
+  }
+
+  // Puente hacia asociación/independencia (nueva página 10b)
+  if (n === '10b') {
+    setTimeout(inicializarCap3Puente, 300);
   }
 
   // Cap V — Exploración chi
@@ -1137,6 +1145,228 @@ function renderizarFPRefTable() {
 }
 
 /* ════════════════════════════════════════════════
+   CAP II — ACTIVIDAD (página 9 visible / page-10 interno)
+   Tabla: Color favorito × Personalidad, N=400.
+   El estudiante responde 3 preguntas abiertas ANTES de que el tutor
+   hable — sus respuestas se envían como contexto inicial de la sesión.
+════════════════════════════════════════════════ */
+const CAP3_ACT_DATA = {
+  filas:    ['Introvertida', 'Extrovertida'],
+  columnas: ['Rojo', 'Amarillo', 'Verde', 'Azul'],
+  matriz:   [[20, 6, 30, 44], [180, 34, 50, 36]],
+  N: 400
+};
+
+// Respuestas del estudiante en pág 9, reutilizadas como contexto en pág 10b
+let cap3RespuestasIniciales = { p1: '', p2: '', p3: '' };
+let chatCap3PuenteIniciado  = false;
+
+function renderizarCap3ActTable() {
+  const { filas, columnas, matriz, N } = CAP3_ACT_DATA;
+  const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
+  const totalesFila = matriz.map(r => r.reduce((s, v) => s + v, 0));
+
+  let html = '<table><thead><tr><th>Personalidad \\ Color</th>';
+  columnas.forEach(c => { html += `<th>${c}</th>`; });
+  html += '<th>Total</th></tr></thead><tbody>';
+  matriz.forEach((fila, i) => {
+    html += `<tr><td>${filas[i]}</td>`;
+    fila.forEach(v => { html += `<td>${v}</td>`; });
+    html += `<td>${totalesFila[i]}</td></tr>`;
+  });
+  html += '<tr><td>Total</td>';
+  totalesCol.forEach(tc => { html += `<td>${tc}</td>`; });
+  html += `<td>${N}</td></tr></tbody></table>`;
+
+  const el = document.getElementById('fp-ref-table');
+  if (el) el.innerHTML = html;
+
+  // Estado de la UI: si ya se enviaron las preguntas antes (misma sesión),
+  // saltar directo al panel del tutor en vez de mostrar el bloque otra vez.
+  const preguntasBlock = document.getElementById('cap3-preguntas-block');
+  const tutorPh        = document.getElementById('cap3-tutor-placeholder');
+  const tutorPanel      = document.getElementById('cap3-tutor-panel');
+  if (chatCap3Iniciado) {
+    if (preguntasBlock) preguntasBlock.style.display = 'none';
+    if (tutorPh) tutorPh.style.display = 'none';
+    if (tutorPanel) tutorPanel.style.display = 'flex';
+  } else {
+    if (preguntasBlock) preguntasBlock.style.display = 'block';
+    if (tutorPh) tutorPh.style.display = 'flex';
+    if (tutorPanel) tutorPanel.style.display = 'none';
+  }
+}
+
+// El estudiante responde las 3 preguntas y las envía — SOLO entonces arranca el tutor.
+async function cap3EnviarPreguntasIniciales() {
+  const p1 = document.getElementById('cap3-preg1')?.value.trim();
+  const p2 = document.getElementById('cap3-preg2')?.value.trim();
+  const p3 = document.getElementById('cap3-preg3')?.value.trim();
+  if (!p1 || !p2 || !p3) {
+    alert('Responde las tres preguntas antes de enviarlas al tutor — no hay respuesta incorrecta, es tu primer acercamiento a los datos.');
+    return;
+  }
+  cap3RespuestasIniciales = { p1, p2, p3 };
+  chatCap3Iniciado = true;
+
+  const preguntasBlock = document.getElementById('cap3-preguntas-block');
+  const tutorPh        = document.getElementById('cap3-tutor-placeholder');
+  const tutorPanel      = document.getElementById('cap3-tutor-panel');
+  if (preguntasBlock) preguntasBlock.style.display = 'none';
+  if (tutorPh) tutorPh.style.display = 'none';
+  if (tutorPanel) tutorPanel.style.display = 'flex';
+
+  const contexto = `[CONTEXTO — Respuestas iniciales del estudiante]
+1) Primera impresión sobre la relación entre color y personalidad: ${p1}
+2) Reflexión sobre la tensión de comparar Extrovertida-Rojo (180) vs Introvertida-Azul (44): ${p2}
+3) Apuesta inicial (¿relacionadas o independientes?) y en qué patrón se basa: ${p3}`;
+
+  agregarMensajeGen('chat-box2', '📋 Envié mis respuestas iniciales al tutor…', 'user');
+  const tid = agregarTypingGen('chat-box2');
+  setStatusGen('tutor-status-text2', 'Analizando tus respuestas…');
+  try {
+    const res  = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: contexto, session_id: `cap3_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    setStatusGen('tutor-status-text2', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-box2', data.reply, 'tutor');
+  } catch (err) {
+    quitarTypingGen(tid);
+    setStatusGen('tutor-status-text2', 'En línea');
+    agregarMensajeGen('chat-box2', 'Hubo un problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+  setTimeout(() => tutorPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
+}
+
+/* ════════════════════════════════════════════════
+   CAP II — PUENTE HACIA ASOCIACIÓN E INDEPENDENCIA
+   (nueva página '10b', entre Actividad y Ejemplos dinámicos)
+   Reutiliza CAP3_ACT_DATA. Gráfico: % de Introvertida por columna.
+════════════════════════════════════════════════ */
+function _cap3PuenteCalcularPorColumna() {
+  const { filas, columnas, matriz } = CAP3_ACT_DATA;
+  const totalesCol = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
+  // % de Introvertida (fila 0) dentro de cada columna
+  return columnas.map((c, j) => +(matriz[0][j] / totalesCol[j] * 100).toFixed(1));
+}
+
+let cap3PuenteChart = null;
+let cap3PuenteRefVisible = false;
+
+function cap3PuenteRenderChart() {
+  const ctx = document.getElementById('cap3-puente-canvas')?.getContext('2d');
+  if (!ctx) return;
+  if (cap3PuenteChart) { cap3PuenteChart.destroy(); cap3PuenteChart = null; }
+  const { columnas } = CAP3_ACT_DATA;
+  const pctIntrovertida = _cap3PuenteCalcularPorColumna();
+  const datasets = [{
+    label: '% Introvertida dentro de cada color',
+    data: pctIntrovertida,
+    backgroundColor: 'rgba(26,58,90,.8)',
+    borderColor: 'rgba(26,58,90,1)',
+    borderWidth: 1,
+    borderRadius: 4,
+  }];
+  if (cap3PuenteRefVisible) {
+    datasets.push({
+      type: 'line',
+      label: '% Introvertida en toda la muestra (25%)',
+      data: columnas.map(() => 25),
+      borderColor: 'rgba(200,168,75,1)',
+      borderWidth: 2,
+      borderDash: [6, 4],
+      pointRadius: 0,
+      fill: false,
+    });
+  }
+  cap3PuenteChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: columnas, datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: cap3PuenteRefVisible, position: 'bottom', labels: { font: { size: 10 } } },
+        title: { display: true, text: '% de Introvertida dentro de cada color favorito', font: { family: 'Playfair Display', size: 13 }, color: '#1A3A5A' }
+      },
+      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+      animation: { duration: 500 }
+    }
+  });
+}
+
+function cap3PuenteToggleReferencia() {
+  cap3PuenteRefVisible = !cap3PuenteRefVisible;
+  const btn = document.getElementById('cap3-puente-toggle-ref');
+  if (btn) btn.textContent = cap3PuenteRefVisible
+    ? '🙈 Ocultar referencia sin relación'
+    : '👁️ Mostrar referencia sin relación';
+  cap3PuenteRenderChart();
+}
+
+async function inicializarCap3Puente() {
+  cap3PuenteRenderChart();
+  if (chatCap3PuenteIniciado) return;
+  chatCap3PuenteIniciado = true;
+
+  const { p1, p2, p3 } = cap3RespuestasIniciales;
+  const contexto = (p1 || p3)
+    ? `[CONTEXTO — Respuestas del estudiante en la página anterior]
+Primera impresión sobre la relación entre color y personalidad: ${p1 || '(sin registrar)'}
+Apuesta inicial (¿relacionadas o independientes?) y en qué patrón se basó: ${p3 || '(sin registrar)'}
+Ahora el estudiante ve un gráfico de barras con el % de introvertidos dentro de cada color.`
+    : `[CONTEXTO — El estudiante no registró respuestas previas en esta sesión]
+Pide primero que formule, en sus propias palabras, si cree que el color favorito y la personalidad están relacionados, mirando el gráfico de barras que ahora tiene disponible.`;
+
+  const chatBox = 'chat-cap3b';
+  agregarMensajeGen(chatBox, '📋 Continuando con el análisis…', 'user');
+  const tid = agregarTypingGen(chatBox);
+  setStatusGen('tutor-status-text2b', 'Conectando…');
+  try {
+    const res  = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: contexto, session_id: `cap3b_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    setStatusGen('tutor-status-text2b', 'En línea');
+    if (data.reply) agregarMensajeGen(chatBox, data.reply, 'tutor');
+  } catch (err) {
+    quitarTypingGen(tid);
+    setStatusGen('tutor-status-text2b', 'En línea');
+    agregarMensajeGen(chatBox, 'Hubo un problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
+
+async function enviarMensajeCap3b() {
+  const input = document.getElementById('user-input-cap3b');
+  if (!input?.value.trim()) return;
+  const texto = input.value.trim(); input.value = '';
+  agregarMensajeGen('chat-cap3b', texto, 'user');
+  const tid = agregarTypingGen('chat-cap3b');
+  setStatusGen('tutor-status-text2b', 'Escribiendo…');
+  try {
+    const res  = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: texto, session_id: `cap3b_${sessionId}` })
+    });
+    const data = await res.json();
+    quitarTypingGen(tid);
+    setStatusGen('tutor-status-text2b', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-cap3b', data.reply, 'tutor');
+  } catch (err) {
+    quitarTypingGen(tid);
+    setStatusGen('tutor-status-text2b', 'En línea');
+    agregarMensajeGen('chat-cap3b', 'Hubo un problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+}
+
+/* ════════════════════════════════════════════════
    CAP IV — EJEMPLOS DINÁMICOS (página 11)
 ════════════════════════════════════════════════ */
 const EJ_DATA = {
@@ -1210,17 +1440,21 @@ function renderizarEjGrafico(tipo) {
   const totalesCol  = columnas.map((_, j) => matriz.reduce((s, r) => s + r[j], 0));
   const totalesFila = matriz.map(r => r.reduce((s, v) => s + v, 0));
 
-  const datasets = filas.map((fila, i) => ({
-    label: fila,
-    data:  matriz[i].map((val, j) => parseFloat(String(calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N)).replace('%',''))),
-    backgroundColor: ['rgba(26,58,90,.8)','rgba(46,107,79,.8)','rgba(200,168,75,.8)'][i],
+  // Facultad en el eje Y (categorías) — Modalidad como series agrupadas en X.
+  // Así se puede comparar visualmente la "forma" de cada fila entre sí: si son
+  // parecidas (independencia) o distintas (asociación), especialmente con % por fila.
+  const datasets = columnas.map((col, j) => ({
+    label: col,
+    data:  filas.map((_, i) => parseFloat(String(calcularCelda(tipo, matriz[i][j], totalesFila[i], totalesCol[j], N)).replace('%',''))),
+    backgroundColor: ['rgba(26,58,90,.8)','rgba(46,107,79,.8)','rgba(200,168,75,.8)'][j],
     borderRadius: 3
   }));
 
   ejGraficoActual = new Chart(ctx, {
     type: 'bar',
-    data: { labels: columnas, datasets },
+    data: { labels: filas, datasets },
     options: {
+      indexAxis: 'y',
       responsive: true,
       animation: { duration: 500, easing: 'easeOutQuart' },
       plugins: {
@@ -1228,8 +1462,8 @@ function renderizarEjGrafico(tipo) {
         title: { display: true, text: `Facultad × Modalidad — ${tipo}`, font: { size: 11 }, color: '#1A3A5A' }
       },
       scales: {
-        y: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 9 } } },
-        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+        x: { beginAtZero: true, ticks: { font: { family: 'JetBrains Mono', size: 9 } } },
+        y: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
       }
     }
   });
@@ -2247,6 +2481,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Recuperar historiales de sesiones previas
   cargarHistorial(sessionId,             'chat-box');
   cargarHistorial(`cap3_${sessionId}`,   'chat-box2');
+  cargarHistorial(`cap3b_${sessionId}`,  'chat-cap3b');
   cargarHistorial(`freq_unif_${sessionId}`, 'chat-freq-unif');
 
   // Renderizar tablas y gráficos estáticos
