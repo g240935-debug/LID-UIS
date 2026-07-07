@@ -774,12 +774,12 @@
         <div class="activity-layout">
           <div class="vis-panel">
             <div class="situation-header">
-              <span class="sit-badge">Actividad · UIS Bucaramanga</span>
-              <h3 class="sit-title">Rendimiento × Horas de estudio</h3>
-              <p class="sit-desc">Usa la tabla que exploraste en la página anterior. El tutor te hará preguntas sobre las distintas formas de calcular proporciones.</p>
+              <span class="sit-badge">Actividad · Color favorito y personalidad</span>
+              <h3 class="sit-title">Color favorito × Personalidad</h3>
+              <p class="sit-desc">Se clasificó a 400 estudiantes según su rasgo de personalidad (Introvertida / Extrovertida) y su color favorito (Rojo, Amarillo, Verde o Azul). Explora la tabla y responde antes de hablar con el tutor.</p>
             </div>
             <div class="fp-ref-table-wrapper">
-              <div class="fp-ref-label">Tabla de referencia — frecuencias absolutas</div>
+              <div class="fp-ref-label">Tabla de referencia — frecuencias absolutas (N = 400)</div>
               <div id="fp-ref-table"></div>
             </div>
             <div class="fp-formulas-strip">
@@ -790,8 +790,35 @@
                 <div class="fps-item"><span class="fps-label">% columna</span><span class="fps-expr">fᵢⱼ / f·ⱼ</span></div>
               </div>
             </div>
+
+            <!-- Tres preguntas abiertas — se envían juntas y arrancan al tutor -->
+            <div id="cap3-preguntas-block">
+              <div class="chi3-preg-card chi3-inline-preg" style="margin-top:14px;">
+                <p class="chi3-preg-num" style="color:var(--sky);">Antes de hablar con el tutor</p>
+                <p class="chi3-preg-text">Observa la tabla completa. Si tuvieras que resumir en una sola frase qué te dicen estos datos sobre la relación entre el color favorito y la personalidad, ¿qué dirías? Escribe tu primera impresión, aunque no estés seguro.</p>
+                <textarea class="p5d-resp-input" id="cap3-preg1" rows="2" placeholder="Escribe tu primera impresión…"></textarea>
+              </div>
+              <div class="chi3-preg-card chi3-inline-preg" style="margin-top:10px;">
+                <p class="chi3-preg-num" style="color:var(--sky);">Segunda pregunta</p>
+                <p class="chi3-preg-text">Extrovertida-Rojo tiene 180 personas; Introvertida-Azul tiene 44. ¿Eso significa que el rojo es "más preferido" entre los extrovertidos que el azul entre los introvertidos? ¿Qué te haría falta saber para comparar esas dos cifras de forma justa?</p>
+                <textarea class="p5d-resp-input" id="cap3-preg2" rows="2" placeholder="Escribe tu razonamiento…"></textarea>
+              </div>
+              <div class="chi3-preg-card chi3-inline-preg" style="margin-top:10px;">
+                <p class="chi3-preg-num" style="color:var(--sky);">Tercera pregunta</p>
+                <p class="chi3-preg-text">Si tuvieras que apostar: ¿el color favorito de una persona depende de su personalidad, o son cosas completamente independientes entre sí? ¿Qué patrón de la tabla te hace pensar eso?</p>
+                <textarea class="p5d-resp-input" id="cap3-preg3" rows="2" placeholder="Escribe tu apuesta…"></textarea>
+              </div>
+              <button class="btn-verificar" style="background:var(--navy);margin-top:10px;" onclick="cap3EnviarPreguntasIniciales()">Enviar al tutor →</button>
+            </div>
+
+            <!-- Placeholder mientras no se han enviado las preguntas -->
+            <div class="p25-tutor-placeholder" id="cap3-tutor-placeholder" style="margin-top:14px;">
+              <div class="p25-ph-icon">🎓</div>
+              <div class="p25-ph-txt">El tutor aparecerá aquí cuando envíes tus tres respuestas.</div>
+            </div>
           </div>
-          <div class="tutor-panel">
+
+          <div class="tutor-panel" id="cap3-tutor-panel" style="display:none;">
             <div class="tutor-header">
               <div class="tutor-avatar">🎓</div>
               <div class="tutor-info">
@@ -815,6 +842,56 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(9)">← Formas parciales</button>
+          <button class="btn-nav next" onclick="irAPagina('10b')">¿Están relacionadas? →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Página 9b (interna 10b): Puente hacia Asociación e Independencia ── -->
+    <div class="page" id="page-10b">
+      <div class="page-inner page-activity">
+        <div class="page-header">
+          <span class="chapter-tag">Capítulo II · Asociación e Independencia</span>
+          <span class="page-num">9</span>
+        </div>
+        <div class="activity-layout">
+          <div class="vis-panel">
+            <div class="situation-header">
+              <span class="sit-badge">Puente hacia la inferencia</span>
+              <h3 class="sit-title">¿Están relacionadas estas variables?</h3>
+              <p class="sit-desc">Ya sabes calcular los tres tipos de porcentaje de una tabla de contingencia. Ahora los vas a usar para explorar si el color favorito y la personalidad tienen alguna relación entre sí, retomando lo que apostaste antes.</p>
+            </div>
+            <div class="fp-ref-table-wrapper">
+              <div class="fp-ref-label">% de personas introvertidas dentro de cada color</div>
+              <canvas id="cap3-puente-canvas" style="max-height:300px;"></canvas>
+            </div>
+            <button class="btn-verificar" id="cap3-puente-toggle-ref" style="background:var(--gold);color:var(--ink);margin-top:10px;" onclick="cap3PuenteToggleReferencia()">👁️ Mostrar referencia sin relación</button>
+          </div>
+
+          <div class="tutor-panel">
+            <div class="tutor-header">
+              <div class="tutor-avatar">🎓</div>
+              <div class="tutor-info">
+                <div class="tutor-name">Tutor Virtual UIS</div>
+                <div class="tutor-status"><span class="status-dot"></span><span id="tutor-status-text2b">Conectando…</span></div>
+              </div>
+              <button class="audio-toggle-btn" id="audio-btn-cap3b"
+                      onclick="toggleAudio('cap3b')" title="Activar lectura en voz alta">
+                <span class="audio-icon">🔇</span>
+                <span class="audio-waves" id="audio-waves-cap3b">
+                  <span></span><span></span><span></span>
+                </span>
+              </button>
+            </div>
+            <div id="chat-cap3b" class="chat-box"></div>
+            <div class="chat-input-area">
+              <input type="text" id="user-input-cap3b" class="chat-input" placeholder="Escribe tu respuesta aquí…" onkeydown="if(event.key==='Enter') enviarMensajeCap3b()">
+              <button class="btn-send" onclick="enviarMensajeCap3b()">Enviar <span class="send-icon">↑</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(10)">← Actividad</button>
           <button class="btn-nav next" onclick="irAPagina(11)">Ejemplos →</button>
         </div>
       </div>
@@ -856,7 +933,7 @@
           </div>
         </div>
         <div class="page-footer">
-          <button class="btn-nav prev" onclick="irAPagina(10)">← Actividad Cap. II</button>
+          <button class="btn-nav prev" onclick="irAPagina('10b')">← Actividad Cap. II</button>
           <button class="btn-nav next" onclick="irAPagina(12)">Problemas →</button>
         </div>
       </div>
@@ -2113,6 +2190,7 @@
     <span class="pi-dot" onclick="irAPagina(8)"   title="Cap II · Síntesis"></span>
     <span class="pi-dot" onclick="irAPagina(9)"   title="Cap II · Formas Parciales"></span>
     <span class="pi-dot" onclick="irAPagina(10)"  title="Cap II · Actividad"></span>
+    <span class="pi-dot" onclick="irAPagina('10b')" title="Cap II · Asociación e Independencia"></span>
     <span class="pi-dot" onclick="irAPagina(11)"  title="Cap II · Ejemplo Dinámico"></span>
     <span class="pi-dot" onclick="irAPagina(12)"  title="Cap II · Formulación"></span>
     <span class="pi-dot" onclick="irAPagina(13)"  title="Cap II · Validación"></span>
