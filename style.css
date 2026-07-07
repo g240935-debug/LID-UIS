@@ -852,6 +852,7 @@ html, body {
   border: 1px solid var(--rule); border-radius: 3px;
   background: var(--cream); overflow: hidden;
 }
+.fp-ref-table-wrapper canvas { padding: 14px; box-sizing: border-box; }
 .fp-ref-label {
   font-family: 'JetBrains Mono', monospace;
   font-size: .62rem; text-transform: uppercase; letter-spacing: .11em;
