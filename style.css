@@ -2179,6 +2179,28 @@ html, body {
 .chi3-marg-total{ background: #fdf6e3; border-color: #e0c870; color: #7a6010; }
 .chi3-p16-validacion { margin-top: 8px; }
 
+/* ── Institucionalización estática (piloto p16) — la escribe el código, no el modelo ── */
+.chi3-inst-card {
+  margin-top: 12px;
+  background: #fdf6e3;
+  border: 1px solid #e0c870;
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.chi3-inst-titulo {
+  font-size: .82rem; font-weight: 700; color: #7a6010;
+  margin-bottom: 8px;
+}
+.chi3-inst-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem; color: var(--navy);
+  background: white; border-radius: 3px;
+  padding: 8px 10px; margin-bottom: 8px;
+}
+.chi3-inst-texto {
+  font-size: .78rem; line-height: 1.55; color: var(--ink);
+}
+
 /* ── Págs 17, 21 — ejemplos guiados ── */
 .chi3-ej-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; flex: 1; }
 .chi3-ej-left { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
