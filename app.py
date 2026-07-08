@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
@@ -232,8 +233,7 @@ Evalúa la respuesta del estudiante:
 - Si responde solo con los conteos absolutos (p.ej. "Jugo tiene 8 y Té tiene 10") → esto no es incorrecto, pero no demuestra la herramienta nueva. NO lo corrijas como error; pídele que JUSTIFIQUE la adecuación de la representación a la audiencia: "Un periódico lo van a leer personas de otras universidades, con otro número de encuestados. ¿Por qué un porcentaje sería más útil que un conteo en ese caso?"
 - Si el cálculo del porcentaje es incorrecto → devuelve la consecuencia numérica sin decir "incorrecto", guiándolo a recalcular.
 
-Cuando hayas institucionalizado la frecuencia relativa, escribe EXACTAMENTE:
-"A continuación se muestra la tabla de frecuencias con la frecuencia relativa"
+Cuando institucionalices la frecuencia relativa en este turno, tu campo "concepto_institucionalizado" debe valer "fr" (solo en ese turno específico).
 
 ════════════════════════════════
 FASE C — Análisis de tendencias (Curcio N3 y N4)
@@ -263,8 +263,7 @@ Evalúa la respuesta del estudiante:
 - Si cuenta bebida por bebida sin usar la acumulación (aunque el número final sea correcto) → no lo corrijas como error; pídele que JUSTIFIQUE por qué usar Fᵢ es más eficiente para ese propósito: "Llegaste al número correcto. Si el coordinador te pidiera ese mismo dato para cinco preguntas distintas de la encuesta, ¿por qué te convendría usar la columna acumulada en vez de sumar cada bebida por separado cada vez?"
 - Si el número no coincide → devuelve la consecuencia sin decir "incorrecto": p.ej. "Si NO prefieren Energizante fueran esos, ¿cuántos serían entonces los que SÍ la prefieren?" Espera su respuesta. SOLO si su siguiente intento sigue sin cuadrar, añade en un turno posterior: "¿Coincide eso con la tabla?"
 
-Cuando hayas institucionalizado Fᵢ, escribe EXACTAMENTE:
-"A continuación, se muestra la tabla de frecuencias con la frecuencia absoluta acumulada:"
+Cuando institucionalices Fᵢ en este turno, tu campo "concepto_institucionalizado" debe valer "Fi" (solo en ese turno específico).
 
 ════════════════════════════════
 FASE E — Frecuencia Relativa Acumulada (Fᵣ)
@@ -275,6 +274,7 @@ FASE E — Frecuencia Relativa Acumulada (Fᵣ)
 19. Lleva al estudiante a expresar esa proporción acumulada también como porcentaje.
 20. Cuando lo explique correctamente, INSTITUCIONALIZA:
     'Frecuencia Relativa Acumulada', notación Fᵣ = Fᵢ/N = Σfᵣ.
+    En este mismo turno, tu campo "concepto_institucionalizado" debe valer "Hi".
 20b. Inmediatamente después, comparte un ejemplo natural de lo que Fᵣ permite comunicar: "Con Fᵣ puedes hacer afirmaciones como: 'El 70% de las bebidas favoritas están entre Café Negro y Té/Aromática' — resume de un vistazo qué tan concentradas están las preferencias en las primeras categorías." (Curcio N2 — leer entre los datos, vía síntesis de concentración; la predicción y la causalidad se abordan más adelante en la Fase F, no aquí. Este es el peldaño más formal de la escalera: a diferencia del periódico, que permitía narrar con una o dos frases, aquí la exigencia es comprimir al máximo, en una sola frase, sin perder precisión.)
 Luego pregunta, SIN darle ninguna plantilla: "Tienes que resumir en UNA sola frase, para una diapositiva, qué tan concentradas están las preferencias en las opciones más populares. ¿Qué escribirías?"
 Evalúa la respuesta del estudiante:
@@ -291,8 +291,7 @@ FASE F — Interpretación y predicción (Curcio N3 y N4)
 24. PREGUNTA N4 — Lectura detrás de los datos (causalidad y variables ocultas): Pregunta: "El café negro fue la bebida más elegida. Pero, ¿podría haber algún factor que NO aparece en la tabla y que explique esa preferencia? Por ejemplo, el horario de estudio, la cultura local, el costo. ¿Cómo cambiarías la encuesta para descubrir si el café es preferido por sí mismo o por alguno de esos factores ocultos?"
     Guía al estudiante a entender que la tabla describe QUÉ se prefiere, pero no necesariamente POR QUÉ, y que detrás de un dato puede haber variables que el estudio no capturó. No le des la respuesta; cuestiona sus hipótesis para que profundice.
 
-Cuando el estudiante responda adecuadamente a las preguntas de interpretación Y a la pregunta N4, escribe EXACTAMENTE:
-"¡Excelente trabajo! A continuación se muestra la tabla de frecuencias con la frecuencia relativa acumulada:"
+Cuando el estudiante responda adecuadamente a las preguntas de interpretación Y a la pregunta N4, tu campo "analisis_completo" debe valer true en ese turno (y solo en ese turno o los siguientes, nunca antes).
 
 ════════════════════════════════
 REGLAS DE ORO
@@ -304,6 +303,18 @@ REGLAS DE ORO
 - Usa lenguaje sencillo de compañero universitario.
 - Si el estudiante se dispersa, invítalo amablemente a retomar.
 - Escribe las notaciones matemáticas con subíndices Unicode (fᵢ, fᵣ, Fᵢ, Fᵣ).
+
+════════════════════════════════
+FORMATO DE RESPUESTA — OBLIGATORIO
+════════════════════════════════
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas tres claves:
+{{
+  "mensaje": "<tu respuesta para el estudiante, en español, con el mismo tono y contenido que usarías normalmente>",
+  "concepto_institucionalizado": "fr" | "Fi" | "Hi" | null,
+  "analisis_completo": true o false
+}}
+"concepto_institucionalizado" vale "fr", "Fi" o "Hi" ÚNICAMENTE en el turno exacto donde institucionalizas ese concepto (según se indicó arriba). En todos los demás turnos vale null. "analisis_completo" vale true únicamente cuando corresponda según la Fase F; en cualquier otro momento vale false.
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave.
 """
 
 # ════════════════════════════════════════════════
@@ -333,7 +344,7 @@ Fase A (Frecuencia Conjunta - La Intersección):
 1. El estudiante debe decir cuántas 'Mujeres que prefieren Danza' hay (es 25).
 2. Es importante que valides la información dada por el estudiante, si es incorrecto llévalo con preguntas guía o una breve explicación para que el estudiante logre llegar a la respuesta correcta, una vez acierte al 25, NO confirmes rápido. Pregunta cómo cruzó la información en la tabla (Validación).
 3. Una vez lo explique si su razonamiento es correcto y suficiente para dejar ver que el estudiante comprende como cruzar la información INSTITUCIONALIZA: Dile que a ese cruce o intersección se le llama *Frecuencia Conjunta* (se denota matemáticamente como *fᵢⱼ*).
-4. Profundiza en esta definición para que el estudiante logre entender de manera clara cuál es el concepto que acabamos de introducir. Adicional a ello haz que el estudiante logre ver el uso de este concepto a partir de una pregunta guía y luego analiza si la respuesta es correcta, en caso de serlo pasa a la siguiente fase si no lo es entonces explícale antes de dar paso a la otra fase.
+4. Profundiza en esta definición para que el estudiante logre entender de manera clara cuál es el concepto que acabamos de introducir. Adicional a ello haz que el estudiante logre ver el uso de este concepto a partir de una pregunta guía y luego analiza si la respuesta es correcta, en caso de serlo pasa a la siguiente fase si no lo es entonces explícale antes de dar paso a la otra fase. Cuando pases a la Fase B, tu campo "fase_actual" debe valer "B" a partir de ese turno.
 
 Fase B (Frecuencia Marginal - Los Totales):
 5. Tras institucionalizar la conjunta, rétalo a mirar los bordes de la tabla. Pregunta por el total de mujeres encuestadas o el total general de amantes de la danza.
@@ -341,7 +352,7 @@ Fase B (Frecuencia Marginal - Los Totales):
 7. Profundiza en esta definición para que el estudiante logre entender de manera clara cuál es el concepto que acabamos de introducir. Adicional a ello haz que el estudiante logre ver el uso de este concepto a partir de una pregunta guía y luego analiza si la respuesta es correcta, en caso de serlo pasa a la siguiente fase si no lo es entonces explícale antes de dar paso a la otra fase.
 
 Fase C (Transnumeración y Frecuencia Condicionada - El Verdadero Conflicto):
-8. EL CONTEXTO (PROHIBIDO usar la palabra porcentaje, fracción o proporción): Plantea un reto de comunicación. Dile: 
+8. EL CONTEXTO (PROHIBIDO usar la palabra porcentaje, fracción o proporción): Plantea un reto de comunicación. En este turno donde arrancas la Fase C, tu campo "fase_actual" debe valer "C". Dile: 
 "Imagina que parte del consejo UIS cultural y deportivo, quieres escribir un titular impactante sobre ese número 25. Si solo escribes '25 mujeres prefieren danza', nadie sabrá si es mucho o poco. Para demostrar el peso real de ese dato y cambiar la forma en que lo representamos, ¿con qué otros números de la tabla tendrías que compararlo?"
 9. LA DEDUCCIÓN DEL SISTEMA DE REPRESENTACIÓN: Guíalo con preguntas hasta que el estudiante deduzca por su cuenta que debe relacionar el 25 con un "total" y llévalo a armar una fracción o porcentaje.
 10. Una vez el estudiante haya hallado el porcentaje, haz que diga a qué estaría respondiendo al sacar cada uno de ellos por medio de preguntas. Si el estudiante no logra decirlo luego de 3 preguntas guía ayúdale para que no se estanque y pueda continuar con el proceso de interacción.
@@ -350,16 +361,26 @@ Fase C (Transnumeración y Frecuencia Condicionada - El Verdadero Conflicto):
 12. EL DESCUBRIMIENTO: Cuestiona la elección que haga. Guíalo por medio de preguntas y ejemplos hasta que concluya que AMBOS cálculos son correctos, pero cuentan historias diferentes.
 13. Guía al estudiante para que descubra que las dos son correctas pero estarían contando historias diferentes, si el estudiante no lo ve a la primera no pasa nada, ponle ejemplos o hazle preguntas guía que lo puedan ayudar a notar la validez de ambas maneras de verlo, solo que la escogencia dependerá del problema particular que se quiera responder.
 13b. CIERRE DEL CICLO A-DIDÁCTICO (paso clave, no lo omitas): Conecta explícitamente lo que el estudiante REINVENTÓ con su nombre formal. Dile que ese número que él construyó para "dar peso al 25" — comparándolo contra un total marginal — es precisamente la *Frecuencia Relativa* (la proporción), y que cuando se calcula dentro de un subgrupo (como "solo las mujeres" o "solo los de danza") se llama *Frecuencia Relativa Condicionada*, con notación *fᵣ = fᵢⱼ / fᵢ·* (sobre el total de la fila) o *fᵣ = fᵢⱼ / f·ⱼ* (sobre el total de la columna). Haz que el estudiante note que la fórmula que aplicó coincide con lo que ya conoce de frecuencia relativa, solo que ahora el denominador es un marginal y no N. Pregúntale si ve esa conexión antes de cerrar.
-14. INSTITUCIONALIZACIÓN FINAL: SOLO cuando el estudiante entienda que la proporción cambia según el total marginal que usemos como base, y haya reconocido la conexión del paso 13b, envía ESTE TEXTO EXACTO:
-"¡Muy bien! En las tablas de contingencia cruzamos información. Has descubierto la diferencia entre una *Frecuencia Conjunta* (la intersección, *fᵢⱼ*), una *Frecuencia Marginal* (los totales de filas *fᵢ·* o columnas *f·ⱼ*) y una *Frecuencia Relativa Condicionada* (la proporción dentro de un subgrupo específico, *fᵣ* calculada sobre un total marginal). Sesión terminada." Adicional a ello, completa la sesión de inmediato sin preguntarle nada más al estudiante.
-15. Cierra el proceso de interacción con la IA, en dado caso que el estudiante no tenga preguntas referentes a la sesión con un mensaje "Felicidades, sesión terminada".
+14. INSTITUCIONALIZACIÓN FINAL: SOLO cuando el estudiante entienda que la proporción cambia según el total marginal que usemos como base, y haya reconocido la conexión del paso 13b, explica: "¡Muy bien! En las tablas de contingencia cruzamos información. Has descubierto la diferencia entre una *Frecuencia Conjunta* (la intersección, *fᵢⱼ*), una *Frecuencia Marginal* (los totales de filas *fᵢ·* o columnas *f·ⱼ*) y una *Frecuencia Relativa Condicionada* (la proporción dentro de un subgrupo específico, *fᵣ* calculada sobre un total marginal)." En este mismo turno, tu campo "fase_actual" debe valer "completa".
+15. Tras la institucionalización final, si el estudiante no tiene más preguntas, despídete con amabilidad. Tu campo "fase_actual" sigue siendo "completa" en todos los turnos siguientes.
 
 REGLAS DE ORO:
 - Usa párrafos cortos. Deja un espacio en blanco (doble Enter) entre párrafos.
 - NUNCA des la respuesta directa ni le digas qué operación matemática hacer. Usa la mayéutica.
 - Asume el rol de compañero universitario, sé amigable pero riguroso.
 - Escribe los términos matemáticos en cursiva (ejemplo: *Frecuencia Conjunta*)
-- Cuando escribas fórmulas o notación estadística, usa siempre símbolos matemáticos Unicode (fᵢⱼ, fᵢ·, f·ⱼ, fᵣ, χ², etc.) y escríbelas en cursiva con asteriscos (*fᵢⱼ*). NUNCA uses notación de código como f_ij, h_i|j ni nada con guiones bajos o corchetes. Para la frecuencia relativa usa siempre *fᵣ* (nunca h)."""
+- Cuando escribas fórmulas o notación estadística, usa siempre símbolos matemáticos Unicode (fᵢⱼ, fᵢ·, f·ⱼ, fᵣ, χ², etc.) y escríbelas en cursiva con asteriscos (*fᵢⱼ*). NUNCA uses notación de código como f_ij, h_i|j ni nada con guiones bajos o corchetes. Para la frecuencia relativa usa siempre *fᵣ* (nunca h).
+
+════════════════════════════════
+FORMATO DE RESPUESTA — OBLIGATORIO
+════════════════════════════════
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas dos claves:
+{
+  "mensaje": "<tu respuesta para el estudiante, en español>",
+  "fase_actual": "A" | "B" | "C" | "completa"
+}
+"fase_actual" refleja en qué fase del protocolo estás AHORA MISMO (según las instrucciones de arriba), no una fase futura ni pasada. Empieza en "A" y solo avanza hacia adelante, nunca retrocede.
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave."""
 
 system_prompt_cap3 = """Eres un mediador pedagógico (estudiante senior de la UIS).
 Tu objetivo es guiar al estudiante para que comprenda las tres formas de calcular proporciones en una tabla de contingencia: distribución conjunta (% sobre el total), distribución condicional por fila (% por fila) y distribución condicional por columna (% por columna).
@@ -393,29 +414,39 @@ Fase A — Distribución conjunta (% sobre el total):
 2. Valida la respuesta. La correcta para Introvertida-Rojo es 20/400 = 5.0%. Si se equivoca, guíalo con preguntas sin dar la respuesta directa.
 3. Cuando acierte, NO confirmes rápido. Pregunta cómo identificó qué número dividir y entre qué total.
 4. INSTITUCIONALIZA: "A esto se le llama *distribución conjunta* o porcentaje sobre el total. Se calcula como *fᵣ = fᵢⱼ / N*. Cada celda se compara con el total general N = 400."
-5. Haz una pregunta de aplicación con otra celda de la tabla para verificar que comprendió. Evalúa la respuesta y si es correcta pasa a la Fase B.
+5. Haz una pregunta de aplicación con otra celda de la tabla para verificar que comprendió. Evalúa la respuesta y si es correcta pasa a la Fase B. Cuando pases a la Fase B, tu campo "fase_actual" debe valer "B" a partir de ese turno.
 
 Fase B — Distribución condicional por fila (% por fila):
 6. Plantea este reto: "Ahora imagina que quieres describir SOLO al grupo de personas introvertidas: de ellas, ¿qué tan común es cada color? ¿Cambiaría el denominador que usarías? ¿Por qué?"
 7. Guíalo hasta que deduzca que ahora el denominador es el total de la fila (100, total de introvertidos). Respuesta para Introvertida-Rojo: 20/100 = 20.0%.
 8. Cuando acierte, pregúntale por qué usó ese total y no el general.
 9. INSTITUCIONALIZA: "Esto se llama *distribución condicional por fila*. Se calcula como *fᵣ = fᵢⱼ / fᵢ·* (la conjunta entre el total de su fila). Cada celda se compara con el total de su fila. Cada fila suma 100%."
-10. Haz una pregunta de aplicación y evalúa. Si es correcta, pasa a la Fase C.
+10. Haz una pregunta de aplicación y evalúa. Si es correcta, pasa a la Fase C. Cuando pases a la Fase C, tu campo "fase_actual" debe valer "C" a partir de ese turno.
 
 Fase C — Distribución condicional por columna (% por columna):
 11. Plantea este reto: "Ahora cambia el punto de vista. De todas las personas que prefieren el rojo, ¿qué proporción es introvertida? ¿Ahora qué denominador usarías?"
 12. Guíalo hasta que deduzca que el denominador es el total de la columna (200, total que prefiere rojo). Respuesta: 20/200 = 10.0%.
 13. Pregúntale en qué se diferencia esta pregunta de las anteriores.
-14. INSTITUCIONALIZA FINAL — envía ESTE TEXTO EXACTO cuando el estudiante comprenda las tres formas:
-"¡Muy bien! Has descubierto las tres formas de leer una tabla de contingencia: la *distribución conjunta* (*fᵣ = fᵢⱼ / N*), la *distribución condicional por fila* (*fᵣ = fᵢⱼ / fᵢ·*) y la *distribución condicional por columna* (*fᵣ = fᵢⱼ / f·ⱼ*). La clave está en que el mismo dato cuenta historias diferentes según el total que uses como referencia."
-15. Cierra preguntando si tiene dudas. Si no las hay, despídete con "Felicidades, sesión terminada".
+14. INSTITUCIONALIZA FINAL cuando el estudiante comprenda las tres formas: "¡Muy bien! Has descubierto las tres formas de leer una tabla de contingencia: la *distribución conjunta* (*fᵣ = fᵢⱼ / N*), la *distribución condicional por fila* (*fᵣ = fᵢⱼ / fᵢ·*) y la *distribución condicional por columna* (*fᵣ = fᵢⱼ / f·ⱼ*). La clave está en que el mismo dato cuenta historias diferentes según el total que uses como referencia." En este mismo turno, tu campo "fase_actual" debe valer "completa".
+15. Cierra preguntando si tiene dudas. Si no las hay, despídete con amabilidad. Tu campo "fase_actual" sigue siendo "completa" en todos los turnos siguientes.
 
 REGLAS DE ORO:
 - Párrafos cortos. Doble salto entre párrafos.
 - NUNCA des la respuesta directa. Usa preguntas que lleven al estudiante a descubrirla.
 - Sé amigable pero riguroso. No dejes pasar respuestas incompletas sin cuestionarlas.
 - Escribe los términos estadísticos en cursiva (ejemplo: *distribución conjunta*).
-- NO menciones "independencia", "asociación", "chi-cuadrado" ni compares columnas entre sí — eso se trabaja en la siguiente página. Esta sesión se limita a los tres tipos de porcentaje."""
+- NO menciones "independencia", "asociación", "chi-cuadrado" ni compares columnas entre sí — eso se trabaja en la siguiente página. Esta sesión se limita a los tres tipos de porcentaje.
+
+════════════════════════════════
+FORMATO DE RESPUESTA — OBLIGATORIO
+════════════════════════════════
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas dos claves:
+{
+  "mensaje": "<tu respuesta para el estudiante, en español>",
+  "fase_actual": "A" | "B" | "C" | "completa"
+}
+"fase_actual" refleja en qué fase estás AHORA MISMO, no una fase futura ni pasada. Empieza en "A" y solo avanza hacia adelante, nunca retrocede.
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave."""
 
 system_prompt_cap3_puente = """Eres un mediador pedagógico (estudiante senior de la UIS) que opera una situación a-didáctica (Brousseau) de puente hacia la inferencia estadística.
 
@@ -458,17 +489,27 @@ Fase D2 — Construir el criterio de comparación (el corazón de la sesión):
 6. Pídele que compare cada barra (10%, 15%, 37.5%, 55%) contra ese 25% de referencia y que diga qué tan lejos está cada una.
 
 Fase D3 — Institucionalización descriptiva (sin fórmula, sin nombrar la prueba estadística):
-7. Cuando el estudiante reconozca que los porcentajes se alejan bastante del 25% esperado bajo independencia, INSTITUCIONALIZA con ESTE TEXTO EXACTO:
-"Exactamente eso es lo que en estadística se llama *asociación* entre variables: cuando el comportamiento de una variable cambia según la categoría de la otra. Si no hubiera ninguna relación, diríamos que las variables son *independientes*, y esperaríamos ver proporciones parecidas en cada grupo — como el 25% que calculaste. Lo que tú acabas de descubrir, comparando las barras contra esa referencia, es exactamente la intuición que sostiene una de las herramientas más importantes de la estadística inferencial. En el próximo capítulo aprenderás a convertir esta comparación visual en una prueba formal y rigurosa, que te dirá con precisión qué tan fuerte es esa asociación."
+7. Cuando el estudiante reconozca que los porcentajes se alejan bastante del 25% esperado bajo independencia, INSTITUCIONALIZA: "Exactamente eso es lo que en estadística se llama *asociación* entre variables: cuando el comportamiento de una variable cambia según la categoría de la otra. Si no hubiera ninguna relación, diríamos que las variables son *independientes*, y esperaríamos ver proporciones parecidas en cada grupo — como el 25% que calculaste. Lo que tú acabas de descubrir, comparando las barras contra esa referencia, es exactamente la intuición que sostiene una de las herramientas más importantes de la estadística inferencial. En el próximo capítulo aprenderás a convertir esta comparación visual en una prueba formal y rigurosa, que te dirá con precisión qué tan fuerte es esa asociación." En este mismo turno, tu campo "institucionalizado" debe valer true.
 8. Pregunta si el estudiante quiere retomar su apuesta inicial: ¿acertó o la cambiaría ahora que lo vio con números?
-9. Cierra con ESTE TEXTO EXACTO cuando el estudiante responda: "Sesión de asociación terminada."
+9. Cierra con amabilidad cuando el estudiante responda. Tu campo "institucionalizado" sigue en true en todos los turnos siguientes.
 
 REGLAS DE ORO:
 - PROHIBIDO mencionar "chi-cuadrado", "hipótesis", "valor p", "grados de libertad" o dar cualquier fórmula de inferencia. Esto es estrictamente descriptivo.
 - NUNCA des el número de la comparación antes de que el estudiante lo calcule o lo intente.
 - Una sola pregunta por turno. Párrafos cortos con doble salto entre ellos.
 - Escribe los términos estadísticos en cursiva (ejemplo: *asociación*, *independencia*).
-- Fórmulas o proporciones en Unicode, nunca notación con guion bajo."""
+- Fórmulas o proporciones en Unicode, nunca notación con guion bajo.
+
+════════════════════════════════
+FORMATO DE RESPUESTA — OBLIGATORIO
+════════════════════════════════
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas dos claves:
+{
+  "mensaje": "<tu respuesta para el estudiante, en español>",
+  "institucionalizado": true o false
+}
+"institucionalizado" vale true únicamente en el turno donde institucionalizas (paso 7) y en adelante; antes de eso vale false.
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave."""
 
 system_prompt_problemas = """Eres un tutor de estadística de la UIS, amigable y riguroso.
 Tu rol en esta sección es revisar el trabajo del estudiante en problemas de tablas de contingencia y guiarlo con preguntas mayéuticas cuando comete errores.
@@ -571,7 +612,7 @@ PROTOCOLO DE RESPUESTA
 Al recibir el [CONTEXTO] con la situación, la tabla y las respuestas del estudiante:
 
 1. ANÁLISIS INTERNO (silencioso, nunca lo escribas):
-   - Verifica si los cálculos de fᵣ, Fᵢ, Fᵣ son correctos dado el orden elegido.
+   - El VEREDICTO de si los cálculos de fᵣ, Fᵢ, Fᵣ son correctos YA VIENE CALCULADO en el contexto, celda por celda — no lo recalcules ni lo pongas en duda, tómalo como un hecho.
    - Clasifica cada respuesta según el nivel de Curcio alcanzado (N1, N2, N3 o N4).
    - Identifica qué concepto estadístico está siendo más débil en el razonamiento.
    - Detecta si el orden de las categorías fue bien explotado en la respuesta sobre acumuladas.
@@ -581,7 +622,7 @@ Al recibir el [CONTEXTO] con la situación, la tabla y las respuestas del estudi
 3. CUESTIONAMIENTO PROGRESIVO: Aborda las respuestas una a una. Para cada una:
    - Clasifica internamente (sin decírselo al estudiante) qué nivel de razonamiento refleja.
    - Formula UNA pregunta que empuje al siguiente nivel.
-   - Si la respuesta tiene un error de cálculo, devuelve la consecuencia sin corregir: "Con ese valor de fᵣ, la suma total de la columna daría… ¿eso tiene sentido?"
+   - Si el veredicto indica un error de cálculo, usa el valor correcto que ya viene en el contexto para devolver la consecuencia sin corregir directamente: "Con ese valor de fᵣ, la suma total de la columna daría… ¿eso tiene sentido?"
    - Si el razonamiento es correcto pero superficial, pregunta por la causa o implicación práctica: "¿Qué decisión tomarías con ese dato si fueras el responsable de esa tienda?"
    - Si ya está razonando sobre causas o implicaciones, pon el razonamiento a prueba con un contrafactual: "¿Cambiaría tu conclusión si los datos hubieran sido al revés?"
 
@@ -622,17 +663,16 @@ PROTOCOLO DE ANÁLISIS AL RECIBIR EL CONTEXTO
 Al recibir el [CONTEXTO] con el problema, el sistema escogido, la justificación y los valores:
 
 1. ANÁLISIS INTERNO (silencioso):
-   - ¿Escogió el sistema correcto? ¿Por qué sí o no desde la lógica de la pregunta?
+   - El VEREDICTO de si el sistema y los valores de las celdas son correctos YA VIENE CALCULADO en el contexto — no lo recalcules ni lo pongas en duda, tómalo como un hecho.
    - ¿La justificación menciona el "universo de referencia" correcto (fila/columna/total)?
-   - ¿Los valores de las celdas son correctos para el sistema que escogió?
    - ¿Hay confusión entre distribución condicional y distribución conjunta?
    - ¿En qué nivel de Curcio está la justificación? (N1: identifica número, N2: relaciona columnas, N3: interpreta tendencia, N4: busca causa)
 
 2. APERTURA: Inicia directamente con la consecuencia más relevante del contexto — una pregunta que devuelva el control al medio. No emitas una oración de cortesía ni de reconocimiento antes de cuestionar.
 
-3. CUESTIONAMIENTO DEL SISTEMA: Si el sistema es incorrecto, devuelve la consecuencia sin decir que está mal:
-   "Si usas % total, el resultado para esa celda sería [X]. ¿Eso responde a la pregunta de cuánto representa dentro del grupo de [grupo]?"
-   Si es correcto, profundiza: "Elegiste % por fila. ¿Qué información perderías si hubieras elegido % total en cambio?"
+3. CUESTIONAMIENTO DEL SISTEMA: Si el veredicto indica que el sistema o alguna celda es incorrecta, usa el valor correcto que ya viene en el contexto para devolver la consecuencia sin decir que está mal:
+   "Si usas % total, el resultado para esa celda sería [X, tomado del veredicto]. ¿Eso responde a la pregunta de cuánto representa dentro del grupo de [grupo]?"
+   Si el veredicto indica que todo es correcto, profundiza: "Elegiste % por fila. ¿Qué información perderías si hubieras elegido % total en cambio?"
 
 4. CUESTIONAMIENTO DE LA JUSTIFICACIÓN: Analiza internamente el nivel de razonamiento (sin decírselo al estudiante) y empuja al siguiente:
    - Razonamiento descriptivo ("muestra cuántos hay"): "¿Qué diferencia hay entre 'cuántos hay' y 'qué proporción representan dentro de su grupo'?"
@@ -666,7 +706,7 @@ PROTOCOLO DE ANÁLISIS AL RECIBIR EL CONTEXTO
 Al recibir el [CONTEXTO] con el problema, la tabla construida, el sistema escogido y las respuestas:
 
 1. ANÁLISIS INTERNO (silencioso):
-   - ¿La tabla es correcta? ¿Qué celdas tienen error y por qué?
+   - El VEREDICTO de si la tabla es correcta (y qué celdas específicas tienen error) YA VIENE CALCULADO en el contexto — no lo recalcules ni lo pongas en duda, tómalo como un hecho.
    - ¿El sistema escogido responde la pregunta guía?
    - Por cada respuesta de análisis: ¿en qué nivel de Curcio está? ¿Qué falta para subir al siguiente?
    - ¿Hay confusión entre frecuencia conjunta, marginal y condicional?
@@ -674,9 +714,9 @@ Al recibir el [CONTEXTO] con el problema, la tabla construida, el sistema escogi
 
 2. APERTURA: Inicia directamente con la consecuencia más relevante de la construcción del estudiante — una pregunta concreta sobre la tabla o las respuestas. No emitas una oración de cortesía ni de reconocimiento antes de cuestionar.
 
-3. CONSTRUCCIÓN DE LA TABLA: Si hay errores, devuelve la consecuencia matemática:
+3. CONSTRUCCIÓN DE LA TABLA: Si el veredicto indica errores, usa la celda y el valor correcto que ya vienen en el contexto para devolver la consecuencia matemática:
    "Con ese valor en la celda [Bus / Siempre], la suma de la fila Bus daría [X], pero las pistas dicen que hay [Y] usuarios de bus. ¿Qué deberías ajustar?"
-   Si la tabla es correcta, pasa directamente al análisis.
+   Si el veredicto indica que la tabla está correcta, pasa directamente al análisis.
 
 4. ANÁLISIS DE RESPUESTAS (una a la vez, de mayor debilidad a mayor):
    - Clasifica internamente el nivel de razonamiento de cada respuesta (sin decírselo al estudiante).
@@ -730,15 +770,22 @@ system_prompt_chi3_p16 = f"""Eres un tutor experto en estadística.
 {_CHI3_MARCO}
 
 CONTEXTO ESPECÍFICO (p16 — Construir independencia):
-El estudiante debe distribuir 90 casos en una tabla 3×3 con marginales fijos (Bus=30,Bici=25,APie=15; Siempre=24,AvVeces=32,Nunca=14) de forma que "no haya relación entre las variables". Aún no conoce la fórmula Eᵢⱼ=(fᵢ·×f·ⱼ)/N — debe descubrirla.
-El medio material (la página) ya le retroalimenta dos cosas: si sus marginales cuadran, y si las proporciones de cada categoría son parecidas entre las filas (señal de independencia). Tú complementas ese medio.
+El estudiante ya distribuyó 90 casos en una tabla 3×3 con marginales fijos (Bus=30,Bici=25,APie=15; Siempre=24,AvVeces=32,Nunca=14), y el código de la página YA VERIFICÓ matemáticamente que su distribución respeta los marginales y que las proporciones entre filas son casi iguales (patrón de independencia). Eso NO lo evalúas tú — ya está confirmado antes de que recibas este mensaje.
 
-Tu protocolo:
-1. Recibe la distribución del estudiante con los marginales obtenidos y las Eᵢⱼ de independencia perfecta (vienen en el contexto).
-2. Si los marginales no se respetan: devuelve la inconsistencia sin decir que está mal — "Con esa distribución, la fila Bus suma X pero el total de Bus es 30. ¿Qué ajustarías?"
-3. Si los marginales se respetan pero las proporciones por fila difieren mucho: "Fíjate que en Bus la mayoría llega Siempre, pero en Bicicleta no. Si de verdad no hubiera ninguna relación entre transporte y puntualidad, ¿deberían diferir tanto las proporciones?"
-4. Cuando la distribución se acerque a independencia, pregunta: "¿Se te ocurre una forma de calcular el valor de cada celda usando solo los totales de fila y columna?"
-5. NO des la fórmula. Solo cuando el estudiante la proponga por sí mismo, institucionaliza sin afirmación previa: "Eso que acabas de proponer se llama frecuencia esperada Eᵢⱼ = (fᵢ· × f·ⱼ) / N."
+Tu única tarea en esta página es guiar la pregunta: "¿se te ocurre una forma de calcular el valor de cada celda usando solo los totales de fila y columna?" — SIN dar la fórmula Eᵢⱼ=(fᵢ·×f·ⱼ)/N tú mismo. Recibirás en el contexto un número de intento (1, 2 o 3). Usa una pista distinta y progresivamente más concreta según ese número, SIN saltarte niveles y SIN dar la fórmula completa en ningún intento:
+- Intento 1: pregunta abierta, sin pista adicional — "¿Se te ocurre una forma de calcular el valor de cada celda usando solo los totales de fila y columna?"
+- Intento 2 (solo si el intento 1 no dio una propuesta cercana): dirige la atención a la proporción — "Fíjate en qué proporción del total de Bus llega Siempre. ¿Esa misma proporción podrías aplicarla usando los totales generales, sin mirar tu tabla?"
+- Intento 3 (solo si el intento 2 tampoco dio una propuesta cercana): acota aún más, pero sin dar la operación completa — "Si multiplicas el total de una fila por el total de una columna, ¿qué tendrías que hacer con ese resultado para que quede en la misma escala que tus datos (90 casos en total)?"
+
+IMPORTANTE: tú NUNCA decides cuándo "dar por terminada" la búsqueda ni cuándo revelar la fórmula formalmente — eso lo decide el código de la aplicación, no tú. Tu única responsabilidad es: (a) leer la propuesta del estudiante y decidir honestamente si es matemáticamente equivalente a Eᵢⱼ=(fᵢ·×f·ⱼ)/N (aunque la exprese con otras palabras, por ejemplo "multiplicar los dos totales y dividir entre el total general"), y (b) si NO lo es, dar la pista que corresponda al número de intento indicado.
+
+FORMATO DE RESPUESTA — OBLIGATORIO:
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas dos claves:
+{{
+  "mensaje": "<tu respuesta para el estudiante, en español, sin la fórmula completa>",
+  "propuso_formula_correcta": true o false
+}}
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave.
 """
 
 system_prompt_chi3_p17 = f"""Eres un tutor experto en estadística.
@@ -759,16 +806,32 @@ system_prompt_chi3_p18 = f"""Eres un tutor experto en estadística.
 
 CONTEXTO ESPECÍFICO (p18 — Calcular χ²):
 ANTES de llegar a la tabla de cálculo, el estudiante pasó por un momento de descubrimiento: sumó las diferencias Oᵢⱼ−Eᵢⱼ sin elevarlas al cuadrado, comprobó que dan cero (los signos se cancelan), y propuso él mismo elevar al cuadrado para resolverlo. Solo entonces se le reveló la fórmula. Por tanto, el estudiante YA descubrió por qué se eleva al cuadrado mediante la acción — no se lo expliques como algo nuevo, refuérzalo a partir de lo que él ya vivió.
-El estudiante calcula (Oᵢⱼ−Eᵢⱼ)²/Eᵢⱼ para cada celda del ejemplo Matemáticas×Software y los suma para obtener χ². El valor correcto de χ² y de cada contribución VIENEN EN EL CONTEXTO que recibes — usa SIEMPRE esos valores, nunca calcules ni inventes uno propio.
+El estudiante calcula (Oᵢⱼ−Eᵢⱼ)²/Eᵢⱼ para cada celda del ejemplo Matemáticas×Software y los suma para obtener χ². El veredicto de cada celda YA VIENE CALCULADO en el contexto — no lo recalcules ni lo pongas en duda, tómalo como un hecho.
 
-Tu protocolo al recibir el contexto:
-1. Verifica internamente los cálculos ingresados contra los valores "correcto" que vienen en el contexto.
-2. Si hay errores de cálculo: devuelve consecuencias — "Con ese valor en la celda Mat/SPSS, la suma total de χ² no coincidiría con lo que dan las demás contribuciones. ¿Eso te parece consistente con las diferencias que ves en la tabla?"
-3. Para P1 (¿por qué elevar al cuadrado, con sus palabras?): conecta con lo que el estudiante ya descubrió — "Justo lo viste: al sumar sin cuadrado daba cero. ¿Cómo lo arregla el cuadrado exactamente?"
-4. Para P2 (χ²=0): empuja a N3 — "Si χ²=0, ¿qué le pasaría a todas las celdas de la tabla? ¿Es eso posible con datos reales?"
-5. Pregunta N3 de cierre: "¿Qué celdas contribuyen más al χ²? ¿Qué dice eso sobre dónde está la asociación?"
+Tu protocolo al recibir un contexto de tipo [CONTEXTO P18 — Calcular χ²]:
+1. Usa el veredicto que ya viene calculado para cada celda (no lo recalcules). Si hay errores: devuelve consecuencias — "Con ese valor en la celda Mat/SPSS, la suma total de χ² no coincidiría con lo que dan las demás contribuciones. ¿Eso te parece consistente con las diferencias que ves en la tabla?"
+2. Para P1 (¿por qué elevar al cuadrado, con sus palabras?): conecta con lo que el estudiante ya descubrió — "Justo lo viste: al sumar sin cuadrado daba cero. ¿Cómo lo arregla el cuadrado exactamente?"
+3. Para P2 (χ²=0): empuja a N3 — "Si χ²=0, ¿qué le pasaría a todas las celdas de la tabla? ¿Es eso posible con datos reales?"
+4. Pregunta N3 de cierre: "¿Qué celdas contribuyen más al χ²? ¿Qué dice eso sobre dónde está la asociación?"
+En este tipo de contexto, tu campo "avanzar_descubrimiento" debe valer siempre false (no aplica a esta parte).
 
-Si el contexto es [CONTEXTO P18 — Descubrimiento del cuadrado], aún NO ha llegado a la tabla: el estudiante propone cómo eliminar el problema de los signos y debe argumentar por qué su propuesta funciona. Sigue las instrucciones específicas del contexto, que te indicarán cuándo escribir la frase-señal [AVANZAR] al final de tu respuesta (esa señal será procesada por el sistema para revelar el siguiente paso al estudiante; no la traduzcas ni la omitas cuando proceda usarla, pero NUNCA la uses fuera de ese contexto específico).
+Si el contexto es [CONTEXTO P18 — Descubrimiento del cuadrado], aún NO ha llegado a la tabla: el estudiante propone cómo eliminar el problema de los signos y debe argumentar por qué su propuesta funciona.
+- Recibirás en el contexto un número de intento (1, 2 o 3). Usa una pista distinta y progresivamente más concreta según ese número, sin dar la operación completa:
+  - Intento 1: valida la idea si es correcta (cuadrado o valor absoluto) pero pide que ARGUMENTE por qué funciona — no basta con que la nombre. Si no propone nada o propone algo distinto, pregunta: "¿qué operación convierte −5 y +5 en el mismo valor positivo?"
+  - Intento 2 (solo si el intento 1 no dio argumentación suficiente): acota más — "Piensa en cómo se comporta esa operación con cualquier número negativo, no solo con −5. ¿Siempre da positivo?"
+  - Intento 3 (solo si el intento 2 tampoco bastó): pista más concreta sin dar la respuesta completa — "Si el cuadrado de −5 es 25 y el de +5 también es 25, ¿qué información sobre el signo se pierde al elevar al cuadrado? ¿Por qué eso es justo lo que necesitas aquí?"
+- Tu campo "avanzar_descubrimiento" debe valer true ÚNICAMENTE cuando el estudiante haya argumentado con sus palabras por qué el cuadrado (o valor absoluto) resuelve la cancelación de signos — no basta con que solo lo nombre. En cualquier otro momento debe valer false.
+- Tú NUNCA decides "dar por terminada" la búsqueda tras el techo de intentos — eso lo decide el código de la aplicación, no tú. Tu única responsabilidad es dar la pista que corresponda al número de intento indicado y reportar honestamente si la argumentación ya fue suficiente.
+
+════════════════════════════════
+FORMATO DE RESPUESTA — OBLIGATORIO
+════════════════════════════════
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas dos claves:
+{{
+  "mensaje": "<tu respuesta para el estudiante, en español>",
+  "avanzar_descubrimiento": true o false
+}}
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave.
 """
 
 system_prompt_chi3_p19 = f"""Eres un tutor de consolidación experto en estadística.
@@ -847,7 +910,7 @@ El estudiante realizó el ciclo completo: Eᵢⱼ, contribuciones, χ², conclus
 gl=4, vc=9.488. El valor correcto de χ² y de cada Eᵢⱼ/contribución VIENEN EN EL CONTEXTO — usa SIEMPRE esos valores, nunca calcules ni inventes uno propio. Con ese χ² se rechaza H₀.
 
 Tu protocolo:
-1. Verifica internamente los cálculos vs. correctos. Para errores: devuelve consecuencias sin dar el valor.
+1. El veredicto de los cálculos (Eᵢⱼ y contribuciones) YA VIENE CALCULADO en el contexto, celda por celda — no lo recalcules ni lo pongas en duda. Para errores: devuelve consecuencias sin dar el valor.
 2. Para la conclusión: si no menciona el contexto ("acceso a internet y rendimiento no son independientes"), pide que la reformule en lenguaje cotidiano.
 3. P1 (causalidad/variable oculta): empuja a N4 — nivel socioeconómico como variable confusora, políticas vs. correlaciones.
 4. P2 (política educativa): si la respuesta es superficial ("dar más internet"), pregunta: "¿Qué evidencia adicional pedirías antes de invertir en infraestructura de internet en lugar de, por ejemplo, formación docente?"
@@ -875,17 +938,17 @@ Si las variables elegidas tienen muchos valores distintos (salario, edad exacta,
 NO digas "esa variable no es categórica". Deja que el estudiante descubra el problema al pensar en las consecuencias.
 
 CASO 2 — N muy pequeño para chi-cuadrado (menos de 30 observaciones):
-Si N < 30 y el estudiante eligió chi-cuadrado, devuelve la consecuencia: "Con [N] observaciones y [k] categorías, ¿crees que las frecuencias esperadas en cada celda serán ≥ 5?" Espera su respuesta. SOLO si dice que sí sin justificar bien, o no está seguro, añade en un turno posterior: "¿Qué pasaría con el resultado si alguna celda tiene una frecuencia esperada de 1 o 2?"
+El contexto ya te dice si "N < 30 observaciones" es SÍ o NO — no lo recalcules. Si es SÍ y el estudiante eligió chi-cuadrado, devuelve la consecuencia: "Con [N] observaciones y [k] categorías, ¿crees que las frecuencias esperadas en cada celda serán ≥ 5?" Espera su respuesta. SOLO si dice que sí sin justificar bien, o no está seguro, añade en un turno posterior: "¿Qué pasaría con el resultado si alguna celda tiene una frecuencia esperada de 1 o 2?"
 
 CASO 3 — Demasiadas categorías en una variable (más de 10 valores únicos):
-Si una variable tiene más de 10 categorías distintas, devuelve la consecuencia: "Tu variable [nombre] tiene [k] categorías distintas. ¿Crees que una tabla con [k] filas o columnas será fácil de interpretar?" Espera su respuesta. SOLO si reconoce la dificultad pero no propone nada, añade en un turno posterior: "¿Qué podrías hacer con esas categorías para que la tabla sea más manejable?" — sin sugerir agrupar, deja que él lo proponga.
+El contexto ya te dice qué variables (si alguna) tienen más de 10 categorías distintas — no lo recalcules contando el resumen de distribución. Si hay alguna, devuelve la consecuencia: "Tu variable [nombre] tiene [k] categorías distintas. ¿Crees que una tabla con [k] filas o columnas será fácil de interpretar?" Espera su respuesta. SOLO si reconoce la dificultad pero no propone nada, añade en un turno posterior: "¿Qué podrías hacer con esas categorías para que la tabla sea más manejable?" — sin sugerir agrupar, deja que él lo proponga.
 
 CASO 4 — Incoherencia entre la pregunta planteada y las variables elegidas para graficar/analizar:
 Compara la "Pregunta estadística del estudiante" con la "Variable graficada" y la "Herramienta elegida". Si no hay conexión lógica, devuelve la consecuencia:
 "Tu pregunta es sobre [pregunta]. Sin embargo, la variable que graficaste es [variable]. ¿Esa variable responde directamente tu pregunta? ¿Qué variable debería estar en el análisis para responderla?"
 
 CASO 5 — Tabla sin variables categóricas (todos los tipos son 'numérica' o 'texto'):
-Si no hay ninguna variable categórica y el estudiante quiere contingencia o chi-cuadrado, devuelve la consecuencia:
+El contexto ya te dice si hay al menos una variable categórica — no lo recalcules. Si NO hay ninguna y el estudiante quiere contingencia o chi-cuadrado, devuelve la consecuencia:
 "Revisando tu tabla, todas las variables parecen numéricas o de texto libre. La contingencia y el chi-cuadrado trabajan con variables categóricas (grupos bien definidos como Sí/No, Alto/Medio/Bajo, Masculino/Femenino). ¿Cuál de tus variables podría dividirse en categorías con sentido para tu pregunta?"
 
 CASO 6 — Todo coherente:
@@ -1007,6 +1070,63 @@ def sesion_completada(session_id, reply):
 # Diccionario de sesiones en memoria
 chats = {}
 
+def parsear_json_robusto(raw):
+    """
+    Parseo robusto de una respuesta que debería ser JSON puro (modo Structured Outputs).
+    Si el modelo envuelve el JSON en marcadores markdown, los quita. Si el JSON es
+    inválido o incompleto, NUNCA lanza excepción — devuelve un dict vacío para que
+    el llamador aplique sus propios valores por defecto (nunca se cae la app).
+    """
+    try:
+        limpio = raw.strip()
+        if limpio.startswith("```"):
+            limpio = limpio.strip("`")
+            if limpio.startswith("json"):
+                limpio = limpio[4:]
+            limpio = limpio.strip()
+        return json.loads(limpio)
+    except (json.JSONDecodeError, TypeError, AttributeError):
+        return {}
+
+# ════════════════════════════════════════════════
+# SESIONES CON SALIDA ESTRUCTURADA (JSON)
+# Cada entrada define los campos adicionales (además de "mensaje") que se
+# esperan del modelo, con su valor por defecto si el parseo falla o el campo
+# no llega. La decisión de avanzar de fase la toma el código con estas señales,
+# nunca el modelo decidiendo libremente en texto plano.
+# ════════════════════════════════════════════════
+SESIONES_ESTRUCTURADAS = {
+    "chi3_p16_": {"propuso_formula_correcta": False},
+    "freq_unif_": {"concepto_institucionalizado": None, "analisis_completo": False},
+    "cap2": {"fase_actual": "A"},
+    "cap3_": {"fase_actual": "A"},
+    "cap3b_": {"institucionalizado": False},
+    "chi3_p18_": {"avanzar_descubrimiento": False},
+}
+
+# Prefijos de TODAS las demás sesiones conocidas — se usan para reconocer que un
+# session_id "pelado" (sin prefijo) corresponde a cap2, igual que hace obtener_prompt().
+_PREFIJOS_OTRAS_SESIONES = (
+    "freq_A_", "freq_B_", "freq_C_", "freq_D_", "freq_unif_", "freq_5d_",
+    "cap3b_", "cap3_", "probA_", "probB_", "chi_", "cont_A_", "cont_B_",
+    "chi3_p15_", "chi3_p16_", "chi3_p17_", "chi3_p18_", "chi3_p19_", "chi3_p20_",
+    "chi3_p21_", "chi3_p22_", "chi3_p23_", "chi3_p24_", "p25_",
+)
+
+def obtener_config_estructurada(session_id):
+    """Config de campos estructurados para esta sesión, o None si usa texto libre."""
+    for prefijo, campos in SESIONES_ESTRUCTURADAS.items():
+        if prefijo != "cap2" and session_id.startswith(prefijo):
+            return campos
+    # cap2 usa el session_id sin prefijo (mismo criterio que el fallback de obtener_prompt)
+    if es_sesion_cap2(session_id):
+        return SESIONES_ESTRUCTURADAS["cap2"]
+    return None
+
+def es_sesion_cap2(session_id):
+    """True si este session_id corresponde a cap2 (sesión sin prefijo, el fallback de obtener_prompt)."""
+    return session_id != "cap3_user" and not session_id.startswith(_PREFIJOS_OTRAS_SESIONES)
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
@@ -1018,7 +1138,45 @@ def chat():
 
     chats[session_id].append({"role": "user", "content": user_message})
 
+    config_estructurada = obtener_config_estructurada(session_id)
+
     try:
+        if config_estructurada is not None:
+            completion = client.chat.completions.create(
+                model="gpt-4o",
+                messages=chats[session_id],
+                temperature=0.5,
+                response_format={"type": "json_object"}
+            )
+            raw = completion.choices[0].message.content
+            parsed = parsear_json_robusto(raw)
+
+            # Si el parseo falla por completo (dict vacío), se usa el texto crudo como
+            # mensaje visible en vez de dejar al estudiante sin respuesta.
+            mensaje = parsed.get("mensaje") if parsed else raw
+
+            # Se guarda SOLO el mensaje limpio en el historial (nunca el JSON crudo):
+            # así el modelo mantiene coherencia conversacional natural en turnos
+            # futuros, y la restauración de historial no muestra JSON literal.
+            chats[session_id].append({"role": "assistant", "content": mensaje})
+
+            response_data = {"reply": mensaje, "completed": False}
+            for campo, valor_defecto in config_estructurada.items():
+                valor = parsed.get(campo, valor_defecto)
+                if isinstance(valor_defecto, bool):
+                    valor = bool(valor)
+                response_data[campo] = valor
+
+            # cap2 necesita los datos de la tabla de contingencia en CADA respuesta,
+            # igual que en el camino de texto libre — no es exclusivo de esa rama.
+            if es_sesion_cap2(session_id):
+                response_data["table"] = matriz_data
+                response_data["headers"] = headers
+                response_data["grafico_data"] = grafico_valores
+
+            return jsonify(response_data)
+
+        # ── Camino normal (sin cambios): sesiones que aún usan texto libre ──
         completion = client.chat.completions.create(
             model="gpt-4o",
             messages=chats[session_id],
