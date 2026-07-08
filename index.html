@@ -15,7 +15,7 @@
 
 <div class="book-shell">
 
-  <!--Lomo del libro-->
+  <!-- Lomo del libro -->
   <div class="book-spine">
     <span class="spine-text">LID · Estadística Descriptiva · UIS · 2026</span>
   </div>
@@ -263,7 +263,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(1)">← Presentación</button>
-          <button class="btn-nav next" onclick="irAPagina(5)">Síntesis →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(5, freqUnifCompletado, 'freq_unif', 'construcción completa de la tabla de frecuencias', MENSAJE_GATE_COMPLETITUD)">Síntesis →</button>
         </div>
       </div>
     </div>
@@ -561,7 +561,7 @@
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina('5c')">← Completar tabla</button>
-          <button class="btn-nav next" onclick="irAPagina(6)">Capítulo II: Contingencia →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(6, huboInteraccion('chat-5d'), 'freq_5d', `situación ${p5dSituacionActual}`, MENSAJE_GATE_INTERACCION)">Capítulo II: Contingencia →</button>
         </div>
       </div>
     </div>
@@ -682,7 +682,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(6)">← Presentación</button>
-          <button class="btn-nav next" onclick="irAPagina(8)">Síntesis →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(8, cap2Completado, 'cap2', 'las tres frecuencias de la tabla de contingencia', MENSAJE_GATE_COMPLETITUD)">Síntesis →</button>
         </div>
       </div>
     </div>
@@ -842,7 +842,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(9)">← Formas parciales</button>
-          <button class="btn-nav next" onclick="irAPagina('10b')">¿Están relacionadas? →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate('10b', cap3Completado, 'cap3', 'las tres formas de leer una tabla de contingencia', MENSAJE_GATE_COMPLETITUD)">¿Están relacionadas? →</button>
         </div>
       </div>
     </div>
@@ -892,7 +892,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(10)">← Actividad</button>
-          <button class="btn-nav next" onclick="irAPagina(11)">Ejemplos →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(11, cap3PuenteInstitucionalizado, 'cap3_puente', 'la intuición de asociación e independencia', MENSAJE_GATE_COMPLETITUD)">Ejemplos →</button>
         </div>
       </div>
     </div>
@@ -1033,7 +1033,7 @@
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(11)">← Ejemplos</button>
-          <button class="btn-nav next" onclick="irAPagina(13)">Fase de Validación →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(13, huboInteraccion('chat-contA'), 'cont_A', `problema ${probAActual}`, MENSAJE_GATE_INTERACCION)">Fase de Validación →</button>
         </div>
       </div>
     </div>
@@ -1131,7 +1131,7 @@
 
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(12)">← Formulación</button>
-          <button class="btn-nav next" onclick="irAPagina(14)">¿Se puede probar? →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(14, huboInteraccion('chat-contB'), 'cont_B', `problema ${probBActual}`, MENSAJE_GATE_INTERACCION)">¿Se puede probar? →</button>
         </div>
       </div>
     </div>
@@ -1217,7 +1217,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(13)">← Validación</button>
-          <button class="btn-nav next" onclick="irAPagina('14b')">Cap. III: Chi-cuadrado →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate('14b', huboInteraccion('chat-chi'), 'chi', 'exploración libre de independencia', MENSAJE_GATE_INTERACCION)">Cap. III: Chi-cuadrado →</button>
         </div>
       </div>
     </div>
@@ -1338,7 +1338,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina('14b')">← Presentación Cap. III</button>
-          <button class="btn-nav next" onclick="irAPagina(16)">Frecuencias esperadas →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(16, huboInteraccion('chat-chi3-p15'), 'chi3_p15', 'el primer contacto con el problema de independencia', MENSAJE_GATE_INTERACCION)">Frecuencias esperadas →</button>
         </div>
       </div>
     </div>
@@ -1404,7 +1404,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(15)">← Introducción</button>
-          <button class="btn-nav next" onclick="irAPagina(17)">Ejemplo guiado →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(17, chi3P16FormulaResuelta, 'chi3_p16', 'el descubrimiento de la fórmula Eᵢⱼ', MENSAJE_GATE_COMPLETITUD)">Ejemplo guiado →</button>
         </div>
       </div>
     </div>
@@ -1465,7 +1465,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(16)">← Acción</button>
-          <button class="btn-nav next" onclick="irAPagina(18)">Calcular χ² →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(18, chi3P17PasoActual === CHI3_P17_PASOS.length - 1, 'chi3_p17', 'el recorrido completo del ejemplo guiado', MENSAJE_GATE_COMPLETITUD)">Calcular χ² →</button>
         </div>
       </div>
     </div>
@@ -1579,11 +1579,11 @@
 
       </div><div class="page-footer">
         <button class="btn-nav prev" onclick="irAPagina(17)">← Ejemplo Eᵢⱼ</button>
-        <button class="btn-nav next" onclick="irAPagina(19)">Síntesis →</button>
+        <button class="btn-nav next" onclick="intentarAvanzarConGate(19, chi3P18DescubrimientoResuelto, 'chi3_p18', 'el descubrimiento de por qué elevar al cuadrado', MENSAJE_GATE_COMPLETITUD)">Síntesis →</button>
       </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(17)">← Ejemplo Eᵢⱼ</button>
-          <button class="btn-nav next" onclick="irAPagina(19)">Síntesis →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(19, chi3P18DescubrimientoResuelto, 'chi3_p18', 'el descubrimiento de por qué elevar al cuadrado', MENSAJE_GATE_COMPLETITUD)">Síntesis →</button>
         </div>
       </div>
     </div>
@@ -1642,12 +1642,12 @@
                 <button class="btn-send" onclick="chi3ChatLibre('p19')">Enviar <span class="send-icon">↑</span></button>
               </div>
             </div>
-            <button class="btn-nav next" id="btn-p19-next" style="margin-top:14px;opacity:.4;pointer-events:none;" onclick="irAPagina(20)">Continuar: gl y valor crítico →</button>
+            <button class="btn-nav next" id="btn-p19-next" style="margin-top:14px;" onclick="intentarAvanzarConGate(20, huboInteraccion('chat-chi3-p19'), 'chi3_p19', 'la verbalización de síntesis', MENSAJE_GATE_INTERACCION)">Continuar: gl y valor crítico →</button>
           </div>
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(18)">← Calcular χ²</button>
-          <button class="btn-nav next" onclick="irAPagina(20)">gl y valor crítico →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(20, huboInteraccion('chat-chi3-p19'), 'chi3_p19', 'la verbalización de síntesis', MENSAJE_GATE_INTERACCION)">gl y valor crítico →</button>
         </div>
       </div>
     </div>
@@ -1712,7 +1712,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(19)">← Síntesis Eᵢⱼ y χ²</button>
-          <button class="btn-nav next" onclick="irAPagina(21)">Ejemplo completo →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(21, huboInteraccion('chat-chi3-p20'), 'chi3_p20', 'la conjetura sobre gl y valor crítico', MENSAJE_GATE_INTERACCION)">Ejemplo completo →</button>
         </div>
       </div>
     </div>
@@ -1761,7 +1761,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(20)">← gl y valor crítico</button>
-          <button class="btn-nav next" onclick="irAPagina(22)">¿Asociación = causalidad? →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(22, chi3P21PasoActual === CHI3_P21_PASOS.length - 1, 'chi3_p21', 'el recorrido completo del ejemplo de 8 pasos', MENSAJE_GATE_COMPLETITUD)">¿Asociación = causalidad? →</button>
         </div>
       </div>
     </div>
@@ -1814,7 +1814,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(21)">← Ejemplo completo</button>
-          <button class="btn-nav next" onclick="irAPagina(23)">Síntesis final →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(23, huboInteraccion('chat-chi3-p22'), 'chi3_p22', 'la reflexión sobre asociación vs. causalidad', MENSAJE_GATE_INTERACCION)">Síntesis final →</button>
         </div>
       </div>
     </div>
@@ -1872,7 +1872,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(22)">← Causalidad</button>
-          <button class="btn-nav next" onclick="irAPagina(24)">Situación libre final →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(24, huboInteraccion('chat-chi3-p23'), 'chi3_p23', 'la síntesis final del capítulo', MENSAJE_GATE_INTERACCION)">Situación libre final →</button>
         </div>
       </div>
     </div>
@@ -1922,7 +1922,7 @@
         </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(23)">← Síntesis final</button>
-          <button class="btn-nav next" onclick="irAPagina(25)">Tu propio estudio →</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate(25, huboInteraccion('chat-chi3-p24'), 'chi3_p24', 'la situación libre final de evaluación', MENSAJE_GATE_INTERACCION)">Tu propio estudio →</button>
         </div>
       </div>
     </div>
@@ -2217,6 +2217,18 @@
   <div class="loading-content">
     <div class="loading-spinner"></div>
     <p>Iniciando LID…</p>
+  </div>
+</div>
+
+<!-- Soft Gate — ruptura explícita del contrato didáctico, nunca bloquea el avance -->
+<div id="soft-gate-overlay" class="soft-gate-overlay" style="display:none;">
+  <div class="soft-gate-modal">
+    <div class="soft-gate-icono">⚠️</div>
+    <p class="soft-gate-mensaje" id="soft-gate-mensaje"></p>
+    <div class="soft-gate-botones">
+      <button class="soft-gate-btn soft-gate-volver" id="soft-gate-btn-volver">Volver a la actividad</button>
+      <button class="soft-gate-btn soft-gate-continuar" id="soft-gate-btn-continuar">Continuar de todos modos</button>
+    </div>
   </div>
 </div>
 
