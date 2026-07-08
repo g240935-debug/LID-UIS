@@ -996,7 +996,7 @@
 
             <!-- Paso 3: justificación -->
             <div class="pts-step2-label" style="margin-top:10px;">3. Justifica tu elección:</div>
-            <textarea class="p5d-resp-input" id="probA-justif" rows="2"
+            <textarea class="p5d-resp-input" id="probA-justif" rows="2" oninput="pAGuardarEstado()"
                       placeholder="Explica por qué escogiste ese sistema y qué revela sobre los datos…"></textarea>
 
             <div class="prob-bottom-row" style="margin-top:8px;">
@@ -1395,9 +1395,11 @@
             <div class="tutor-context-strip" style="border-left-color:var(--gold);">🤔 El tutor te devolverá las consecuencias matemáticas de tu distribución. No dará la fórmula — te ayudará a descubrirla.</div>
             <div id="chat-chi3-p16" class="chat-box p5d-chat-box"></div>
             <div class="chat-input-area">
-              <input type="text" id="input-chi3-p16" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3ChatLibre('p16')">
-              <button class="btn-send" onclick="chi3ChatLibre('p16')">Enviar <span class="send-icon">↑</span></button>
+              <input type="text" id="input-chi3-p16" class="chat-input" placeholder="Continúa el diálogo…" onkeydown="if(event.key==='Enter') chi3P16ResponderFormula()">
+              <button class="btn-send" onclick="chi3P16ResponderFormula()">Enviar <span class="send-icon">↑</span></button>
             </div>
+            <!-- Institucionalización real: tarjeta estática generada por código, no narrada por el modelo -->
+            <div id="chi3-p16-institucionalizacion" class="chi3-inst-card" style="display:none;"></div>
           </div>
         </div>
         <div class="page-footer">
