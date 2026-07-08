@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════════
    LID — script.js
    Conexión al backend: https://lid-uis.onrender.com/api/chat
-   No modificar URL_BACKEND sin actualizar el servidor
+   No modificar URL_BACKEND sin actualizar el servidor.
 
-   MAPA DE PÁGINAS
+   MAPA DE PÁGINAS:
    0  → Portada
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
@@ -42,6 +42,64 @@ function leerEstadoLocal(clave) {
   } catch (e) { return null; }
 }
 
+// ════════════════════════════════════════════════
+// SOFT GATE — ruptura explícita del contrato didáctico
+// Nunca bloquea el avance: solo expone la consecuencia cognitiva de saltar una
+// situación de aprendizaje, y si el estudiante decide avanzar de todos modos,
+// registra el hito incompleto en el backend para la trazabilidad de la
+// investigación (no solo en localStorage, que nunca llegaría al investigador).
+// ════════════════════════════════════════════════
+const MENSAJE_GATE_COMPLETITUD = 'Estás a punto de avanzar sin haber completado esta situación de aprendizaje. La construcción del concepto que trabajamos aquí depende de que la resuelvas antes de continuar — saltarla ahora puede dejarte sin la base que necesitas más adelante.\n\nAun así, tú decides.';
+const MENSAJE_GATE_INTERACCION = 'Estás a punto de avanzar sin haber interactuado con el tutor en esta página. La exploración con el tutor es donde se construye el razonamiento de esta situación — sin ella, es probable que te falte una base importante más adelante.\n\nAun así, tú decides.';
+
+function mostrarSoftGate(mensaje) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('soft-gate-overlay');
+    const msgEl = document.getElementById('soft-gate-mensaje');
+    const btnVolver = document.getElementById('soft-gate-btn-volver');
+    const btnContinuar = document.getElementById('soft-gate-btn-continuar');
+    if (!overlay || !msgEl || !btnVolver || !btnContinuar) { resolve(true); return; }
+    msgEl.textContent = mensaje;
+    overlay.style.display = 'flex';
+    const limpiar = () => {
+      overlay.style.display = 'none';
+      btnVolver.onclick = null;
+      btnContinuar.onclick = null;
+    };
+    btnVolver.onclick = () => { limpiar(); resolve(false); };
+    btnContinuar.onclick = () => { limpiar(); resolve(true); };
+  });
+}
+
+function registrarHitoIncompleto(pagina, hito) {
+  try {
+    fetch(URL_BACKEND.replace('/api/chat', '/api/log/hito_incompleto'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, pagina, hito, timestamp: new Date().toISOString() })
+    }).catch(() => {});
+  } catch (e) { /* un fallo de registro nunca debe interrumpir la navegación */ }
+}
+
+// Verifica si hubo al menos una interacción del estudiante en un chat (para
+// páginas sin una señal formal de "completado" — diálogos abiertos por diseño).
+function huboInteraccion(chatBoxId) {
+  const box = document.getElementById(chatBoxId);
+  return !!(box && box.querySelector('.msg-user'));
+}
+
+// Función central del Soft Gate. Si `estaCompleto` es true, avanza directo sin
+// ningún aviso. Si es false, expone el aviso — y solo si el estudiante decide
+// avanzar de todos modos, se registra el hito incompleto y se navega.
+async function intentarAvanzarConGate(destino, estaCompleto, pagina, hito, mensaje) {
+  if (estaCompleto) { irAPagina(destino); return; }
+  const continuar = await mostrarSoftGate(mensaje || MENSAJE_GATE_INTERACCION);
+  if (continuar) {
+    registrarHitoIncompleto(pagina, hito);
+    irAPagina(destino);
+  }
+}
+
 // ── Estado global ──
 let graficoActual  = null;
 let vistaActual    = 'tabla';
@@ -49,6 +107,9 @@ let paginaActual   = 0;
 
 // Flags de inicialización por tutor
 let chatCap2Iniciado   = false;  // pág 7
+let cap2Completado     = false;  // para el Soft Gate
+let cap3Completado     = false;  // para el Soft Gate
+let freqUnifCompletado = false;  // para el Soft Gate
 let chatCap3Iniciado   = false;  // pág 10
 let chatChiIniciado    = false;  // pág 14
 let chatFreqAIniciado  = false;  // pág 2
@@ -334,6 +395,7 @@ function actualizarFaseCap2(texto) {
 // clave. actualizarFaseCap2 se conserva solo para reconstruir el estado al
 // restaurar el historial de una sesión previa.
 function _cap2AplicarSenalEstructurada(data) {
+  if (data.fase_actual === 'completa') cap2Completado = true;
   const dot   = document.getElementById('phaseIndicator')?.querySelector('.phase-dot');
   const label = document.getElementById('phaseLabel');
   if (!dot || !label) return;
@@ -751,10 +813,13 @@ function _p3AplicarSenalEstructurada(data) {
   }
 
   const tablaCompleta = p3Columnas.fi && p3Columnas.hi && p3Columnas.Fi && p3Columnas.Hi;
-  if (data.analisis_completo === true && tablaCompleta && p3FaseActual !== 'completa') {
-    _p3ActualizarFaseVisual('completa');
-    const btn = document.getElementById('btn-freq-unif-next');
-    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+  if (data.analisis_completo === true && tablaCompleta) {
+    freqUnifCompletado = true;
+    if (p3FaseActual !== 'completa') {
+      _p3ActualizarFaseVisual('completa');
+      const btn = document.getElementById('btn-freq-unif-next');
+      if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+    }
   }
 }
 
@@ -990,6 +1055,7 @@ async function inicializarChatCap3() {
 // del backend. De paso conecta el indicador phaseIndicator2/phaseDot2/phaseLabel2
 // que existía en el HTML pero ningún JS actualizaba.
 function _cap3AplicarSenalEstructurada(data) {
+  if (data.fase_actual === 'completa') cap3Completado = true;
   const dot   = document.getElementById('phaseDot2');
   const label = document.getElementById('phaseLabel2');
   if (!dot || !label) return;
