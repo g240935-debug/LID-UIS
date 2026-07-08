@@ -28,6 +28,20 @@ if (!sessionId) {
     localStorage.setItem('lid_uid', sessionId);
 }
 
+// ── Persistencia local por dispositivo (localStorage nunca se sincroniza entre
+// dispositivos, y cada llave incluye sessionId para que una sesión nueva en el
+// mismo equipo nunca recoja datos de una sesión anterior) ──
+function guardarEstadoLocal(clave, obj) {
+  try { localStorage.setItem(`lid_${sessionId}_${clave}`, JSON.stringify(obj)); }
+  catch (e) { /* almacenamiento lleno o no disponible: no interrumpe la app */ }
+}
+function leerEstadoLocal(clave) {
+  try {
+    const raw = localStorage.getItem(`lid_${sessionId}_${clave}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
 // ── Estado global ──
 let graficoActual  = null;
 let vistaActual    = 'tabla';
@@ -255,9 +269,20 @@ function irAPagina(n) {
 
   // Cap III — Chi-cuadrado (págs 15-24)
   if (n === 8)  setTimeout(ctxExplorerInit,  200);
-  if (n === 16) setTimeout(chi3P16Render, 300);
+  if (n === 16) {
+    chi3P16Intentos = 0; chi3P16FormulaResuelta = false;
+    setTimeout(() => {
+      chi3P16Render();
+      const card = document.getElementById('chi3-p16-institucionalizacion');
+      if (card) { card.style.display = 'none'; card.innerHTML = ''; }
+      const inp = document.getElementById('input-chi3-p16');
+      if (inp) { inp.disabled = false; inp.placeholder = 'Continúa el diálogo…'; }
+      const inputArea = document.querySelector('#chi3-p16-tutor .chat-input-area');
+      if (inputArea) inputArea.style.opacity = '1';
+    }, 300);
+  }
   if (n === 17) setTimeout(chi3P17Init,   300);
-  if (n === 18) setTimeout(chi3P18Render, 300);
+  if (n === 18) { chi3P18Intentos = 0; chi3P18DescubrimientoResuelto = false; setTimeout(chi3P18Render, 300); }
   if (n === 19) setTimeout(chi3P19Render, 300);
   if (n === 20) setTimeout(chi3P20Render, 300);
   if (n === 21) setTimeout(chi3P21Init,   300);
@@ -296,6 +321,31 @@ function actualizarFaseCap2(texto) {
     label.textContent = 'Transnumeración';
     mostrarBotonTransnum();
   } else if (esB) {
+    dot.className     = 'phase-dot phase-b';
+    label.textContent = 'Frecuencias marginales';
+  } else {
+    dot.className     = 'phase-dot phase-a';
+    label.textContent = 'Exploración';
+  }
+}
+
+// Reemplazo determinístico de actualizarFaseCap2 para la conversación EN VIVO: lee
+// la señal estructurada (JSON) del backend en vez de escanear el texto por palabras
+// clave. actualizarFaseCap2 se conserva solo para reconstruir el estado al
+// restaurar el historial de una sesión previa.
+function _cap2AplicarSenalEstructurada(data) {
+  const dot   = document.getElementById('phaseIndicator')?.querySelector('.phase-dot');
+  const label = document.getElementById('phaseLabel');
+  if (!dot || !label) return;
+  const fase = data.fase_actual;
+  if (fase === 'completa') {
+    dot.className     = 'phase-dot phase-done';
+    label.textContent = 'Institucionalización';
+  } else if (fase === 'C') {
+    dot.className     = 'phase-dot phase-c';
+    label.textContent = 'Transnumeración';
+    mostrarBotonTransnum();
+  } else if (fase === 'B') {
     dot.className     = 'phase-dot phase-b';
     label.textContent = 'Frecuencias marginales';
   } else {
@@ -677,6 +727,37 @@ function _p3DetectarFaseEnRespuesta(texto) {
   }
 }
 
+// Reemplazo determinístico de _p3DetectarFaseEnRespuesta para la conversación EN VIVO:
+// lee las señales estructuradas (JSON) que devuelve el backend en vez de escanear
+// el texto en busca de palabras clave. _p3DetectarFaseEnRespuesta se conserva solo
+// como reconstrucción de estado al restaurar el historial de una sesión previa.
+function _p3AplicarSenalEstructurada(data) {
+  const concepto = data.concepto_institucionalizado;
+  if (concepto === 'fr' && !p3Columnas.hi) {
+    p3Columnas.hi = true;
+    setTimeout(renderizarP3Tabla, 300);
+    _p3MostrarNotificacion('fᵣ — Frecuencia Relativa');
+    _p3ActualizarFaseVisual('hi');
+  } else if (concepto === 'Fi' && !p3Columnas.Fi) {
+    p3Columnas.Fi = true;
+    setTimeout(renderizarP3Tabla, 300);
+    _p3MostrarNotificacion('Fᵢ — Frecuencia Absoluta Acumulada');
+    _p3ActualizarFaseVisual('Fi');
+  } else if (concepto === 'Hi' && !p3Columnas.Hi) {
+    p3Columnas.Hi = true;
+    setTimeout(renderizarP3Tabla, 300);
+    _p3MostrarNotificacion('Fᵣ — Frecuencia Relativa Acumulada');
+    _p3ActualizarFaseVisual('Hi');
+  }
+
+  const tablaCompleta = p3Columnas.fi && p3Columnas.hi && p3Columnas.Fi && p3Columnas.Hi;
+  if (data.analisis_completo === true && tablaCompleta && p3FaseActual !== 'completa') {
+    _p3ActualizarFaseVisual('completa');
+    const btn = document.getElementById('btn-freq-unif-next');
+    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+  }
+}
+
 async function inicializarChatFreqUnif() {
   setStatusFreq('tutor-status-freq-unif', 'Conectando…');
   _p3ActualizarFaseVisual('fi');
@@ -692,7 +773,7 @@ async function inicializarChatFreqUnif() {
     const data = await res.json();
     if (data.reply) {
       agregarMensajeGen('chat-freq-unif', data.reply, 'tutor');
-      _p3DetectarFaseEnRespuesta(data.reply);
+      _p3AplicarSenalEstructurada(data);
     }
     setStatusFreq('tutor-status-freq-unif', 'En línea');
   } catch (err) {
@@ -719,7 +800,7 @@ async function enviarMensajeFreqUnif() {
     setStatusFreq('tutor-status-freq-unif', 'En línea');
     if (data.reply) {
       agregarMensajeGen('chat-freq-unif', data.reply, 'tutor');
-      _p3DetectarFaseEnRespuesta(data.reply);
+      _p3AplicarSenalEstructurada(data);
     }
   } catch (err) {
     quitarTypingGen(tid);
@@ -842,7 +923,7 @@ async function inicializarChatCap2() {
     const data = await res.json();
     if (data.reply) {
       agregarMensajeGen('chat-box', data.reply, 'tutor');
-      actualizarFaseCap2(data.reply);
+      _cap2AplicarSenalEstructurada(data);
     }
     if (data.table)        actualizarTablaCap2(data.table, data.headers);
     if (data.grafico_data) sincronizarDatosGrafico(data.grafico_data);
@@ -873,7 +954,7 @@ async function enviarMensaje() {
     setStatusGen('tutor-status-text', 'En línea');
     if (data.reply) {
       agregarMensajeGen('chat-box', data.reply, 'tutor');
-      actualizarFaseCap2(data.reply);
+      _cap2AplicarSenalEstructurada(data);
     }
     if (data.table)        actualizarTablaCap2(data.table, data.headers);
     if (data.grafico_data) sincronizarDatosGrafico(data.grafico_data);
@@ -905,6 +986,29 @@ async function inicializarChatCap3() {
   }
 }
 
+// Reemplazo determinístico de texto para cap3 (página 9): lee la señal estructurada
+// del backend. De paso conecta el indicador phaseIndicator2/phaseDot2/phaseLabel2
+// que existía en el HTML pero ningún JS actualizaba.
+function _cap3AplicarSenalEstructurada(data) {
+  const dot   = document.getElementById('phaseDot2');
+  const label = document.getElementById('phaseLabel2');
+  if (!dot || !label) return;
+  const fase = data.fase_actual;
+  if (fase === 'completa') {
+    dot.className     = 'phase-dot phase-done';
+    label.textContent = 'Institucionalización';
+  } else if (fase === 'C') {
+    dot.className     = 'phase-dot phase-c';
+    label.textContent = 'Distribución por columna';
+  } else if (fase === 'B') {
+    dot.className     = 'phase-dot phase-b';
+    label.textContent = 'Distribución por fila';
+  } else {
+    dot.className     = 'phase-dot phase-a';
+    label.textContent = 'Distribución conjunta';
+  }
+}
+
 async function enviarMensaje2() {
   const input = document.getElementById('user-input2');
   if (!input?.value.trim()) return;
@@ -922,6 +1026,7 @@ async function enviarMensaje2() {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2', 'En línea');
     if (data.reply) agregarMensajeGen('chat-box2', data.reply, 'tutor');
+    _cap3AplicarSenalEstructurada(data);
   } catch (err) {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2', 'En línea');
@@ -1160,6 +1265,11 @@ const CAP3_ACT_DATA = {
 // Respuestas del estudiante en pág 9, reutilizadas como contexto en pág 10b
 let cap3RespuestasIniciales = { p1: '', p2: '', p3: '' };
 let chatCap3PuenteIniciado  = false;
+let chi3P16Intentos         = 0;      // piloto: cuenta intentos de descubrir Eᵢⱼ, gobierna el código, no el modelo
+let chi3P16FormulaResuelta  = false;
+let cap3PuenteInstitucionalizado = false;
+let chi3P18Intentos = 0;
+let chi3P18DescubrimientoResuelto = false;
 
 function renderizarCap3ActTable() {
   const { filas, columnas, matriz, N } = CAP3_ACT_DATA;
@@ -1234,6 +1344,7 @@ async function cap3EnviarPreguntasIniciales() {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2', 'En línea');
     if (data.reply) agregarMensajeGen('chat-box2', data.reply, 'tutor');
+    _cap3AplicarSenalEstructurada(data);
   } catch (err) {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2', 'En línea');
@@ -1335,6 +1446,7 @@ Pide primero que formule, en sus propias palabras, si cree que el color favorito
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2b', 'En línea');
     if (data.reply) agregarMensajeGen(chatBox, data.reply, 'tutor');
+    if (data.institucionalizado === true) cap3PuenteInstitucionalizado = true;
   } catch (err) {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2b', 'En línea');
@@ -1359,6 +1471,7 @@ async function enviarMensajeCap3b() {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2b', 'En línea');
     if (data.reply) agregarMensajeGen('chat-cap3b', data.reply, 'tutor');
+    if (data.institucionalizado === true) cap3PuenteInstitucionalizado = true;
   } catch (err) {
     quitarTypingGen(tid);
     setStatusGen('tutor-status-text2b', 'En línea');
@@ -1564,6 +1677,7 @@ function escogerTipoA(tipo) {
   const sec = document.getElementById('probA-tabla-section');
   if (sec) sec.style.display = 'block';
   _renderizarTablaA();
+  pAGuardarEstado();
 }
 
 function renderizarProbA() {
@@ -1584,6 +1698,8 @@ function renderizarProbA() {
   if (panel) panel.style.display = 'none';
   const box = document.getElementById('chat-contA');
   if (box) box.innerHTML = '';
+  // Tras el reseteo, intentar restaurar el estado guardado de ESTE problema
+  pARestaurarEstado();
 }
 
 function _renderizarTablaA() {
@@ -1603,7 +1719,7 @@ function _renderizarTablaA() {
       const valorCorrecto = calcularCeldaNum(tipo, val, totalesFila[i], totalesCol[j], N);
       const celdaDisplay  = calcularCelda(tipo, val, totalesFila[i], totalesCol[j], N);
       if (esOculta) {
-        html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${valorCorrecto}" placeholder="?"></td>`;
+        html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${valorCorrecto}" placeholder="?" oninput="pAGuardarEstado()"></td>`;
       } else { html += `<td>${celdaDisplay}</td>`; }
     });
     html += `<td class="td-marg">${calcularMarginalFila(tipo, totalesFila[i], N)}</td></tr>`;
@@ -1613,6 +1729,54 @@ function _renderizarTablaA() {
   html += `<td class="td-marg">${tipo === 'absoluta' ? N : '100%'}</td></tr></tbody></table>`;
   const w = document.getElementById('probA-tabla-wrapper');
   if (w) w.innerHTML = html;
+}
+
+// Guarda tipo escogido + valores de celdas + justificación, por problema y por sesión/dispositivo.
+function pAGuardarEstado() {
+  const celdas = {};
+  document.querySelectorAll('#probA-tabla-wrapper .cell-input').forEach(inp => {
+    celdas[`${inp.dataset.fila}-${inp.dataset.col}`] = inp.value;
+  });
+  guardarEstadoLocal(`pA_${probAActual}`, {
+    tipo: tipoEscogidoA,
+    celdas,
+    justificacion: document.getElementById('probA-justif')?.value || '',
+  });
+}
+
+// Restaura el estado guardado de ESTE problema específico (si existe) — nunca
+// llama a escogerTipoA() para no disparar un guardado prematuro con celdas vacías.
+function pARestaurarEstado() {
+  const saved = leerEstadoLocal(`pA_${probAActual}`);
+  if (!saved) return;
+
+  if (saved.tipo) {
+    tipoEscogidoA = saved.tipo;
+    document.querySelectorAll('#page-12 .pts-btn').forEach(b => {
+      b.classList.remove('selected','correcto','incorrecto');
+      if (b.dataset.tipo === saved.tipo) b.classList.add('selected');
+    });
+    const sec = document.getElementById('probA-tabla-section');
+    if (sec) sec.style.display = 'block';
+    _renderizarTablaA();
+  }
+
+  if (saved.celdas) {
+    document.querySelectorAll('#probA-tabla-wrapper .cell-input').forEach(inp => {
+      const k = `${inp.dataset.fila}-${inp.dataset.col}`;
+      if (saved.celdas[k]) inp.value = saved.celdas[k];
+    });
+  }
+
+  const justif = document.getElementById('probA-justif');
+  if (justif && saved.justificacion) justif.value = saved.justificacion;
+
+  const sid = `cont_A_${probAActual}_${sessionId}`;
+  cargarHistorial(sid, 'chat-contA').then(() => {
+    const box = document.getElementById('chat-contA');
+    const panel = document.getElementById('pA-tutor-panel');
+    if (box && box.innerHTML.trim() !== '' && panel) panel.style.display = 'flex';
+  });
 }
 
 function verificarProblemaA() {
@@ -1784,6 +1948,7 @@ function escogerTipoB(tipo) {
   const sec = document.getElementById('probB-tabla-section');
   if (sec) sec.style.display = 'block';
   _renderizarTablaB();
+  pBGuardarEstado();
 }
 
 function renderizarProbB() {
@@ -1805,6 +1970,8 @@ function renderizarProbB() {
   const box = document.getElementById('chat-contB');
   if (box) box.innerHTML = '';
   _renderizarPreguntasB(p);
+  // Tras el reseteo, intentar restaurar el estado guardado de ESTE problema
+  pBRestaurarEstado();
 }
 
 function _renderizarPreguntasB(p) {
@@ -1814,7 +1981,7 @@ function _renderizarPreguntasB(p) {
     <div class="p5d-pregunta-card">
       <div class="p5d-preg-badge" style="background:${q.color}">${q.badge}</div>
       <p class="p5d-preg-texto"><strong>Pregunta ${i+1}:</strong> ${q.texto}</p>
-      <textarea class="p5d-resp-input" id="${q.id}" rows="3"
+      <textarea class="p5d-resp-input" id="${q.id}" rows="3" oninput="pBGuardarEstado()"
                 placeholder="Escribe aquí tu análisis…"></textarea>
       <div class="p5d-retro" id="${q.id}-retro" style="display:none;"></div>
     </div>`).join('');
@@ -1834,7 +2001,7 @@ function _renderizarTablaB() {
     html += `<tr><td>${fila}</td>`;
     columnas.forEach((_, j) => {
       const valorCorrecto = calcularCeldaNum(tipo, p.solucion[i][j], totalesFila[i], totalesCol[j], N);
-      html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${valorCorrecto}" placeholder="?"></td>`;
+      html += `<td><input type="number" step="any" class="cell-input" data-fila="${i}" data-col="${j}" data-correcto="${valorCorrecto}" placeholder="?" oninput="pBGuardarEstado()"></td>`;
     });
     html += `<td class="td-marg">${calcularMarginalFila(tipo, totalesFila[i], N)}</td></tr>`;
   });
@@ -1843,6 +2010,57 @@ function _renderizarTablaB() {
   html += `<td class="td-marg">${tipo === 'absoluta' ? N : '100%'}</td></tr></tbody></table>`;
   const w = document.getElementById('probB-tabla-wrapper');
   if (w) w.innerHTML = html;
+}
+
+// Guarda tipo + celdas + las 3 preguntas de análisis, por problema y por sesión/dispositivo.
+function pBGuardarEstado() {
+  const celdas = {};
+  document.querySelectorAll('#probB-tabla-wrapper .cell-input').forEach(inp => {
+    celdas[`${inp.dataset.fila}-${inp.dataset.col}`] = inp.value;
+  });
+  const p = PROBLEMAS_B[probBActual];
+  const respuestas = {};
+  (p?.preguntas || []).forEach(q => { respuestas[q.id] = document.getElementById(q.id)?.value || ''; });
+  guardarEstadoLocal(`pB_${probBActual}`, { tipo: tipoEscogidoB, celdas, respuestas });
+}
+
+// Restaura el estado guardado de ESTE problema (si existe) — nunca llama a
+// escogerTipoB() para no disparar un guardado prematuro con celdas vacías.
+function pBRestaurarEstado() {
+  const saved = leerEstadoLocal(`pB_${probBActual}`);
+  if (!saved) return;
+
+  if (saved.tipo) {
+    tipoEscogidoB = saved.tipo;
+    document.querySelectorAll('#page-13 .pts-btn').forEach(b => {
+      b.classList.remove('selected','correcto','incorrecto');
+      if (b.dataset.tipo === saved.tipo) b.classList.add('selected');
+    });
+    const sec = document.getElementById('probB-tabla-section');
+    if (sec) sec.style.display = 'block';
+    _renderizarTablaB();
+  }
+
+  if (saved.celdas) {
+    document.querySelectorAll('#probB-tabla-wrapper .cell-input').forEach(inp => {
+      const k = `${inp.dataset.fila}-${inp.dataset.col}`;
+      if (saved.celdas[k]) inp.value = saved.celdas[k];
+    });
+  }
+
+  if (saved.respuestas) {
+    Object.entries(saved.respuestas).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val) el.value = val;
+    });
+  }
+
+  const sid = `cont_B_${probBActual}_${sessionId}`;
+  cargarHistorial(sid, 'chat-contB').then(() => {
+    const box = document.getElementById('chat-contB');
+    const panel = document.getElementById('pB-tutor-panel');
+    if (box && box.innerHTML.trim() !== '' && panel) panel.style.display = 'flex';
+  });
 }
 
 function verificarProblemaB() {
@@ -2522,6 +2740,18 @@ document.addEventListener('DOMContentLoaded', () => {
   cargarHistorial(`cap3_${sessionId}`,   'chat-box2');
   cargarHistorial(`cap3b_${sessionId}`,  'chat-cap3b');
   cargarHistorial(`freq_unif_${sessionId}`, 'chat-freq-unif');
+  cargarHistorial(`chi_${sessionId}`,        'chat-chi');
+  cargarHistorial(`p25_${sessionId}`,        'chat-p25');
+  cargarHistorial(`chi3_p15_${sessionId}`,   'chat-chi3-p15');
+  cargarHistorial(`chi3_p16_${sessionId}`,   'chat-chi3-p16');
+  cargarHistorial(`chi3_p17_${sessionId}`,   'chat-chi3-p17');
+  cargarHistorial(`chi3_p18_${sessionId}`,   'chat-chi3-p18');
+  cargarHistorial(`chi3_p19_${sessionId}`,   'chat-chi3-p19');
+  cargarHistorial(`chi3_p20_${sessionId}`,   'chat-chi3-p20');
+  cargarHistorial(`chi3_p21_${sessionId}`,   'chat-chi3-p21');
+  cargarHistorial(`chi3_p22_${sessionId}`,   'chat-chi3-p22');
+  cargarHistorial(`chi3_p23_${sessionId}`,   'chat-chi3-p23');
+  cargarHistorial(`chi3_p24_${sessionId}`,   'chat-chi3-p24');
 
   // Renderizar tablas y gráficos estáticos
   renderizarFPTabla('absoluta');
@@ -2933,9 +3163,73 @@ function p5dCargarSituacion(idx) {
   });
   // Resetear respuestas
   document.querySelectorAll('.p5d-resp-input').forEach(t => t.value = '');
+  // Resetear chat y panel del tutor (antes no se limpiaban al cambiar de situación)
+  const chatBox = document.getElementById('chat-5d');
+  if (chatBox) chatBox.innerHTML = '';
+  const tutorPanel = document.getElementById('p5d-tutor-panel');
+  if (tutorPanel) tutorPanel.style.display = 'none';
 
   p5dRenderTabla(sit);
   p5dRenderPreguntas(sit);
+  // Tras el reseteo, intentar restaurar el estado guardado de ESTA situación
+  p5dRestaurarEstado();
+}
+
+// Guarda el orden elegido + celdas (por posición) + respuestas, por situación y por sesión/dispositivo.
+function p5dGuardarEstado() {
+  const hiCells = document.querySelectorAll('.p5d-hi-cell');
+  const FiCells = document.querySelectorAll('.p5d-Fi-cell');
+  const HiCells = document.querySelectorAll('.p5d-Hi-cell');
+  const sit = P5D_SITUACIONES[p5dSituacionActual];
+  const respuestas = {};
+  (sit?.preguntas || []).forEach(p => { respuestas[p.id] = document.getElementById(p.id)?.value || ''; });
+  guardarEstadoLocal(`p5d_${p5dSituacionActual}`, {
+    orden: p5dOrdenActual,
+    celdas: {
+      hi: [...hiCells].map(c => c.value),
+      Fi: [...FiCells].map(c => c.value),
+      Hi: [...HiCells].map(c => c.value),
+    },
+    respuestas,
+  });
+}
+
+// Restaura el estado guardado de ESTA situación (si existe). El orden se restaura
+// PRIMERO y se re-renderiza la tabla en ese orden antes de rellenar celdas —
+// de lo contrario los valores quedarían en la fila equivocada.
+function p5dRestaurarEstado() {
+  const saved = leerEstadoLocal(`p5d_${p5dSituacionActual}`);
+  if (!saved) return;
+
+  if (saved.orden && Array.isArray(saved.orden) && saved.orden.length) {
+    p5dOrdenActual = saved.orden;
+    const sit = P5D_SITUACIONES[p5dSituacionActual];
+    p5dRenderTabla(sit);
+  }
+
+  if (saved.celdas) {
+    const hiCells = document.querySelectorAll('.p5d-hi-cell');
+    const FiCells = document.querySelectorAll('.p5d-Fi-cell');
+    const HiCells = document.querySelectorAll('.p5d-Hi-cell');
+    (saved.celdas.hi || []).forEach((v,i) => { if (v && hiCells[i]) hiCells[i].value = v; });
+    (saved.celdas.Fi || []).forEach((v,i) => { if (v && FiCells[i]) FiCells[i].value = v; });
+    (saved.celdas.Hi || []).forEach((v,i) => { if (v && HiCells[i]) HiCells[i].value = v; });
+    p5dActualizarCalculos();
+  }
+
+  if (saved.respuestas) {
+    Object.entries(saved.respuestas).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val) el.value = val;
+    });
+  }
+
+  const sid = `freq_5d_${p5dSituacionActual}_${sessionId}`;
+  cargarHistorial(sid, 'chat-5d').then(() => {
+    const box = document.getElementById('chat-5d');
+    const panel = document.getElementById('p5d-tutor-panel');
+    if (box && box.innerHTML.trim() !== '' && panel) panel.style.display = 'flex';
+  });
 }
 
 function p5dRenderTabla(sit) {
@@ -2959,9 +3253,9 @@ function p5dRenderTabla(sit) {
       <td class="p5d-drag-handle" title="Arrastra para reordenar">⠿</td>
       <td class="p5c-cat">${cat.cat}</td>
       <td><input type="number" class="p5c-cell p5d-fi-cell" value="${cat.fi}" readonly></td>
-      <td><input type="number" step="0.0001" class="p5c-cell p5d-hi-cell" placeholder="?" oninput="p5dActualizarCalculos()"></td>
-      <td><input type="number" step="1"      class="p5c-cell p5d-Fi-cell" placeholder="?" oninput="p5dActualizarCalculos()"></td>
-      <td><input type="number" step="0.0001" class="p5c-cell p5d-Hi-cell" placeholder="?" oninput="p5dActualizarCalculos()"></td>
+      <td><input type="number" step="0.0001" class="p5c-cell p5d-hi-cell" placeholder="?" oninput="p5dActualizarCalculos(); p5dGuardarEstado();"></td>
+      <td><input type="number" step="1"      class="p5c-cell p5d-Fi-cell" placeholder="?" oninput="p5dActualizarCalculos(); p5dGuardarEstado();"></td>
+      <td><input type="number" step="0.0001" class="p5c-cell p5d-Hi-cell" placeholder="?" oninput="p5dActualizarCalculos(); p5dGuardarEstado();"></td>
     </tr>`;
   });
   html += `</tbody></table>`;
@@ -2980,7 +3274,7 @@ function p5dRenderPreguntas(sit) {
     return `<div class="p5d-pregunta-card">
       <div class="p5d-preg-badge" style="background:${color}">${badge}</div>
       <p class="p5d-preg-texto"><strong>Pregunta ${i+1}:</strong> ${p.texto}</p>
-      <textarea class="p5d-resp-input" id="${p.id}" rows="3"
+      <textarea class="p5d-resp-input" id="${p.id}" rows="3" oninput="p5dGuardarEstado()"
                 placeholder="Escribe aquí tu análisis…"></textarea>
       <div class="p5d-retro" id="${p.id}-retro" style="display:none;"></div>
     </div>`;
@@ -3002,6 +3296,7 @@ function p5dDrop(e, targetIdx) {
   p5dOrdenActual.splice(targetIdx, 0, moved);
   const sit = P5D_SITUACIONES[p5dSituacionActual];
   p5dRenderTabla(sit);
+  p5dGuardarEstado();
 }
 function p5dDragEnd(e) {
   p5dDragSrcIdx = null;
@@ -3103,26 +3398,36 @@ function p5dConstruirContexto() {
   const sit   = P5D_SITUACIONES[p5dSituacionActual];
   const N     = sit.N;
 
-  // Tabla tal como la construyó el estudiante (orden actual + valores ingresados)
+  // Verificación determinística en código — el modelo recibe el veredicto ya
+  // calculado por cada celda, no seis números por fila para comparar por su cuenta.
   const hiCells = document.querySelectorAll('.p5d-hi-cell');
   const FiCells = document.querySelectorAll('.p5d-Fi-cell');
   const HiCells = document.querySelectorAll('.p5d-Hi-cell');
 
-  let tablaTexto = 'Tabla construida por el estudiante (en el orden que eligió):\n';
-  tablaTexto += `Categoría | fᵢ | fᵣ (estudiante) | Fᵢ (estudiante) | Fᵣ (estudiante) | fᵣ correcto | Fᵢ correcto | Fᵣ correcto\n`;
+  const evaluarCelda = (valEstStr, correcto) => {
+    const val = parseFloat(valEstStr);
+    if (valEstStr === undefined || valEstStr === '' || isNaN(val)) return 'SIN COMPLETAR';
+    return Math.abs(val - correcto) < 0.011 ? 'CORRECTO' : `INCORRECTO (correcto=${Number.isInteger(correcto) ? correcto : correcto.toFixed(4)})`;
+  };
 
+  let tablaTexto = 'Tabla construida por el estudiante (en el orden que eligió) — veredicto ya calculado por el código, no lo recalcules:\n';
   let acumF = 0;
+  let todoCorrecto = true;
   p5dOrdenActual.forEach((catIdx, pos) => {
     const cat = sit.categorias[catIdx];
     acumF += cat.fi;
-    const hiCorr = (cat.fi / N).toFixed(4);
+    const hiCorr = cat.fi / N;
     const FiCorr = acumF;
-    const HiCorr = (acumF / N).toFixed(4);
-    const hiEst  = hiCells[pos]?.value || '(vacío)';
-    const FiEst  = FiCells[pos]?.value || '(vacío)';
-    const HiEst  = HiCells[pos]?.value || '(vacío)';
-    tablaTexto += `${cat.cat} | ${cat.fi} | ${hiEst} | ${FiEst} | ${HiEst} | ${hiCorr} | ${FiCorr} | ${HiCorr}\n`;
+    const HiCorr = acumF / N;
+
+    const vHi = evaluarCelda(hiCells[pos]?.value, hiCorr);
+    const vFi = evaluarCelda(FiCells[pos]?.value, FiCorr);
+    const vHi2 = evaluarCelda(HiCells[pos]?.value, HiCorr);
+    if (!vHi.startsWith('CORRECTO') || !vFi.startsWith('CORRECTO') || !vHi2.startsWith('CORRECTO')) todoCorrecto = false;
+
+    tablaTexto += `${cat.cat} (fᵢ=${cat.fi}): fᵣ=${vHi} | Fᵢ=${vFi} | Fᵣ=${vHi2}\n`;
   });
+  tablaTexto += todoCorrecto ? 'VEREDICTO GENERAL: todos los cálculos son correctos.' : 'VEREDICTO GENERAL: hay al menos un cálculo incorrecto o sin completar (ver detalle arriba).';
 
   // Respuestas del estudiante a las 3 preguntas
   let respuestasTexto = '\nRespuestas del estudiante a las preguntas de análisis:\n';
@@ -3131,7 +3436,7 @@ function p5dConstruirContexto() {
     respuestasTexto += `\nPregunta ${i+1} [tipo ${p.tipo}]: ${p.texto}\nRespuesta: ${resp}\n`;
   });
 
-  return `[CONTEXTO DE LA SITUACIÓN]\nSituación: ${sit.titulo}\nN = ${N}\nDescripción: ${sit.enunciado}\n\n${tablaTexto}${respuestasTexto}\n\nPor favor analiza las respuestas del estudiante, identifica el nivel de Curcio de cada una, cuestiona el razonamiento y empuja hacia niveles más profundos (N3/N4). Recuerda: una sola pregunta por turno al final.`;
+  return `[CONTEXTO DE LA SITUACIÓN]\nSituación: ${sit.titulo}\nN = ${N}\nDescripción: ${sit.enunciado}\n\n${tablaTexto}\n${respuestasTexto}\n\nCon base en el veredicto de arriba (ya calculado, no lo repitas ni lo recalcules), analiza las respuestas del estudiante, identifica el nivel de Curcio de cada una, cuestiona el razonamiento y empuja hacia niveles más profundos (N3/N4). Recuerda: una sola pregunta por turno al final.`;
 }
 
 async function p5dEnviarAlTutor() {
@@ -3222,12 +3527,28 @@ function pAConstruirContexto() {
   const tipo = tipoEscogidoA || '(no seleccionado)';
   const justif = document.getElementById('probA-justif')?.value?.trim() || '(sin justificación)';
 
-  // Extraer valores ingresados en celdas
+  // Verificación determinística en código — el modelo recibe el veredicto ya
+  // calculado, no dos números para comparar por su cuenta.
   const inputs = document.querySelectorAll('#probA-tabla-wrapper .cell-input');
   let celdasTexto = '';
+  let todasCorrectas = true, hayVacias = false;
   inputs.forEach(inp => {
-    celdasTexto += `  Celda [fila ${inp.dataset.fila}, col ${inp.dataset.col}]: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correcto}\n`;
+    const val = parseFloat(inp.value);
+    const correcto = parseFloat(inp.dataset.correcto);
+    let veredicto;
+    if (inp.value === '' || isNaN(val)) {
+      veredicto = 'SIN COMPLETAR'; hayVacias = true; todasCorrectas = false;
+    } else if (Math.abs(val - correcto) < 0.011) {
+      veredicto = 'CORRECTA';
+    } else {
+      veredicto = `INCORRECTA (el estudiante puso ${inp.value}; el valor correcto es ${inp.dataset.correcto})`;
+      todasCorrectas = false;
+    }
+    celdasTexto += `  Celda [fila ${inp.dataset.fila}, col ${inp.dataset.col}]: ${veredicto}\n`;
   });
+  const resumenTabla = todasCorrectas ? 'VEREDICTO GENERAL: todas las celdas están correctas.'
+    : hayVacias ? 'VEREDICTO GENERAL: hay celdas sin completar.'
+    : 'VEREDICTO GENERAL: hay al menos una celda incorrecta.';
 
   return `[CONTEXTO — Problema de Formulación ${probAActual+1}]
 Enunciado: ${p.enunciado.replace(/<[^>]+>/g,'')}
@@ -3240,11 +3561,12 @@ Sistema de representación correcto: ${p.respuestaCorrecta}
 Sistema escogido por el estudiante: ${tipo}
 Justificación del estudiante: ${justif}
 
-Celdas ocultas (ingresado vs correcto):
-${celdasTexto}
+Celdas ocultas (veredicto ya calculado por el código, no lo recalcules):
+${celdasTexto}${resumenTabla}
+
 Pregunta de reflexión del problema: ${p.analisis}
 
-Analiza la elección de sistema, la justificación y los valores. Cuestiona el razonamiento usando TSD y Curcio. No des la respuesta directa.`;
+Con base en el veredicto de arriba (ya calculado), cuestiona la elección de sistema y la justificación usando TSD y Curcio. No des la respuesta directa. No repitas ni verifiques tú mismo si las celdas están bien — ese cálculo ya está hecho.`;
 }
 
 async function pAEnviarAlTutor() {
@@ -3293,11 +3615,28 @@ function pBConstruirContexto() {
   const p   = PROBLEMAS_B[probBActual];
   const tipo = tipoEscogidoB || '(no seleccionado)';
 
+  // Verificación determinística en código — el modelo recibe el veredicto ya
+  // calculado, no dos números para comparar por su cuenta.
   const inputs = document.querySelectorAll('#probB-tabla-wrapper .cell-input');
   let celdasTexto = '';
+  let todasCorrectas = true, hayVacias = false;
   inputs.forEach(inp => {
-    celdasTexto += `  Celda [${inp.dataset.fila},${inp.dataset.col}]: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correcto}\n`;
+    const val = parseFloat(inp.value);
+    const correcto = parseFloat(inp.dataset.correcto);
+    let veredicto;
+    if (inp.value === '' || isNaN(val)) {
+      veredicto = 'SIN COMPLETAR'; hayVacias = true; todasCorrectas = false;
+    } else if (Math.abs(val - correcto) < 0.011) {
+      veredicto = 'CORRECTA';
+    } else {
+      veredicto = `INCORRECTA (el estudiante puso ${inp.value}; el valor correcto es ${inp.dataset.correcto})`;
+      todasCorrectas = false;
+    }
+    celdasTexto += `  Celda [${inp.dataset.fila},${inp.dataset.col}]: ${veredicto}\n`;
   });
+  const resumenTabla = todasCorrectas ? 'VEREDICTO GENERAL: toda la tabla está correcta.'
+    : hayVacias ? 'VEREDICTO GENERAL: hay celdas sin completar.'
+    : 'VEREDICTO GENERAL: hay al menos una celda incorrecta.';
 
   let respuestasTexto = '';
   p.preguntas.forEach((q,i) => {
@@ -3313,10 +3652,11 @@ N = ${p.N}, Filas: ${p.filas.join(', ')}, Columnas: ${p.columnas.join(', ')}
 Sistema correcto: ${p.respuestaCorrecta}
 Sistema escogido: ${tipo}
 
-Celdas construidas (ingresado vs correcto):
-${celdasTexto}
+Celdas construidas (veredicto ya calculado por el código, no lo recalcules):
+${celdasTexto}${resumenTabla}
+
 Respuestas a preguntas de análisis:${respuestasTexto}
-Analiza todo lo anterior: la construcción de la tabla, la elección de sistema y las respuestas de análisis. Clasifica cada respuesta por nivel de Curcio (N1–N4) y cuestiona para empujar hacia N3/N4. No des respuestas directas.`;
+Con base en el veredicto de arriba (ya calculado), analiza la construcción de la tabla, la elección de sistema y las respuestas de análisis por separado — no mezcles la corrección de la tabla con el cuestionamiento del análisis en el mismo párrafo. Clasifica cada respuesta por nivel de Curcio (N1–N4) y cuestiona para empujar hacia N3/N4. No des respuestas directas. No repitas ni verifiques tú mismo si las celdas están bien — ese cálculo ya está hecho.`;
 }
 
 async function pBEnviarAlTutor() {
@@ -3596,11 +3936,79 @@ async function chi3P16EnviarAlTutor() {
   tablaEst+=`Eᵢⱼ si hubiera independencia perfecta:\n`;
   filas.forEach((f,i)=>{tablaEst+=`${f}: ${CHI3_P16_E[i].map(v=>v.toFixed(2)).join(', ')}\n`;});
   const n3=document.getElementById('chi3-p16-n3')?.value||'(sin responder)';
+  chi3P16Intentos = 1;
   const ctx=`[CONTEXTO P16 — Construir independencia]
 ${tablaEst}
 Respuesta del estudiante a la pregunta de interpretación (N3) — "si lo observado se pareciera/difiriera de esta tabla sin relación, ¿qué dirías?": ${n3}
-El estudiante debe descubrir por sí mismo la fórmula Eᵢⱼ=(fᵢ·×f·ⱼ)/N. NO la des directamente. Devuelve consecuencias matemáticas de su distribución y pregunta si se le ocurre una forma de calcular cada celda con solo los marginales. Sobre la respuesta N3, empuja: ¿qué tan parecidos o distintos tendrían que ser O y E para hablar de "relación"?`;
-  await chi3Enviar('p16', ctx, true);
+El código de la página ya confirmó matemáticamente que los marginales y las proporciones respetan el patrón de independencia. Plantea ahora la pregunta de descubrimiento de Eᵢⱼ.
+Número de intento: ${chi3P16Intentos}`;
+  await chi3P16EnviarMensajeEstructurado(ctx, true);
+}
+
+// Respuesta libre del estudiante mientras intenta descubrir la fórmula (reemplaza
+// el chat genérico solo para esta página — las otras 9 páginas de chi3 no se tocan).
+async function chi3P16ResponderFormula() {
+  if (chi3P16FormulaResuelta) return; // ya se reveló; el chat libre normal no aplica aquí
+  const inp = document.getElementById('input-chi3-p16');
+  if (!inp?.value.trim()) return;
+  const txt = inp.value.trim(); inp.value = '';
+  chi3P16Intentos++;
+  const ctx = `${txt}\n\n[Número de intento: ${chi3P16Intentos}]`;
+  await chi3P16EnviarMensajeEstructurado(ctx, false, txt);
+}
+
+// Versión dedicada a p16 (salida estructurada JSON). El backend devuelve
+// data.propuso_formula_correcta como booleano — esa señal, junto con el contador de
+// intentos, es lo que decide si se revela la institucionalización. El modelo
+// nunca decide eso por sí mismo, solo redacta el texto de cada pista.
+async function chi3P16EnviarMensajeEstructurado(mensaje, esContexto, textoVisible) {
+  const sid = `chi3_p16_${sessionId}`;
+  const panel = document.getElementById('chi3-p16-tutor');
+  if (panel) panel.style.display = 'flex';
+  if (esContexto) agregarMensajeGen('chat-chi3-p16', '📋 Enviando al tutor…', 'user');
+  else agregarMensajeGen('chat-chi3-p16', textoVisible ?? mensaje, 'user');
+  const tid = agregarTypingGen('chat-chi3-p16');
+  setStatusGen('ts-chi3-p16', 'Analizando…');
+  try {
+    const res  = await fetch(URL_BACKEND, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message: mensaje, session_id: sid})});
+    const data = await res.json();
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p16', 'En línea');
+    if (data.reply) agregarMensajeGen('chat-chi3-p16', data.reply, 'tutor');
+
+    // Decisión gobernada por código: éxito reportado por el modelo, o techo de intentos.
+    if (data.propuso_formula_correcta === true) {
+      chi3P16RevelarInstitucionalizacion(false);
+    } else if (chi3P16Intentos >= 3) {
+      chi3P16RevelarInstitucionalizacion(true);
+    }
+  } catch (e) {
+    quitarTypingGen(tid); setStatusGen('ts-chi3-p16', 'En línea');
+    agregarMensajeGen('chat-chi3-p16', 'Problema de conexión. Intenta de nuevo.', 'tutor');
+  }
+  setTimeout(() => panel?.scrollIntoView({behavior:'smooth', block:'start'}), 300);
+}
+
+// Institucionalización real: tarjeta estática escrita por el código, no por el modelo.
+// porTecho=true → se agotaron los 3 intentos sin que el estudiante propusiera la fórmula.
+// porTecho=false → el estudiante sí la propuso; el código lo confirma, no el LLM narrándolo.
+function chi3P16RevelarInstitucionalizacion(porTecho) {
+  if (chi3P16FormulaResuelta) return;
+  chi3P16FormulaResuelta = true;
+  const card = document.getElementById('chi3-p16-institucionalizacion');
+  if (!card) return;
+  const encabezado = porTecho
+    ? 'Después de explorar varias ideas, esta es la fórmula formal:'
+    : '¡Justo eso propusiste! Así se formaliza:';
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="chi3-inst-titulo">📐 ${encabezado}</div>
+    <div class="chi3-inst-formula">Frecuencia esperada: <strong>Eᵢⱼ = (fᵢ· × f·ⱼ) / N</strong></div>
+    <div class="chi3-inst-texto">Es el valor que tendría cada celda si las dos variables no tuvieran ninguna relación entre sí — se calcula multiplicando el total de su fila por el total de su columna, y dividiendo entre el total general N.</div>`;
+  const inputArea = document.querySelector('#chi3-p16-tutor .chat-input-area');
+  if (inputArea) inputArea.style.opacity = '.5';
+  const inp = document.getElementById('input-chi3-p16');
+  if (inp) { inp.disabled = true; inp.placeholder = 'Ya descubriste la fórmula — continúa a la siguiente página.'; }
 }
 
 /* ── PÁGINA 17 ── */
@@ -3769,19 +4177,11 @@ async function chi3P18DescubreIdea() {
   // Mostrar el tutor principal de pág 18 (el que ya funciona, debajo de la tabla)
   const panelPrincipal=document.getElementById('chi3-p18-tutor');
   if(panelPrincipal) panelPrincipal.style.display='flex';
-  const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado · turno inicial]
+  chi3P18Intentos = 1;
+  const ctx=`[CONTEXTO P18 — Descubrimiento del cuadrado]
 El estudiante acaba de comprobar que sumar las diferencias Oᵢⱼ−Eᵢⱼ da cero porque los signos se cancelan.
 Propuesta del estudiante para eliminar el problema de los signos: "${idea}"
-
-Tu tarea: dialogar con el estudiante hasta que muestre que comprende por qué elevar al cuadrado resuelve el problema. NO reveles la fórmula completa de χ² todavía.
-
-Reglas de avance (CRÍTICAS):
-- Si la propuesta del estudiante es elevar al cuadrado O usar valor absoluto: valida la idea, pero cuestiónalo con una pregunta breve para que ARGUMENTE por qué funciona (no basta con que lo nombre). Una vez argumente con sus palabras que el cuadrado/valor absoluto convierte los negativos en positivos y por eso evita la cancelación, considera que comprendió.
-- Si propone otra cosa o no responde: guíalo con una pregunta — "¿qué operación convierte −5 y +5 en el mismo valor positivo?" — sin dar la respuesta.
-- Cuando, y SOLO cuando, el estudiante haya argumentado con sus palabras por qué el cuadrado (o valor absoluto) resuelve la cancelación de signos, termina tu respuesta con esta frase-señal exacta en una línea aparte, sin formato adicional:
-[AVANZAR]
-- Nunca escribas [AVANZAR] en el primer intercambio aunque la propuesta sea correcta — primero pide la argumentación. La señal va solo después de que el estudiante haya razonado, no solo nombrado.`;
-  // Enviar al tutor principal de pág 18
+Número de intento: ${chi3P18Intentos}`;
   agregarMensajeGen('chat-chi3-p18', '💡 Propuesta sobre los signos: ' + idea, 'user');
   const tid=agregarTypingGen('chat-chi3-p18');
   setStatusGen('ts-chi3-p18','Analizando…');
@@ -3791,18 +4191,8 @@ Reglas de avance (CRÍTICAS):
       body:JSON.stringify({message:ctx,session_id:sid})});
     const data=await res.json();
     quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
-    if(data.reply){
-      const avanzar=data.reply.includes('[AVANZAR]');
-      const visible=data.reply.replace(/\[AVANZAR\]/g,'').trim();
-      agregarMensajeGen('chat-chi3-p18',visible,'tutor');
-      if(avanzar){
-        const paso3=document.getElementById('chi3-descubre-paso3');
-        const calculo=document.getElementById('chi3-p18-calculo');
-        if(paso3) paso3.style.display='block';
-        if(calculo) calculo.style.display='block';
-        setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),400);
-      }
-    }
+    if(data.reply) agregarMensajeGen('chat-chi3-p18',data.reply,'tutor');
+    _chi3P18EvaluarAvance(data);
   } catch(e){
     quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
     agregarMensajeGen('chat-chi3-p18','Problema de conexión. Intenta de nuevo.','tutor');
@@ -3810,29 +4200,39 @@ Reglas de avance (CRÍTICAS):
   setTimeout(()=>panelPrincipal?.scrollIntoView({behavior:'smooth',block:'nearest'}),200);
 }
 
+// Decisión gobernada por código: éxito reportado por el modelo, o techo de 3
+// intentos — nunca el modelo decidiendo por su cuenta cuándo "dar por terminada"
+// la búsqueda (evita el riesgo de pistas cada vez más obvias / Efecto Topaze).
+function _chi3P18EvaluarAvance(data) {
+  if (chi3P18DescubrimientoResuelto) return;
+  const avanzar = data.avanzar_descubrimiento === true || chi3P18Intentos >= 3;
+  if (!avanzar) return;
+  chi3P18DescubrimientoResuelto = true;
+  const paso3=document.getElementById('chi3-descubre-paso3');
+  const calculo=document.getElementById('chi3-p18-calculo');
+  if(paso3) paso3.style.display='block';
+  if(calculo) calculo.style.display='block';
+  setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),400);
+}
 
 async function chi3EnviarPrincipalP18(texto) {
   const sid=`chi3_p18_${sessionId}`;
   agregarMensajeGen('chat-chi3-p18',texto,'user');
   const tid=agregarTypingGen('chat-chi3-p18');
   setStatusGen('ts-chi3-p18','Escribiendo…');
+  // Solo cuenta como intento del descubrimiento si aún no se ha resuelto esa parte
+  let mensajeAEnviar = texto;
+  if (!chi3P18DescubrimientoResuelto) {
+    chi3P18Intentos++;
+    mensajeAEnviar = `${texto}\n\n[Número de intento: ${chi3P18Intentos}]`;
+  }
   try {
     const res=await fetch(URL_BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:texto,session_id:sid})});
+      body:JSON.stringify({message:mensajeAEnviar,session_id:sid})});
     const data=await res.json();
     quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
-    if(data.reply){
-      const avanzar=data.reply.includes('[AVANZAR]');
-      const visible=data.reply.replace(/\[AVANZAR\]/g,'').trim();
-      agregarMensajeGen('chat-chi3-p18',visible,'tutor');
-      if(avanzar){
-        const paso3=document.getElementById('chi3-descubre-paso3');
-        const calculo=document.getElementById('chi3-p18-calculo');
-        if(paso3) paso3.style.display='block';
-        if(calculo) calculo.style.display='block';
-        setTimeout(()=>paso3?.scrollIntoView({behavior:'smooth',block:'nearest'}),400);
-      }
-    }
+    if(data.reply) agregarMensajeGen('chat-chi3-p18',data.reply,'tutor');
+    _chi3P18EvaluarAvance(data);
   } catch(e){
     quitarTypingGen(tid); setStatusGen('ts-chi3-p18','En línea');
     agregarMensajeGen('chat-chi3-p18','Problema de conexión.','tutor');
@@ -3889,18 +4289,37 @@ function chi3P18Verificar() {
 async function chi3P18EnviarAlTutor() {
   const inputs=document.querySelectorAll('.chi3-p18-cell');
   let detalle='';
-  inputs.forEach(inp=>{detalle+=`  ${inp.id}: ingresado=${inp.value||'vacío'}, correcto=${inp.dataset.correct}\n`;});
+  let todasCorrectas = true, hayVacias = false;
+  inputs.forEach(inp=>{
+    const val = parseFloat(inp.value);
+    const correcto = parseFloat(inp.dataset.correct);
+    let veredicto;
+    if (inp.value === '' || isNaN(val)) {
+      veredicto = 'SIN COMPLETAR'; hayVacias = true; todasCorrectas = false;
+    } else if (Math.abs(val - correcto) < 0.011) {
+      veredicto = 'CORRECTA';
+    } else {
+      veredicto = `INCORRECTA (el estudiante puso ${inp.value}; el valor correcto es ${inp.dataset.correct})`;
+      todasCorrectas = false;
+    }
+    detalle+=`  ${inp.id}: ${veredicto}\n`;
+  });
+  const resumen = todasCorrectas ? 'VEREDICTO GENERAL: todas las contribuciones son correctas.'
+    : hayVacias ? 'VEREDICTO GENERAL: hay celdas sin completar.'
+    : 'VEREDICTO GENERAL: hay al menos una contribución incorrecta.';
   const q1=document.getElementById('chi3-p18-q1')?.value||'(sin responder)';
   const q2=document.getElementById('chi3-p18-q2')?.value||'(sin responder)';
   const q3=document.getElementById('chi3-p18-q3')?.value||'(sin responder)';
   const ctx=`[CONTEXTO P18 — Calcular χ²]
 Oᵢⱼ=${JSON.stringify(CHI3_O)}, Eᵢⱼ=${JSON.stringify(CHI3_E.map(r=>r.map(v=>v.toFixed(2))))}.
 χ² correcto = ${CHI3_CHI2.toFixed(4)}.
-Contribuciones ingresadas:\n${detalle}
+Contribuciones ingresadas (veredicto ya calculado por el código, no lo recalcules):
+${detalle}${resumen}
+
 P1 (¿Por qué elevar al cuadrado?): ${q1}
 P2 (¿Qué significa χ²=0?): ${q2}
 P3 (N3 — celda de mayor contribución y qué revela): ${q3}
-Analiza los cálculos y las tres respuestas. P1 y P2 son N2 (concepto). P3 es N3 (interpretación). Si P3 solo nombra la celda sin contar la "historia" de la asociación, empuja a interpretar. No des la respuesta directa.`;
+Con base en el veredicto de arriba, analiza los cálculos y las tres respuestas. P1 y P2 son N2 (concepto). P3 es N3 (interpretación). Si P3 solo nombra la celda sin contar la "historia" de la asociación, empuja a interpretar. No des la respuesta directa. No repitas ni verifiques tú mismo los cálculos — ese trabajo ya está hecho.`;
   await chi3Enviar('p18', ctx, true);
 }
 
@@ -4220,25 +4639,38 @@ function chi3P24VerifChi(){
 }
 
 async function chi3P24EnviarAlTutor(){
-  const eInputs=document.querySelectorAll('.chi3-p24-e-cell');
-  const ctInputs=document.querySelectorAll('.chi3-p24-contrib-cell');
+  const evaluarCelda = (valStr, correcto) => {
+    const val = parseFloat(valStr);
+    if (valStr === undefined || valStr === '' || isNaN(val)) return 'SIN COMPLETAR';
+    return Math.abs(val - correcto) < 0.011 ? 'CORRECTA' : `INCORRECTA (correcto=${correcto.toFixed(2)})`;
+  };
   let eVals='',ctVals='';
+  let todoCorrecto = true;
   CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
-    eVals+=`  E[${f}/${c}]: est=${document.getElementById(`chi3-p24-e-${i}-${j}`)?.value||'vacío'}, corr=${CHI3_P24_E[i][j].toFixed(2)}\n`;
-    ctVals+=`  (O-E)²/E[${f}/${c}]: est=${document.getElementById(`chi3-p24-ct-${i}-${j}`)?.value||'vacío'}, corr=${(Math.pow(CHI3_P24_O[i][j]-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j]).toFixed(4)}\n`;
+    const vE = evaluarCelda(document.getElementById(`chi3-p24-e-${i}-${j}`)?.value, CHI3_P24_E[i][j]);
+    const contribCorr = Math.pow(CHI3_P24_O[i][j]-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j];
+    const vCt = evaluarCelda(document.getElementById(`chi3-p24-ct-${i}-${j}`)?.value, contribCorr);
+    if (!vE.startsWith('CORRECTO') && !vE.startsWith('CORRECTA')) todoCorrecto = false;
+    if (!vCt.startsWith('CORRECTO') && !vCt.startsWith('CORRECTA')) todoCorrecto = false;
+    eVals+=`  E[${f}/${c}]: ${vE}\n`;
+    ctVals+=`  (O-E)²/E[${f}/${c}]: ${vCt}\n`;
   }));
+  const resumen = todoCorrecto ? 'VEREDICTO GENERAL: todos los cálculos son correctos.' : 'VEREDICTO GENERAL: hay al menos un cálculo incorrecto o sin completar.';
   const concl=document.getElementById('chi3-p24-concl')?.value||'(sin responder)';
   const q1=document.getElementById('chi3-p24-q1')?.value||'(sin responder)';
   const q2=document.getElementById('chi3-p24-q2')?.value||'(sin responder)';
   const ctx=`[CONTEXTO P24 — Situación libre final]
 Datos: Internet×Rendimiento, N=${CHI3_P24_N}, O=${JSON.stringify(CHI3_P24_O)}.
 χ² correcto=${CHI3_P24_CHI2.toFixed(4)}, gl=${CHI3_P24_GL}, vc=9.488.
-E��ⱼ ingresadas:\n${eVals}
-Contribuciones:\n${ctVals}
+Eᵢⱼ ingresadas (veredicto ya calculado por el código, no lo recalcules):
+${eVals}
+Contribuciones (veredicto ya calculado):
+${ctVals}${resumen}
+
 Conclusión del estudiante: ${concl}
 P1 (causalidad/variable oculta): ${q1}
 P2 (implicaciones para política educativa): ${q2}
-Evalúa el ciclo completo. Clasifica el nivel de Curcio de la conclusión y las respuestas N4. Cuestiona lo que esté superficial. Si todo está en N4, valida y cierra el capítulo.`;
+Con base en el veredicto de arriba, evalúa el ciclo completo. Clasifica el nivel de Curcio de la conclusión y las respuestas N4. Cuestiona lo que esté superficial. Si todo está en N4, valida y cierra el capítulo. No repitas ni verifiques tú mismo los cálculos.`;
   await chi3Enviar('p24',ctx,true);
 }
 
@@ -4499,16 +4931,30 @@ function p25SelAnalisis(tipo) {
 // ── Construir contexto para el tutor ──
 function p25ConstruirContexto() {
   const {contexto,pregunta,variables,cols,tipos,filas,nFilas,analisis,justif,interpGrafica,nombreArchivo}=p25Datos;
-  // Calcular distribución de cada columna categórica (conteos)
+  // Calcular distribución de cada columna categórica (conteos) — y de paso, hechos
+  // determinísticos que el modelo NO debe inferir por su cuenta (N<30, número de
+  // categorías por variable, si existe alguna categórica). Solo la coherencia
+  // semántica pregunta↔variable queda como juicio genuino del modelo.
   const catCols=cols.filter(c=>tipos[c]==='categórica');
   let distrib='';
+  const numCategoriasPorVar = {};
   catCols.forEach(c=>{
     const counts=p25ContarUna(c);
+    const numCats = Object.keys(counts).length;
+    numCategoriasPorVar[c] = numCats;
     const resumen=Object.entries(counts).map(([v,n])=>`${v}:${n}`).join(', ');
-    distrib+=`  "${c}" → ${resumen}\n`;
+    distrib+=`  "${c}" → ${numCats} categorías distintas (${resumen})\n`;
   });
   const v1=document.getElementById('p25-sel-var1')?.value;
   const v2=document.getElementById('p25-sel-var2')?.value;
+
+  const hechosTexto = `
+HECHOS YA CALCULADOS POR EL CÓDIGO (no los recalcules ni los pongas en duda):
+- N < 30 observaciones: ${nFilas < 30 ? 'SÍ' : 'NO'} (N real = ${nFilas})
+- ¿Hay al menos una variable categórica en la tabla?: ${catCols.length > 0 ? 'SÍ' : 'NO'}
+- Variables con más de 10 categorías distintas: ${Object.entries(numCategoriasPorVar).filter(([,n])=>n>10).map(([c,n])=>`"${c}" (${n} categorías)`).join(', ') || 'ninguna'}
+- Variables numéricas/continuas entre las elegidas para graficar: ${[v1,v2].filter(v=>v && tipos[v] && tipos[v]!=='categórica').join(', ') || 'ninguna'}`;
+
   return `[CONTEXTO P25 — Estudio propio del estudiante]
 Archivo: ${nombreArchivo}
 N = ${nFilas} observaciones · ${cols.length} variables
@@ -4522,6 +4968,7 @@ ${cols.map(c=>`  "${c}" (${tipos[c]})`).join('\n')}
 
 Distribución de variables categóricas:
 ${distrib||'(sin variables categóricas detectadas)'}
+${hechosTexto}
 
 Variable graficada: ${v1}${v2?` × ${v2}`:''}
 Interpretación de la gráfica del estudiante: ${interpGrafica}
