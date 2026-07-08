@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime, timezone
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
@@ -1240,6 +1241,31 @@ def obtener_historial():
     historial_completo = chats.get(session_id, [])
     historial_filtrado = [msg for msg in historial_completo if msg["role"] in ["user", "assistant"]]
     return jsonify({"history": historial_filtrado})
+
+# ════════════════════════════════════════════════
+# TRAZABILIDAD DE INVESTIGACIÓN — Soft Gate
+# Registra en disco (no solo en el navegador del estudiante) cada vez que un
+# estudiante decide avanzar sin haber completado una situación de aprendizaje.
+# Nunca bloquea la navegación — solo deja constancia para el análisis posterior.
+# ════════════════════════════════════════════════
+RUTA_LOG_HITOS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "registro_hitos_incompletos.jsonl")
+
+@app.route('/api/log/hito_incompleto', methods=['POST'])
+def registrar_hito_incompleto():
+    try:
+        data = request.json or {}
+        entrada = {
+            "session_id": data.get("session_id", "desconocido"),
+            "pagina": data.get("pagina", "desconocida"),
+            "hito": data.get("hito", ""),
+            "timestamp": data.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+        }
+        with open(RUTA_LOG_HITOS, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entrada, ensure_ascii=False) + "\n")
+        return jsonify({"ok": True})
+    except Exception as e:
+        # Un fallo de registro NUNCA debe interrumpir la experiencia del estudiante.
+        return jsonify({"ok": False, "error": str(e)}), 200
 
 if __name__ == '__main__':
     app.run(port=5000)
