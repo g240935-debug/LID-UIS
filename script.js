@@ -1101,7 +1101,7 @@ async function cargarHistorial(idSesion, contenedorId) {
     const data = await res.json();
     if (data.history && data.history.length > 0) {
       const box = document.getElementById(contenedorId);
-      if (!box) return;
+      if (!box) return false;
       box.innerHTML = '';
       data.history.forEach(msg => {
         if (msg.role === 'user')      agregarMensajeGen(contenedorId, msg.content, 'user');
@@ -1126,8 +1126,12 @@ async function cargarHistorial(idSesion, contenedorId) {
         });
         renderizarP3Tabla();
       }
+      // Hubo conversación previa: quien llama debe marcar su bandera "ya inicié"
+      // como true, para que la página NO dispare de nuevo su saludo automático.
+      return true;
     }
-  } catch (err) { console.error(`Error al recuperar historial ${idSesion}:`, err); }
+    return false;
+  } catch (err) { console.error(`Error al recuperar historial ${idSesion}:`, err); return false; }
 }
 
 /* ════════════════════════════════════════════════
@@ -1748,29 +1752,31 @@ function pAGuardarEstado() {
 // llama a escogerTipoA() para no disparar un guardado prematuro con celdas vacías.
 function pARestaurarEstado() {
   const saved = leerEstadoLocal(`pA_${probAActual}`);
-  if (!saved) return;
 
-  if (saved.tipo) {
-    tipoEscogidoA = saved.tipo;
-    document.querySelectorAll('#page-12 .pts-btn').forEach(b => {
-      b.classList.remove('selected','correcto','incorrecto');
-      if (b.dataset.tipo === saved.tipo) b.classList.add('selected');
-    });
-    const sec = document.getElementById('probA-tabla-section');
-    if (sec) sec.style.display = 'block';
-    _renderizarTablaA();
+  if (saved) {
+    if (saved.tipo) {
+      tipoEscogidoA = saved.tipo;
+      document.querySelectorAll('#page-12 .pts-btn').forEach(b => {
+        b.classList.remove('selected','correcto','incorrecto');
+        if (b.dataset.tipo === saved.tipo) b.classList.add('selected');
+      });
+      const sec = document.getElementById('probA-tabla-section');
+      if (sec) sec.style.display = 'block';
+      _renderizarTablaA();
+    }
+
+    if (saved.celdas) {
+      document.querySelectorAll('#probA-tabla-wrapper .cell-input').forEach(inp => {
+        const k = `${inp.dataset.fila}-${inp.dataset.col}`;
+        if (saved.celdas[k]) inp.value = saved.celdas[k];
+      });
+    }
+
+    const justif = document.getElementById('probA-justif');
+    if (justif && saved.justificacion) justif.value = saved.justificacion;
   }
 
-  if (saved.celdas) {
-    document.querySelectorAll('#probA-tabla-wrapper .cell-input').forEach(inp => {
-      const k = `${inp.dataset.fila}-${inp.dataset.col}`;
-      if (saved.celdas[k]) inp.value = saved.celdas[k];
-    });
-  }
-
-  const justif = document.getElementById('probA-justif');
-  if (justif && saved.justificacion) justif.value = saved.justificacion;
-
+  // El chat se restaura SIEMPRE, sin importar si había o no estado local guardado.
   const sid = `cont_A_${probAActual}_${sessionId}`;
   cargarHistorial(sid, 'chat-contA').then(() => {
     const box = document.getElementById('chat-contA');
@@ -2028,33 +2034,35 @@ function pBGuardarEstado() {
 // escogerTipoB() para no disparar un guardado prematuro con celdas vacías.
 function pBRestaurarEstado() {
   const saved = leerEstadoLocal(`pB_${probBActual}`);
-  if (!saved) return;
 
-  if (saved.tipo) {
-    tipoEscogidoB = saved.tipo;
-    document.querySelectorAll('#page-13 .pts-btn').forEach(b => {
-      b.classList.remove('selected','correcto','incorrecto');
-      if (b.dataset.tipo === saved.tipo) b.classList.add('selected');
-    });
-    const sec = document.getElementById('probB-tabla-section');
-    if (sec) sec.style.display = 'block';
-    _renderizarTablaB();
+  if (saved) {
+    if (saved.tipo) {
+      tipoEscogidoB = saved.tipo;
+      document.querySelectorAll('#page-13 .pts-btn').forEach(b => {
+        b.classList.remove('selected','correcto','incorrecto');
+        if (b.dataset.tipo === saved.tipo) b.classList.add('selected');
+      });
+      const sec = document.getElementById('probB-tabla-section');
+      if (sec) sec.style.display = 'block';
+      _renderizarTablaB();
+    }
+
+    if (saved.celdas) {
+      document.querySelectorAll('#probB-tabla-wrapper .cell-input').forEach(inp => {
+        const k = `${inp.dataset.fila}-${inp.dataset.col}`;
+        if (saved.celdas[k]) inp.value = saved.celdas[k];
+      });
+    }
+
+    if (saved.respuestas) {
+      Object.entries(saved.respuestas).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && val) el.value = val;
+      });
+    }
   }
 
-  if (saved.celdas) {
-    document.querySelectorAll('#probB-tabla-wrapper .cell-input').forEach(inp => {
-      const k = `${inp.dataset.fila}-${inp.dataset.col}`;
-      if (saved.celdas[k]) inp.value = saved.celdas[k];
-    });
-  }
-
-  if (saved.respuestas) {
-    Object.entries(saved.respuestas).forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el && val) el.value = val;
-    });
-  }
-
+  // El chat se restaura SIEMPRE, sin importar si había o no estado local guardado.
   const sid = `cont_B_${probBActual}_${sessionId}`;
   cargarHistorial(sid, 'chat-contB').then(() => {
     const box = document.getElementById('chat-contB');
@@ -2735,12 +2743,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inicializar tabla dinámica página 3
   renderizarP3Tabla();
 
-  // Recuperar historiales de sesiones previas
-  cargarHistorial(sessionId,             'chat-box');
+  // Recuperar historiales de sesiones previas.
+  // Si YA existe conversación guardada en el backend, se marca la bandera "ya
+  // inicié" correspondiente — así la página no dispara de nuevo su saludo
+  // automático al recargar (eso era lo que causaba la sensación de "reinicio").
+  cargarHistorial(sessionId,             'chat-box').then(h => { if (h) chatCap2Iniciado = true; });
   cargarHistorial(`cap3_${sessionId}`,   'chat-box2');
-  cargarHistorial(`cap3b_${sessionId}`,  'chat-cap3b');
-  cargarHistorial(`freq_unif_${sessionId}`, 'chat-freq-unif');
-  cargarHistorial(`chi_${sessionId}`,        'chat-chi');
+  cargarHistorial(`cap3b_${sessionId}`,  'chat-cap3b').then(h => { if (h) chatCap3PuenteIniciado = true; });
+  cargarHistorial(`freq_unif_${sessionId}`, 'chat-freq-unif').then(h => { if (h) chatFreqUnifIniciado = true; });
+  cargarHistorial(`chi_${sessionId}`,        'chat-chi').then(h => { if (h) chatChiIniciado = true; });
   cargarHistorial(`p25_${sessionId}`,        'chat-p25');
   cargarHistorial(`chi3_p15_${sessionId}`,   'chat-chi3-p15');
   cargarHistorial(`chi3_p16_${sessionId}`,   'chat-chi3-p16');
@@ -3199,33 +3210,37 @@ function p5dGuardarEstado() {
 // de lo contrario los valores quedarían en la fila equivocada.
 function p5dRestaurarEstado() {
   const saved = leerEstadoLocal(`p5d_${p5dSituacionActual}`);
-  if (!saved) return;
 
-  if (saved.orden && Array.isArray(saved.orden) && saved.orden.length) {
-    p5dOrdenActual = saved.orden;
-    const sit = P5D_SITUACIONES[p5dSituacionActual];
-    p5dRenderTabla(sit);
+  if (saved) {
+    if (saved.orden && Array.isArray(saved.orden) && saved.orden.length) {
+      p5dOrdenActual = saved.orden;
+      const sit = P5D_SITUACIONES[p5dSituacionActual];
+      p5dRenderTabla(sit);
+    }
+
+    if (saved.celdas) {
+      const hiCells = document.querySelectorAll('.p5d-hi-cell');
+      const FiCells = document.querySelectorAll('.p5d-Fi-cell');
+      const HiCells = document.querySelectorAll('.p5d-Hi-cell');
+      (saved.celdas.hi || []).forEach((v,i) => { if (v && hiCells[i]) hiCells[i].value = v; });
+      (saved.celdas.Fi || []).forEach((v,i) => { if (v && FiCells[i]) FiCells[i].value = v; });
+      (saved.celdas.Hi || []).forEach((v,i) => { if (v && HiCells[i]) HiCells[i].value = v; });
+      p5dActualizarCalculos();
+    }
+
+    if (saved.respuestas) {
+      Object.entries(saved.respuestas).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && val) el.value = val;
+      });
+    }
   }
 
-  if (saved.celdas) {
-    const hiCells = document.querySelectorAll('.p5d-hi-cell');
-    const FiCells = document.querySelectorAll('.p5d-Fi-cell');
-    const HiCells = document.querySelectorAll('.p5d-Hi-cell');
-    (saved.celdas.hi || []).forEach((v,i) => { if (v && hiCells[i]) hiCells[i].value = v; });
-    (saved.celdas.Fi || []).forEach((v,i) => { if (v && FiCells[i]) FiCells[i].value = v; });
-    (saved.celdas.Hi || []).forEach((v,i) => { if (v && HiCells[i]) HiCells[i].value = v; });
-    p5dActualizarCalculos();
-  }
-
-  if (saved.respuestas) {
-    Object.entries(saved.respuestas).forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el && val) el.value = val;
-    });
-  }
-
+  // El chat se restaura SIEMPRE, sin importar si había o no estado local de
+  // celdas guardado — son dos fuentes independientes (backend vs localStorage).
   const sid = `freq_5d_${p5dSituacionActual}_${sessionId}`;
-  cargarHistorial(sid, 'chat-5d').then(() => {
+  cargarHistorial(sid, 'chat-5d').then((hubo) => {
+    if (hubo) chat5dIniciado = true;
     const box = document.getElementById('chat-5d');
     const panel = document.getElementById('p5d-tutor-panel');
     if (box && box.innerHTML.trim() !== '' && panel) panel.style.display = 'flex';
@@ -4646,31 +4661,42 @@ async function chi3P24EnviarAlTutor(){
   };
   let eVals='',ctVals='';
   let todoCorrecto = true;
+  let primeraCeldaError = null; // la primera celda con error — el foco de la pregunta socrática
   CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
     const vE = evaluarCelda(document.getElementById(`chi3-p24-e-${i}-${j}`)?.value, CHI3_P24_E[i][j]);
     const contribCorr = Math.pow(CHI3_P24_O[i][j]-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j];
     const vCt = evaluarCelda(document.getElementById(`chi3-p24-ct-${i}-${j}`)?.value, contribCorr);
-    if (!vE.startsWith('CORRECTO') && !vE.startsWith('CORRECTA')) todoCorrecto = false;
-    if (!vCt.startsWith('CORRECTO') && !vCt.startsWith('CORRECTA')) todoCorrecto = false;
+    if (!vE.startsWith('CORRECTA')) { todoCorrecto = false; if (!primeraCeldaError) primeraCeldaError = `Eᵢⱼ[${f}/${c}]: ${vE}`; }
+    if (!vCt.startsWith('CORRECTA')) { todoCorrecto = false; if (!primeraCeldaError) primeraCeldaError = `Contribución[${f}/${c}]: ${vCt}`; }
     eVals+=`  E[${f}/${c}]: ${vE}\n`;
     ctVals+=`  (O-E)²/E[${f}/${c}]: ${vCt}\n`;
   }));
-  const resumen = todoCorrecto ? 'VEREDICTO GENERAL: todos los cálculos son correctos.' : 'VEREDICTO GENERAL: hay al menos un cálculo incorrecto o sin completar.';
-  const concl=document.getElementById('chi3-p24-concl')?.value||'(sin responder)';
-  const q1=document.getElementById('chi3-p24-q1')?.value||'(sin responder)';
-  const q2=document.getElementById('chi3-p24-q2')?.value||'(sin responder)';
-  const ctx=`[CONTEXTO P24 — Situación libre final]
-Datos: Internet×Rendimiento, N=${CHI3_P24_N}, O=${JSON.stringify(CHI3_P24_O)}.
+
+  let ctx;
+  if (!todoCorrecto) {
+    // Fase de corrección numérica: el código decide qué se envía — la conclusión
+    // y las preguntas P1/P2 NUNCA llegan al modelo en este tipo de contexto, así
+    // que no hay forma de que las mezcle con la corrección aritmética.
+    ctx = `[CONTEXTO P24 — Corrección numérica]
+Datos: Internet×Rendimiento, N=${CHI3_P24_N}.
+Tabla completa (veredicto ya calculado por el código, no lo recalcules):
+${eVals}${ctVals}
+Celda con error a enfocar en esta pregunta socrática (la primera detectada, no menciones las demás todavía): ${primeraCeldaError}`;
+  } else {
+    // Fase de evaluación cualitativa: solo se llega aquí cuando TODA la tabla es
+    // correcta. Aquí sí se envían conclusión y preguntas de análisis.
+    const concl=document.getElementById('chi3-p24-concl')?.value||'(sin responder)';
+    const q1=document.getElementById('chi3-p24-q1')?.value||'(sin responder)';
+    const q2=document.getElementById('chi3-p24-q2')?.value||'(sin responder)';
+    ctx = `[CONTEXTO P24 — Evaluación de la conclusión]
+Datos: Internet×Rendimiento, N=${CHI3_P24_N}.
+Toda la tabla numérica es correcta (verificado por el código).
 χ² correcto=${CHI3_P24_CHI2.toFixed(4)}, gl=${CHI3_P24_GL}, vc=9.488.
-Eᵢⱼ ingresadas (veredicto ya calculado por el código, no lo recalcules):
-${eVals}
-Contribuciones (veredicto ya calculado):
-${ctVals}${resumen}
 
 Conclusión del estudiante: ${concl}
 P1 (causalidad/variable oculta): ${q1}
-P2 (implicaciones para política educativa): ${q2}
-Con base en el veredicto de arriba, evalúa el ciclo completo. Clasifica el nivel de Curcio de la conclusión y las respuestas N4. Cuestiona lo que esté superficial. Si todo está en N4, valida y cierra el capítulo. No repitas ni verifiques tú mismo los cálculos.`;
+P2 (implicaciones para política educativa): ${q2}`;
+  }
   await chi3Enviar('p24',ctx,true);
 }
 
