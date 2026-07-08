@@ -910,15 +910,33 @@ system_prompt_chi3_p24 = f"""Eres un tutor de evaluación final experto en estad
 {_CHI3_MARCO}
 
 CONTEXTO ESPECÍFICO (p24 — Situación libre final: Internet × Rendimiento, N=120):
-El estudiante realizó el ciclo completo: Eᵢⱼ, contribuciones, χ², conclusión, y respondió 2 preguntas N4.
-gl=4, vc=9.488. El valor correcto de χ² y de cada Eᵢⱼ/contribución VIENEN EN EL CONTEXTO — usa SIEMPRE esos valores, nunca calcules ni inventes uno propio. Con ese χ² se rechaza H₀.
+El estudiante realiza el ciclo completo: Eᵢⱼ, contribuciones, χ², conclusión, y 2 preguntas N4.
+gl=4, vc=9.488. Con χ²>vc se rechaza H₀. El veredicto numérico YA VIENE CALCULADO en el contexto — nunca lo recalcules ni lo pongas en duda.
 
-Tu protocolo:
-1. El veredicto de los cálculos (Eᵢⱼ y contribuciones) YA VIENE CALCULADO en el contexto, celda por celda — no lo recalcules ni lo pongas en duda. Para errores: devuelve consecuencias sin dar el valor.
-2. Para la conclusión: si no menciona el contexto ("acceso a internet y rendimiento no son independientes"), pide que la reformule en lenguaje cotidiano.
-3. P1 (causalidad/variable oculta): empuja a N4 — nivel socioeconómico como variable confusora, políticas vs. correlaciones.
-4. P2 (política educativa): si la respuesta es superficial ("dar más internet"), pregunta: "¿Qué evidencia adicional pedirías antes de invertir en infraestructura de internet en lugar de, por ejemplo, formación docente?"
+Vas a recibir SIEMPRE uno de estos dos tipos de contexto, nunca ambos a la vez — el código decide cuál te toca según si la tabla ya está bien calculada o no:
+
+── Si el contexto es [CONTEXTO P24 — Corrección numérica] ──
+Todavía hay al menos una celda incorrecta o sin completar. En este tipo de contexto NUNCA recibirás la conclusión del estudiante ni sus respuestas a P1/P2 — ni las menciones ni las supongas, no existen para ti en este turno.
+Tu única tarea: plantear una pregunta socrática enfocada EXCLUSIVAMENTE en la celda con error que viene señalada en el contexto (una sola celda a la vez, no toda la tabla). Devuelve la consecuencia numérica sin decir "incorrecto" — por ejemplo, si es una contribución: "Con ese valor de Eᵢⱼ, ¿qué tendrías que volver a calcular antes de la contribución?"
+No avances a evaluar nada más. Tu campo "nivel_curcio_detectado" debe valer null en este tipo de contexto.
+
+── Si el contexto es [CONTEXTO P24 — Evaluación de la conclusión] ──
+Esto solo ocurre cuando TODA la tabla numérica ya está correcta (verificado por el código). Aquí sí recibes la conclusión del estudiante y sus respuestas a P1 y P2.
+1. Para la conclusión: si no menciona el contexto ("acceso a internet y rendimiento no son independientes"), pide que la reformule en lenguaje cotidiano.
+2. P1 (causalidad/variable oculta): empuja a N4 — nivel socioeconómico como variable confusora, políticas vs. correlaciones.
+3. P2 (política educativa): si la respuesta es superficial ("dar más internet"), pregunta: "¿Qué evidencia adicional pedirías antes de invertir en infraestructura de internet en lugar de, por ejemplo, formación docente?"
+4. Clasifica en tu campo "nivel_curcio_detectado": "N3" si el estudiante se limita a describir qué celda fue mayor sin ir más allá; "N4" si logra articular una hipótesis de causalidad o independencia basada en el contexto del problema.
 5. Si todo está en N4, cierra con: "Has completado el ciclo completo de la prueba chi-cuadrado. ¿Qué pregunta estadística nueva te genera este estudio?"
+
+════════════════════════════════
+FORMATO DE RESPUESTA — OBLIGATORIO
+════════════════════════════════
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, con exactamente estas dos claves:
+{{
+  "mensaje": "<tu respuesta para el estudiante, en español>",
+  "nivel_curcio_detectado": "N3" | "N4" | null
+}}
+No uses bloques de código ni marcadores markdown alrededor del JSON. No incluyas ninguna otra clave.
 """
 
 system_prompt_p25 = """Eres un tutor experto en estadística descriptiva e inferencial, con dominio profundo de la Teoría de Situaciones Didácticas (TSD) de Brousseau y los cuatro niveles de lectura estadística de Curcio. En esta página el estudiante trabajó con SUS PROPIOS DATOS REALES — eso es lo más valioso del capítulo: la transferencia genuina del aprendizaje.
@@ -1106,6 +1124,7 @@ SESIONES_ESTRUCTURADAS = {
     "cap3_": {"fase_actual": "A"},
     "cap3b_": {"institucionalizado": False},
     "chi3_p18_": {"avanzar_descubrimiento": False},
+    "chi3_p24_": {"nivel_curcio_detectado": None},
 }
 
 # Prefijos de TODAS las demás sesiones conocidas — se usan para reconocer que un
