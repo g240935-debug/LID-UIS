@@ -2232,6 +2232,42 @@
   </div>
 </div>
 
+<!-- Microcalculadora — botón flotante global, visible en cualquier página -->
+<button id="calc-toggle-btn" class="calc-toggle-btn" onclick="calcToggle()" title="Calculadora">🧮</button>
+<div id="calc-panel" class="calc-panel" style="display:none;">
+  <div class="calc-header">
+    <span>Calculadora</span>
+    <button class="calc-close" onclick="calcToggle()" title="Cerrar">✕</button>
+  </div>
+  <div class="calc-display" id="calc-display">0</div>
+  <div class="calc-grid">
+    <button class="calc-btn calc-btn-fn" onclick="calcClear()">C</button>
+    <button class="calc-btn calc-btn-fn" onclick="calcSigno()">±</button>
+    <button class="calc-btn calc-btn-fn" onclick="calcPorcentaje()">%</button>
+    <button class="calc-btn calc-btn-op" onclick="calcOperador('÷')">÷</button>
+
+    <button class="calc-btn" onclick="calcDigito('7')">7</button>
+    <button class="calc-btn" onclick="calcDigito('8')">8</button>
+    <button class="calc-btn" onclick="calcDigito('9')">9</button>
+    <button class="calc-btn calc-btn-op" onclick="calcOperador('×')">×</button>
+
+    <button class="calc-btn" onclick="calcDigito('4')">4</button>
+    <button class="calc-btn" onclick="calcDigito('5')">5</button>
+    <button class="calc-btn" onclick="calcDigito('6')">6</button>
+    <button class="calc-btn calc-btn-op" onclick="calcOperador('-')">−</button>
+
+    <button class="calc-btn" onclick="calcDigito('1')">1</button>
+    <button class="calc-btn" onclick="calcDigito('2')">2</button>
+    <button class="calc-btn" onclick="calcDigito('3')">3</button>
+    <button class="calc-btn calc-btn-op" onclick="calcOperador('+')">+</button>
+
+    <button class="calc-btn calc-btn-fn" onclick="calcCuadrado()">x²</button>
+    <button class="calc-btn" onclick="calcDigito('0')">0</button>
+    <button class="calc-btn" onclick="calcDecimal()">.</button>
+    <button class="calc-btn calc-btn-igual" onclick="calcIgual()">=</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
