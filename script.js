@@ -116,6 +116,43 @@ function calcToggle() {
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 }
 
+// Posiciona el botón (y el panel) junto al número de página de la página
+// ACTUALMENTE visible — no requiere tocar el encabezado de cada página, se
+// recalcula en vivo con la posición real del elemento .page-num en pantalla.
+function calcPosicionarBoton() {
+  const btn = document.getElementById('calc-toggle-btn');
+  const panel = document.getElementById('calc-panel');
+  if (!btn) return;
+
+  const paginaEl = document.getElementById(`page-${paginaActual}`);
+  const pageNumEl = paginaEl ? paginaEl.querySelector('.page-num') : null;
+
+  if (!pageNumEl) {
+    // Sin número de página visible en esta página: posición por defecto discreta
+    btn.style.top = '14px';
+    btn.style.left = '';
+    btn.style.right = '14px';
+  } else {
+    const rect = pageNumEl.getBoundingClientRect();
+    const btnAncho = 30;
+    let left = rect.left - btnAncho - 8;
+    if (left < 4) left = rect.right + 8; // si no cabe a la izquierda, va a la derecha del número
+    btn.style.top   = `${Math.max(4, rect.top - 6)}px`;
+    btn.style.left  = `${left}px`;
+    btn.style.right = '';
+  }
+
+  if (panel) {
+    const btnRect = btn.getBoundingClientRect();
+    panel.style.top  = `${btnRect.bottom + 8}px`;
+    let panelLeft = btnRect.left - 190 + btnRect.width; // alinear el borde derecho del panel con el botón
+    if (panelLeft < 4) panelLeft = 4;
+    panel.style.left  = `${panelLeft}px`;
+    panel.style.right = '';
+  }
+}
+window.addEventListener('resize', () => calcPosicionarBoton());
+
 function calcActualizarDisplay() {
   const el = document.getElementById('calc-display');
   if (el) el.textContent = calcDisplayValor;
@@ -378,6 +415,7 @@ function irAPagina(n) {
 
   paginaActual = n;
   actualizarIndicadores();
+  calcPosicionarBoton();
 
   // ── Inicialización de tutores al llegar a cada página ──
 
@@ -2911,6 +2949,7 @@ function ejfRenderizarGrafico() {
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(ocultarLoading, 800);
+  setTimeout(calcPosicionarBoton, 100);
 
   const repDot = document.getElementById('rep-dot');
   if (repDot) repDot.className = 'rep-dot is-tabla';
