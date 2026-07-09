@@ -100,6 +100,115 @@ async function intentarAvanzarConGate(destino, estaCompleto, pagina, hito, mensa
   }
 }
 
+// ════════════════════════════════════════════════
+// MICROCALCULADORA — botón flotante global, para que el estudiante haga
+// cálculos rápidos sin salir del libro. Sin eval() sobre strings: la
+// aritmética se resuelve con un switch explícito.
+// ════════════════════════════════════════════════
+let calcDisplayValor    = '0';
+let calcOperandoGuardado = null;
+let calcOperadorPendiente = null;
+let calcEsperandoNuevo   = false;
+
+function calcToggle() {
+  const panel = document.getElementById('calc-panel');
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function calcActualizarDisplay() {
+  const el = document.getElementById('calc-display');
+  if (el) el.textContent = calcDisplayValor;
+}
+
+function calcDigito(d) {
+  if (calcEsperandoNuevo || calcDisplayValor === '0') {
+    calcDisplayValor = d;
+    calcEsperandoNuevo = false;
+  } else {
+    if (calcDisplayValor.replace('-','').replace('.','').length >= 12) return; // evitar overflow visual
+    calcDisplayValor += d;
+  }
+  calcActualizarDisplay();
+}
+
+function calcDecimal() {
+  if (calcEsperandoNuevo) { calcDisplayValor = '0.'; calcEsperandoNuevo = false; calcActualizarDisplay(); return; }
+  if (!calcDisplayValor.includes('.')) {
+    calcDisplayValor += '.';
+    calcActualizarDisplay();
+  }
+}
+
+function calcClear() {
+  calcDisplayValor = '0';
+  calcOperandoGuardado = null;
+  calcOperadorPendiente = null;
+  calcEsperandoNuevo = false;
+  calcActualizarDisplay();
+}
+
+function calcSigno() {
+  if (calcDisplayValor === '0') return;
+  calcDisplayValor = calcDisplayValor.startsWith('-') ? calcDisplayValor.slice(1) : '-' + calcDisplayValor;
+  calcActualizarDisplay();
+}
+
+function calcPorcentaje() {
+  calcDisplayValor = String(parseFloat(calcDisplayValor) / 100);
+  calcActualizarDisplay();
+}
+
+function calcCuadrado() {
+  const v = parseFloat(calcDisplayValor);
+  calcDisplayValor = calcFormatearResultado(v * v);
+  calcEsperandoNuevo = true;
+  calcActualizarDisplay();
+}
+
+function calcOperar(a, op, b) {
+  switch (op) {
+    case '+': return a + b;
+    case '-': return a - b;
+    case '×': return a * b;
+    case '÷': return b === 0 ? NaN : a / b;
+    default:  return b;
+  }
+}
+
+function calcFormatearResultado(n) {
+  if (isNaN(n)) return 'Error';
+  if (!isFinite(n)) return 'Error';
+  // Redondeo suave para evitar artefactos de coma flotante, sin perder precisión útil
+  const redondeado = Math.round(n * 1e10) / 1e10;
+  return String(redondeado);
+}
+
+function calcOperador(op) {
+  const actual = parseFloat(calcDisplayValor);
+  if (calcOperadorPendiente !== null && !calcEsperandoNuevo) {
+    const resultado = calcOperar(calcOperandoGuardado, calcOperadorPendiente, actual);
+    calcDisplayValor = calcFormatearResultado(resultado);
+    calcOperandoGuardado = parseFloat(calcDisplayValor);
+  } else {
+    calcOperandoGuardado = actual;
+  }
+  calcOperadorPendiente = op;
+  calcEsperandoNuevo = true;
+  calcActualizarDisplay();
+}
+
+function calcIgual() {
+  if (calcOperadorPendiente === null || calcOperandoGuardado === null) return;
+  const actual = parseFloat(calcDisplayValor);
+  const resultado = calcOperar(calcOperandoGuardado, calcOperadorPendiente, actual);
+  calcDisplayValor = calcFormatearResultado(resultado);
+  calcOperandoGuardado = null;
+  calcOperadorPendiente = null;
+  calcEsperandoNuevo = true;
+  calcActualizarDisplay();
+}
+
 // ── Estado global ──
 let graficoActual  = null;
 let vistaActual    = 'tabla';
