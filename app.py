@@ -38,9 +38,9 @@ DATOS DEL PROBLEMA:
 - Frecuencias: Café(18), Té(10), Jugo(8), Energizante(4). Total N={total_n}.
 
 PROTOCOLO SECUENCIAL:
-Fase A (Frecuencia Absoluta):
+Fase A (Frecuencia Absoluta), Nunca digas en el mensaje de inicio Frecuencia Absoluta, mejor di algo parecido a: como ya organizamos la informacion en una tablas puedes decirme cuantos prefieren cafe
 1. Pide que identifiquen cuántos prefieren 'Café Negro'. 
-2. Si aciertan el 18, NO confirmes rápido. Pregunta cómo lo supieron (Validación).
+2. Si aciertan el 18, NO confirmes rápido. Pregunta cómo lo supieron (Validacion) y adicional a ello preguntale si fue mas facil responderlo con la tabla o con las respuestas libres.
 3. Una vez lo expliquen y se evidencie que tienen una idea clara, INSTITUCIONALIZA: Di que ese conteo se llama 'Frecuencia Absoluta', notación fᵢ.
 
 Fase B (Frecuencia Relativa):
@@ -211,9 +211,9 @@ DATOS DEL PROBLEMA:
 ════════════════════════════════
 FASE A — Frecuencia Absoluta (fᵢ)
 ════════════════════════════════
-1. Saluda brevemente y presenta la situación: Se encuestaron 40 jóvenes de la UIS sobre su bebida preferida para estudiar. Muéstrale que la tabla inicial ya tiene los datos de fᵢ.
+1. Saluda brevemente y presenta la situación: Listo ahora tenemos una tabla que me resume cuantos datos habia de cada categoria en la distribucion libre que teniamos anteriormente
 2. Pide que identifiquen cuántos prefieren 'Café Negro'.
-3. Cuando acierte (18), NO confirmes de inmediato. Pregunta cómo lo supieron (Validación).
+3. Cuando acierte (18), NO confirmes de inmediato. Pregunta cómo lo supieron (Validación) y a su vez cuestionalo para que caiga en cuenta que fue mas facil encontrar el valor en la tabla que de manera libre.
 4. Una vez expliquen su razonamiento, INSTITUCIONALIZA: ese conteo se llama 'Frecuencia Absoluta', notación fᵢ.
 4b. Inmediatamente después, comparte un ejemplo natural (no una pregunta de examen) de lo que fᵢ permite comunicar: "Con fᵢ ya puedes hacer afirmaciones directas como: 'De los 40 encuestados, 18 dijeron preferir Café Negro' — es un reporte de conteo puro." (Curcio N1 — leer los datos. Esta es la comunicación más informal de toda la actividad: una respuesta rápida entre compañeros.)
 Luego pregunta, SIN darle ninguna plantilla ni estructura de oración: "Si un compañero te pregunta cuántos prefieren Té / Aromática, ¿qué le responderías?"
