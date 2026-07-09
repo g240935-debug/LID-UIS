@@ -4,7 +4,7 @@
    No modificar URL_BACKEND sin actualizar el servidor.
 
    MAPA DE PÁGINAS:
-   0  → Portada 
+   0  → Portada
    1  → Cap I · Presentación
    2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
    3  → Cap I · Actividad: Curcio N3/N4               (IA: freq_B_*)
@@ -2047,21 +2047,24 @@ const PROBLEMAS_B = [
     enunciado: 'Se encuestaron <strong>90 estudiantes</strong> de la UIS sobre su <strong>medio de transporte</strong> (Bus / Bicicleta / A pie) y su <strong>puntualidad</strong> (Siempre / A veces / Nunca).',
     frases: [
       '30 estudiantes usan Bus.',
+      'De los que usan Bus, 12 llegan A veces a tiempo.',
+      'En total, 20 estudiantes usan Bicicleta.',
       'De quienes usan Bicicleta, la mitad llega Siempre a tiempo.',
+      'De los que usan Bicicleta, 6 llegan A veces a tiempo.',
       '10 estudiantes van A pie y llegan A veces.',
-      'Solo 3 estudiantes van A pie y Nunca llegan a tiempo.',
-      'En total, 24 estudiantes llegan Siempre a tiempo.'
+      '15 estudiantes van A pie y Nunca llegan a tiempo.',
+      'En total, 35 estudiantes llegan Siempre a tiempo.'
     ],
     pregunta: '¿Qué medio de transporte se asocia con mejor puntualidad?',
     filas: ['Bus','Bicicleta','A pie'], columnas: ['Siempre','A veces','Nunca'],
-    solucion: [[10,14,6],[12,8,5],[2,10,3]], respuestaCorrecta: 'fila', N: 90,
+    solucion: [[10,12,8],[10,6,4],[15,10,15]], respuestaCorrecta: 'fila', N: 90,
     preguntas: [
       {
         id: 'pB0-q1', tipo: 'condicional',
         badge: '% por fila', color: 'var(--moss)',
         texto: 'Calcula el porcentaje de puntualidad "Siempre" dentro de cada medio de transporte. ¿Cuál tiene la proporción más alta? ¿Por qué no es suficiente comparar los conteos absolutos?',
-        claves: ['bicicleta','40%','48%','33%','proporciones','grupos de distinto tamaño','base distinta'],
-        retro: 'Bicicleta: 12/25 = 48%, Bus: 10/30 = 33%, A pie: 2/35 ≈ 6%. Los absolutos engañan si los grupos tienen distinto tamaño. Bicicleta tiene menor cantidad total pero mejor proporción de puntualidad.'
+        claves: ['bicicleta','50%','33%','mismo conteo','proporciones','grupos de distinto tamaño','base distinta'],
+        retro: 'Bicicleta: 10/20 = 50%, Bus: 10/30 ≈ 33.3%, A pie: 15/40 = 37.5%. Bus y Bicicleta tienen el MISMO conteo absoluto de estudiantes puntuales (10 y 10), pero Bicicleta representa una proporción mucho mayor de su propio grupo. Los absolutos engañan si los grupos tienen distinto tamaño.'
       },
       {
         id: 'pB0-q2', tipo: 'conjunta',
@@ -2083,35 +2086,38 @@ const PROBLEMAS_B = [
     enunciado: 'Se encuestaron <strong>60 estudiantes</strong> sobre su <strong>programa</strong> (Matemáticas / Física / Estadística) y el <strong>software estadístico</strong> que más usan (R / Python / SPSS).',
     frases: [
       '25 estudiantes son de Matemáticas.',
-      'El 40% de los estudiantes de Física usa R.',
-      '8 estudiantes de Estadística usan Python.',
       'Solo 2 estudiantes de Matemáticas usan SPSS.',
+      'En total, 20 estudiantes son de Física.',
+      'El 40% de los estudiantes de Física usa R.',
+      'De los de Física, 6 usan Python.',
+      '8 estudiantes de Estadística usan Python.',
+      'De los de Estadística, 5 usan SPSS.',
       'En total, 22 estudiantes usan Python.'
     ],
     pregunta: 'Dentro de cada programa, ¿cuál es el software más usado?',
     filas: ['Matemáticas','Física','Estadística'], columnas: ['R','Python','SPSS'],
-    solucion: [[12,11,2],[6,6,3],[4,8,8]], respuestaCorrecta: 'fila', N: 60,
+    solucion: [[15,8,2],[8,6,6],[2,8,5]], respuestaCorrecta: 'fila', N: 60,
     preguntas: [
       {
         id: 'pB1-q1', tipo: 'condicional',
         badge: '% por fila', color: 'var(--moss)',
         texto: 'Compara el perfil de software de Matemáticas versus Estadística usando % por fila. ¿En qué son más diferentes? ¿Qué podría explicar esa diferencia desde el contexto de cada disciplina?',
         claves: ['estadística usa más python','estadística spss','matemáticas prefiere r','disciplina','currículum','contexto','herramientas del área'],
-        retro: 'Matemáticas: R 48%, Python 44%, SPSS 8%. Estadística: R 20%, Python 40%, SPSS 40%. La diferencia en SPSS es enorme — Estadística lo usa más quizás porque su currículo lo incluye explícitamente. El contexto disciplinar explica el patrón.'
+        retro: 'Matemáticas: R 60%, Python 32%, SPSS 8%. Estadística: R 13.3%, Python 53.3%, SPSS 33.3%. La diferencia en Python y SPSS es notable — Estadística los usa mucho más, quizás porque su currículo los incluye explícitamente, mientras Matemáticas se apoya más en R.'
       },
       {
         id: 'pB1-q2', tipo: 'marginal',
         badge: 'Marginal', color: 'var(--navy)',
         texto: 'Python lo usan 22 de 60 estudiantes (37%). ¿Eso significa que es el software más popular entre los tres programas? Usa las frecuencias marginales de columna para justificar tu respuesta.',
-        claves: ['r tiene más','r es el más','marginal','total columna','37%','r 22','r tiene 22','no es el más popular'],
-        retro: 'Marginal R: 12+6+4 = 22, Python: 11+6+8 = 25, SPSS: 2+3+8 = 13. Python (25) supera a R (22) en el total, pero la diferencia es mínima. La marginal de columna revela el uso global, independiente del programa.'
+        claves: ['r tiene más','r es el más','marginal','total columna','37%','r 25','r tiene 25','no es el más popular'],
+        retro: 'Marginal R: 15+8+2 = 25, Python: 8+6+8 = 22, SPSS: 2+6+5 = 13. R (25) supera a Python (22) en el total — Python parece "popular" por mencionarse en el enunciado, pero en realidad R lidera marginalmente. La marginal de columna revela el uso global, independiente del programa.'
       },
       {
         id: 'pB1-q3', tipo: 'N3',
         badge: 'N3 · Predicción', color: 'var(--gold)',
         texto: 'Si la UIS abriera un nuevo programa de Ciencia de Datos, ¿qué distribución de software esperarías? Justifica tu predicción con base en los patrones que observas en la tabla.',
         claves: ['python','datos','tendencia','similar a estadística','predominaría python','predicción','patrón','basado en'],
-        retro: 'Es razonable predecir un perfil similar a Estadística o con mayor peso en Python, dado que la Ciencia de Datos tiene fuerte orientación a programación. Esta es una lectura N3: usar los datos para extrapolar más allá de lo observado.'
+        retro: 'Es razonable predecir un perfil similar a Estadística (53.3% Python), dado que la Ciencia de Datos tiene fuerte orientación a programación. Esta es una lectura N3: usar los datos para extrapolar más allá de lo observado.'
       }
     ]
   },
@@ -2122,6 +2128,8 @@ const PROBLEMAS_B = [
       '20 estudiantes tienen nivel Avanzado.',
       'El 60% de los de nivel Avanzado participó en intercambio.',
       'Solo 3 estudiantes de nivel Básico participaron.',
+      'En total, 25 estudiantes tienen nivel Intermedio.',
+      '7 estudiantes de nivel Intermedio participaron en intercambio.',
       'En total, 22 estudiantes participaron en intercambio.'
     ],
     pregunta: 'De quienes participaron en intercambio, ¿de qué nivel son principalmente?',
