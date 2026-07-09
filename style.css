@@ -2910,3 +2910,75 @@ html, body {
   background: transparent; color: var(--slate);
   border: 1px solid var(--rule);
 }
+
+/* ── Microcalculadora — botón flotante global ── */
+.calc-toggle-btn {
+  position: fixed; top: 14px; right: 14px; z-index: 500;
+  width: 42px; height: 42px;
+  border-radius: 50%; border: 1px solid var(--rule);
+  background: white; font-size: 1.15rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,.15);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform .15s ease;
+}
+.calc-toggle-btn:hover { transform: scale(1.06); }
+
+.calc-panel {
+  position: fixed; top: 62px; right: 14px; z-index: 500;
+  width: 220px;
+  background: white; border-radius: 8px; border: 1px solid var(--rule);
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  padding: 10px;
+  animation: calcPanelIn .18s ease-out;
+}
+@keyframes calcPanelIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.calc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: .74rem; font-weight: 700; color: var(--navy);
+  text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: 8px; padding: 0 2px;
+}
+.calc-close {
+  background: none; border: none; cursor: pointer;
+  font-size: .78rem; color: var(--slate); padding: 2px 4px;
+}
+.calc-close:hover { color: var(--ink); }
+.calc-display {
+  background: var(--cream); border-radius: 5px;
+  padding: 12px 10px; margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.3rem; text-align: right;
+  color: var(--ink); overflow-x: auto; white-space: nowrap;
+}
+.calc-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.calc-btn {
+  border: 1px solid var(--rule); border-radius: 5px;
+  background: #fafafa; color: var(--ink);
+  font-size: .88rem; font-family: 'JetBrains Mono', monospace;
+  padding: 9px 0; cursor: pointer;
+  transition: background .12s ease;
+}
+.calc-btn:hover { background: #eee; }
+.calc-btn-op {
+  background: var(--navy); color: white; border-color: var(--navy);
+}
+.calc-btn-op:hover { opacity: .88; background: var(--navy); }
+.calc-btn-fn {
+  background: #eef2f6; color: var(--slate);
+}
+.calc-btn-igual {
+  background: var(--gold); color: var(--ink); border-color: var(--gold);
+  font-weight: 700;
+}
+.calc-btn-igual:hover { opacity: .88; background: var(--gold); }
+
+@media (max-width: 720px) {
+  .calc-panel { right: 8px; width: 200px; }
+  .calc-toggle-btn { right: 8px; }
+}
