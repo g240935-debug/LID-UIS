@@ -2913,23 +2913,24 @@ html, body {
 
 /* ── Microcalculadora — botón flotante global ── */
 .calc-toggle-btn {
-  position: fixed; top: 14px; right: 14px; z-index: 500;
-  width: 42px; height: 42px;
+  position: fixed; z-index: 500;
+  width: 30px; height: 30px;
   border-radius: 50%; border: 1px solid var(--rule);
-  background: white; font-size: 1.15rem;
+  background: white; font-size: .95rem;
   box-shadow: 0 3px 10px rgba(0,0,0,.15);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: transform .15s ease;
+  transition: transform .15s ease, top .25s ease, left .25s ease;
 }
-.calc-toggle-btn:hover { transform: scale(1.06); }
+.calc-toggle-btn:hover { transform: scale(1.08); }
 
 .calc-panel {
-  position: fixed; top: 62px; right: 14px; z-index: 500;
+  position: fixed; z-index: 500;
   width: 220px;
   background: white; border-radius: 8px; border: 1px solid var(--rule);
   box-shadow: 0 10px 30px rgba(0,0,0,.2);
   padding: 10px;
   animation: calcPanelIn .18s ease-out;
+  transition: top .25s ease, left .25s ease;
 }
 @keyframes calcPanelIn {
   from { opacity: 0; transform: translateY(-6px); }
@@ -2979,6 +2980,5 @@ html, body {
 .calc-btn-igual:hover { opacity: .88; background: var(--gold); }
 
 @media (max-width: 720px) {
-  .calc-panel { right: 8px; width: 200px; }
-  .calc-toggle-btn { right: 8px; }
+  .calc-panel { width: 200px; }
 }
