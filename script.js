@@ -1301,6 +1301,36 @@ function ocultarLoading() {
   document.getElementById('loadingOverlay')?.classList.add('hidden');
 }
 
+// Oculta la pantalla de carga solo cuando el contenido ya está realmente
+// estable (fuentes web cargadas) — evita el bug de "layout roto hasta que
+// abro F12", causado por revelar la página antes de que termine el cambio
+// de fuente (font-display:swap) y quede un repintado a medias.
+function ocultarLoadingCuandoListo() {
+  const MINIMO_MS = 400;   // evita parpadeo si todo carga muy rápido
+  const MAXIMO_MS = 3000;  // red de seguridad: nunca deja la pantalla pegada
+  const inicio = Date.now();
+
+  const esconder = () => {
+    const transcurrido = Date.now() - inicio;
+    setTimeout(ocultarLoading, Math.max(0, MINIMO_MS - transcurrido));
+  };
+
+  const timeoutSeguridad = setTimeout(ocultarLoading, MAXIMO_MS);
+
+  const listo = () => {
+    clearTimeout(timeoutSeguridad);
+    // Doble requestAnimationFrame: garantiza que el navegador ya completó
+    // un ciclo de pintado con el layout final antes de revelar la página.
+    requestAnimationFrame(() => requestAnimationFrame(esconder));
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(listo).catch(listo);
+  } else {
+    listo();
+  }
+}
+
 /* ════════════════════════════════
    RECUPERAR HISTORIAL
 ════════════════════════════════ */
@@ -2956,7 +2986,7 @@ function ejfRenderizarGrafico() {
    INIT — DOMContentLoaded
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(ocultarLoading, 800);
+  ocultarLoadingCuandoListo();
   setTimeout(calcPosicionarBoton, 100);
 
   const repDot = document.getElementById('rep-dot');
