@@ -6,8 +6,8 @@
    MAPA DE PÁGINAS:
    0  → Portada
    1  → Cap I · Presentación
-   2  → Cap I · Actividad: frec. absoluta + relativa   (IA: freq_A_*)
-   3  → Cap I · Actividad: Curcio N3/N4               (IA: freq_B_*)
+   2  → Cap I · Actividad: frec. absoluta + relativa  (IA: freq_A_*)
+   3  → Cap I · Actividad: Curcio N3/N4              (IA: freq_B_*)
    4  → Cap I · Actividad: frec. acumuladas           (IA: freq_C_* + freq_D_*)
    5  → Cap I · Síntesis
    6  → Cap II · Presentación
