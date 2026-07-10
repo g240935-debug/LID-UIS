@@ -416,6 +416,7 @@ function irAPagina(n) {
   paginaActual = n;
   actualizarIndicadores();
   calcPosicionarBoton();
+  guardarEstadoLocal('ultima_pagina', n);
 
   // ── Inicialización de tutores al llegar a cada página ──
 
@@ -2064,6 +2065,7 @@ function verificarProblemaA() {
 function cambiarProbA(idx) {
   if (idx < 0 || idx >= PROBLEMAS_A.length) return;
   probAActual = idx;
+  guardarEstadoLocal('sub_indice_pA', idx);
   document.querySelectorAll('#probA-tabs .p5c-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   tipoEscogidoA = null;
   renderizarProbA();
@@ -2363,6 +2365,7 @@ function verificarProblemaB() {
 function cambiarProbB(idx) {
   if (idx < 0 || idx >= PROBLEMAS_B.length) return;
   probBActual = idx;
+  guardarEstadoLocal('sub_indice_pB', idx);
   document.querySelectorAll('#probB-tabs .p5c-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   tipoEscogidoB = null;
   renderizarProbB();
@@ -3036,6 +3039,27 @@ function ejfRenderizarGrafico() {
    INIT — DOMContentLoaded
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  // Restaurar en qué problema/situación se había quedado el estudiante en cada
+  // página con pestañas — ANTES de saltar a la última página, para que el
+  // "hook" de esa página (p.ej. p5cCargarProblema) use el índice correcto.
+  const subA  = leerEstadoLocal('sub_indice_pA');
+  const subB  = leerEstadoLocal('sub_indice_pB');
+  const subP5c = leerEstadoLocal('sub_indice_p5c');
+  const subP5d = leerEstadoLocal('sub_indice_p5d');
+  if (subA  !== null && subA  !== undefined) probAActual = subA;
+  if (subB  !== null && subB  !== undefined) probBActual = subB;
+  if (subP5c !== null && subP5c !== undefined) p5cProblemaActual = subP5c;
+  if (subP5d !== null && subP5d !== undefined) p5dSituacionActual = subP5d;
+
+  // Restaurar la última página visitada ANTES de ocultar la pantalla de carga:
+  // la pantalla de carga es opaca y cubre toda la vista, así que la animación
+  // de irAPagina() queda oculta — y de paso se disparan los mismos "hooks" de
+  // inicialización de cada página (tablas, tutor, etc.) que ya existían.
+  const ultimaPagina = leerEstadoLocal('ultima_pagina');
+  if (ultimaPagina !== null && ultimaPagina !== undefined && document.getElementById(`page-${ultimaPagina}`)) {
+    irAPagina(ultimaPagina);
+  }
+
   ocultarLoadingCuandoListo();
   setTimeout(calcPosicionarBoton, 100);
 
@@ -3189,6 +3213,7 @@ function toggleFormatoP5c(col) {
 
 function p5cCargarProblema(idx) {
   p5cProblemaActual = idx;
+  guardarEstadoLocal('sub_indice_p5c', idx);
   p5cRestaurarEstadoLocalSiExiste(idx);
   // Actualizar tabs
   document.querySelectorAll('#p5c-tabs .p5c-tab').forEach((t,i) => {
@@ -3514,6 +3539,7 @@ let p5dOrdenActual = []; // índices de categorías en el orden actual del estud
 
 function p5dCargarSituacion(idx) {
   p5dSituacionActual = idx;
+  guardarEstadoLocal('sub_indice_p5d', idx);
   document.querySelectorAll('#p5d-tabs .p5c-tab').forEach((t,i) => {
     t.classList.toggle('active', i === idx);
   });
@@ -3682,7 +3708,15 @@ function p5dDragEnd(e) {
 }
 
 function p5dActualizarCalculos() {
-  // Actualizar colores de celdas hi, Fi, Hi en tiempo real
+  // El coloreo en tiempo real se retiró intencionalmente: ahora el color de las
+  // celdas SOLO aparece al pulsar "Verificar tabla completa" (ver
+  // p5dColorearCeldas). Esta función se conserva vacía porque sigue estando
+  // referenciada en los oninput de las celdas junto con p5dGuardarEstado().
+}
+
+// Colorea las celdas según si están correctas — se llama ÚNICAMENTE desde
+// p5dVerificarTabla(), nunca mientras el estudiante escribe.
+function p5dColorearCeldas() {
   const sit = P5D_SITUACIONES[p5dSituacionActual];
   const hiCells = document.querySelectorAll('.p5d-hi-cell');
   const FiCells = document.querySelectorAll('.p5d-Fi-cell');
@@ -3743,7 +3777,7 @@ function p5dVerificarTabla() {
     fb.textContent = `✅ ¡Tabla correcta! Las 4 frecuencias están bien calculadas en el orden que elegiste. Ahora responde las preguntas.`;
   }
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  p5dActualizarCalculos();
+  p5dColorearCeldas();
 }
 
 // NOTA: la verificación automática de respuestas por palabras clave fue retirada
