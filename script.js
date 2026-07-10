@@ -2709,7 +2709,27 @@ function inicializarEjemplosDinamicos() {
     const el = document.getElementById(`ejf-preg-${i+1}`);
     if (el) el.innerHTML = p.texto;
   });
+  ejfRestaurarRespuestas();
   ejfActualizarVista();
+}
+
+// Persistencia en localStorage de las respuestas de reflexión — esta página no
+// tiene tutor (no pasa por cargarHistorial), así que sin esto se perdían por
+// completo al recargar. Se guardan por tipo de variable, ya que cada una tiene
+// sus propias preguntas.
+function ejfGuardarRespuestas() {
+  guardarEstadoLocal(`ejf_${ejfVariableActual}`, {
+    resp1: document.getElementById('ejf-resp-1')?.value || '',
+    resp2: document.getElementById('ejf-resp-2')?.value || '',
+  });
+}
+function ejfRestaurarRespuestas() {
+  const guardado = leerEstadoLocal(`ejf_${ejfVariableActual}`);
+  if (!guardado) return;
+  const r1 = document.getElementById('ejf-resp-1');
+  const r2 = document.getElementById('ejf-resp-2');
+  if (r1 && guardado.resp1) r1.value = guardado.resp1;
+  if (r2 && guardado.resp2) r2.value = guardado.resp2;
 }
 
 function ejfCambiarVariable(variable) {
@@ -2736,6 +2756,9 @@ function ejfCambiarVariable(variable) {
     const fb = document.getElementById(`ejf-verif-fb-${i+1}`);
     if (fb) { fb.style.display = 'none'; fb.innerHTML = ''; }
   });
+  // Tras limpiar visualmente, restaurar lo que el estudiante ya había escrito
+  // para ESTE tipo de variable en una visita anterior (si existe).
+  ejfRestaurarRespuestas();
 
   ejfActualizarVista();
 }
@@ -3166,6 +3189,7 @@ function toggleFormatoP5c(col) {
 
 function p5cCargarProblema(idx) {
   p5cProblemaActual = idx;
+  p5cRestaurarEstadoLocalSiExiste(idx);
   // Actualizar tabs
   document.querySelectorAll('#p5c-tabs .p5c-tab').forEach((t,i) => {
     t.classList.toggle('active', i === idx);
@@ -3265,6 +3289,7 @@ function p5cActualizarProgreso() {
   });
   if (!p5cEstadoPorProblema[p5cProblemaActual]) p5cEstadoPorProblema[p5cProblemaActual] = {};
   p5cEstadoPorProblema[p5cProblemaActual].valores = estado;
+  p5cGuardarEstadoLocal();
 
   const total = inputs.length;
   const bar   = document.getElementById('p5c-progress-bar');
@@ -3318,6 +3343,20 @@ function p5cVerificar() {
   if (!p5cEstadoPorProblema[p5cProblemaActual]) p5cEstadoPorProblema[p5cProblemaActual] = {};
   p5cEstadoPorProblema[p5cProblemaActual].valores  = estado;
   p5cEstadoPorProblema[p5cProblemaActual].feedback = { clase: claseFb, texto: textoFb };
+  p5cGuardarEstadoLocal();
+}
+
+// Persistencia en localStorage — misma técnica que ya usan cont_A/cont_B/freq_5d,
+// así "Problemas" (que no tiene tutor y por tanto no pasa por cargarHistorial)
+// también sobrevive a un refresco de página sin perder lo que el estudiante escribió.
+function p5cGuardarEstadoLocal() {
+  const estado = p5cEstadoPorProblema[p5cProblemaActual];
+  if (estado) guardarEstadoLocal(`p5c_${p5cProblemaActual}`, estado);
+}
+function p5cRestaurarEstadoLocalSiExiste(idx) {
+  if (p5cEstadoPorProblema[idx]) return; // ya hay algo en memoria de esta misma sesión, no pisarlo
+  const guardado = leerEstadoLocal(`p5c_${idx}`);
+  if (guardado) p5cEstadoPorProblema[idx] = guardado;
 }
 
 function p5cReset() {
@@ -3328,6 +3367,7 @@ function p5cReset() {
   const fb = document.getElementById('p5c-feedback');
   fb.style.display = 'none';
   delete p5cEstadoPorProblema[p5cProblemaActual];
+  guardarEstadoLocal(`p5c_${p5cProblemaActual}`, null); // limpiar también lo persistido, no solo la memoria
   p5cActualizarProgreso();
 }
 
@@ -4905,23 +4945,59 @@ function chi3P24Render(){
   // Etapa 2: Eᵢⱼ inputs
   h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 2 — Calcula Eᵢⱼ = (fᵢ·×f·ⱼ)/N</div><table class="chi3-tbl"><thead><tr><th>↓/→</th>${CHI3_P24_COLS.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
   CHI3_P24_FILAS.forEach((f,i)=>{
-    h+=`<tr><td>${f}</td>${CHI3_P24_COLS.map((_,j)=>`<td><input type="number" step="0.01" class="p5c-cell chi3-p24-e-cell" id="chi3-p24-e-${i}-${j}" data-correct="${CHI3_P24_E[i][j].toFixed(2)}" placeholder="?" style="width:70px;"></td>`).join('')}</tr>`;
+    h+=`<tr><td>${f}</td>${CHI3_P24_COLS.map((_,j)=>`<td><input type="number" step="0.01" class="p5c-cell chi3-p24-e-cell" id="chi3-p24-e-${i}-${j}" data-correct="${CHI3_P24_E[i][j].toFixed(2)}" placeholder="?" style="width:70px;" oninput="chi3P24GuardarEstado()"></td>`).join('')}</tr>`;
   });
   h+=`</tbody></table><button class="btn-verificar" style="background:var(--moss);margin-top:6px;" onclick="chi3P24VerifE()">✅ Verificar Eᵢⱼ</button><div id="chi3-p24-fb-e" class="prob-feedback" style="display:none;"></div></div>`;
   // Etapa 3: chi2 inputs
   h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 3 — Calcula (Oᵢⱼ−Eᵢⱼ)²/Eᵢⱼ y χ²</div><table class="chi3-tbl"><thead><tr><th>Celda</th><th>Contrib.</th></tr></thead><tbody>`;
   CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
     const corr=Math.pow(CHI3_P24_O[i][j]-CHI3_P24_E[i][j],2)/CHI3_P24_E[i][j];
-    h+=`<tr><td>${f}/${c}</td><td><input type="number" step="0.0001" class="p5c-cell chi3-p24-contrib-cell" id="chi3-p24-ct-${i}-${j}" data-correct="${corr.toFixed(4)}" placeholder="?" style="width:100px;"></td></tr>`;
+    h+=`<tr><td>${f}/${c}</td><td><input type="number" step="0.0001" class="p5c-cell chi3-p24-contrib-cell" id="chi3-p24-ct-${i}-${j}" data-correct="${corr.toFixed(4)}" placeholder="?" style="width:100px;" oninput="chi3P24GuardarEstado()"></td></tr>`;
   }));
-  h+=`<tr class="p5c-total-row"><td>χ² total</td><td><input type="number" step="0.0001" class="p5c-cell" id="chi3-p24-chi2-total" data-correct="${CHI3_P24_CHI2.toFixed(4)}" placeholder="suma →" style="width:110px;"></td></tr>`;
+  h+=`<tr class="p5c-total-row"><td>χ² total</td><td><input type="number" step="0.0001" class="p5c-cell" id="chi3-p24-chi2-total" data-correct="${CHI3_P24_CHI2.toFixed(4)}" placeholder="suma →" style="width:110px;" oninput="chi3P24GuardarEstado()"></td></tr>`;
   h+=`</tbody></table><button class="btn-verificar" style="background:var(--moss);margin-top:6px;" onclick="chi3P24VerifChi()">✅ Verificar χ²</button><div id="chi3-p24-fb-chi" class="prob-feedback" style="display:none;"></div></div>`;
   // Etapa 4: conclusión
   h+=`<div class="chi3-p24-etapa"><div class="chi3-etapa-titulo">Etapa 4 — Conclusión (gl=${CHI3_P24_GL}, α=0.05)</div>
     <p style="font-size:.8rem;">Valor crítico para gl=${CHI3_P24_GL}: <strong>9.488</strong></p>
-    <textarea class="p5d-resp-input" id="chi3-p24-concl" rows="3" placeholder="¿Se rechaza H₀? Redacta la conclusión estadística y en lenguaje cotidiano…"></textarea>
+    <textarea class="p5d-resp-input" id="chi3-p24-concl" rows="3" placeholder="¿Se rechaza H₀? Redacta la conclusión estadística y en lenguaje cotidiano…" oninput="chi3P24GuardarEstado()"></textarea>
   </div>`;
   el.innerHTML=h;
+  chi3P24RestaurarEstado();
+}
+
+// Persistencia en localStorage de TODA la página 24 (celdas Eᵢⱼ, contribuciones,
+// χ² total, conclusión y las 2 preguntas N4). Es la página final del libro y no
+// tenía ninguna red de seguridad — se evalúa por código, no por chat, así que
+// sin esto se perdía todo el trabajo del estudiante al recargar.
+function chi3P24GuardarEstado() {
+  const estado = { e: {}, contrib: {} };
+  CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
+    estado.e[`${i}-${j}`]       = document.getElementById(`chi3-p24-e-${i}-${j}`)?.value || '';
+    estado.contrib[`${i}-${j}`] = document.getElementById(`chi3-p24-ct-${i}-${j}`)?.value || '';
+  }));
+  estado.chi2total = document.getElementById('chi3-p24-chi2-total')?.value || '';
+  estado.concl     = document.getElementById('chi3-p24-concl')?.value || '';
+  estado.q1        = document.getElementById('chi3-p24-q1')?.value || '';
+  estado.q2        = document.getElementById('chi3-p24-q2')?.value || '';
+  guardarEstadoLocal('chi3_p24', estado);
+}
+function chi3P24RestaurarEstado() {
+  const estado = leerEstadoLocal('chi3_p24');
+  if (!estado) return;
+  CHI3_P24_FILAS.forEach((f,i)=>CHI3_P24_COLS.forEach((c,j)=>{
+    const eVal = estado.e?.[`${i}-${j}`];
+    if (eVal) { const el = document.getElementById(`chi3-p24-e-${i}-${j}`); if (el) el.value = eVal; }
+    const cVal = estado.contrib?.[`${i}-${j}`];
+    if (cVal) { const el = document.getElementById(`chi3-p24-ct-${i}-${j}`); if (el) el.value = cVal; }
+  }));
+  const chi2El = document.getElementById('chi3-p24-chi2-total');
+  if (chi2El && estado.chi2total) chi2El.value = estado.chi2total;
+  const conclEl = document.getElementById('chi3-p24-concl');
+  if (conclEl && estado.concl) conclEl.value = estado.concl;
+  const q1El = document.getElementById('chi3-p24-q1');
+  if (q1El && estado.q1) q1El.value = estado.q1;
+  const q2El = document.getElementById('chi3-p24-q2');
+  if (q2El && estado.q2) q2El.value = estado.q2;
 }
 
 function chi3P24VerifE(){
