@@ -104,7 +104,6 @@ html, body {
   transition: opacity .4s cubic-bezier(.4,0,.2,1), transform .4s cubic-bezier(.4,0,.2,1);
   pointer-events: none;
   overflow-y: auto;
-  will-change: opacity, transform; /* evita repintados "atascados" hasta forzar reflow */
 }
 .page.active { opacity: 1; transform: translateX(0); pointer-events: all; }
 .page.exit-left { opacity: 0; transform: translateX(-48px); }
@@ -2983,3 +2982,22 @@ html, body {
 @media (max-width: 720px) {
   .calc-panel { width: 200px; }
 }
+
+/* ── Botón de alternancia decimal/porcentaje en columnas fᵣ/Fᵣ ── */
+.toggle-fmt-btn {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  margin-left: 4px;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 3px;
+  background: rgba(255,255,255,.12);
+  color: inherit;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background .12s ease;
+}
+.toggle-fmt-btn:hover { background: rgba(255,255,255,.25); }
+.toggle-fmt-btn.activo { background: var(--gold); color: var(--ink); border-color: var(--gold); }
