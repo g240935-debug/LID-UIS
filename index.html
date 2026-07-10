@@ -15,7 +15,7 @@
 
 <div class="book-shell">
 
-  <!-- Lomo del libro-->
+  <!--Lomo del libro -->
   <div class="book-spine">
     <span class="spine-text">LID · Estadística Descriptiva · UIS · 2026</span>
   </div>
@@ -393,7 +393,7 @@
             <span class="ejf-reflexion-num">1</span>
             <div class="ejf-reflexion-body">
               <p id="ejf-preg-1"></p>
-              <textarea class="p5d-resp-input" id="ejf-resp-1" rows="2" placeholder="Escribe tu respuesta…"></textarea>
+              <textarea class="p5d-resp-input" id="ejf-resp-1" rows="2" oninput="ejfGuardarRespuestas()" placeholder="Escribe tu respuesta…"></textarea>
               <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(1)">⚖️ Comparar</button>
               <div class="ejf-verif-fb" id="ejf-verif-fb-1" style="display:none;"></div>
             </div>
@@ -402,7 +402,7 @@
             <span class="ejf-reflexion-num">2</span>
             <div class="ejf-reflexion-body">
               <p id="ejf-preg-2"></p>
-              <textarea class="p5d-resp-input" id="ejf-resp-2" rows="2" placeholder="Escribe tu respuesta…"></textarea>
+              <textarea class="p5d-resp-input" id="ejf-resp-2" rows="2" oninput="ejfGuardarRespuestas()" placeholder="Escribe tu respuesta…"></textarea>
               <button class="btn-verificar ejf-verif-btn" onclick="ejfVerificarPregunta(2)">⚖️ Comparar</button>
               <div class="ejf-verif-fb" id="ejf-verif-fb-2" style="display:none;"></div>
             </div>
@@ -1896,12 +1896,12 @@
           <div class="chi3-preg-card" style="margin-top:12px;">
             <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Causalidad</p>
             <p class="chi3-preg-text">Si la prueba resulta significativa, ¿podría afirmarse que la falta de internet <em>causa</em> bajo rendimiento? ¿Qué variable oculta podría explicar la asociación?</p>
-            <textarea class="p5d-resp-input" id="chi3-p24-q1" rows="3" placeholder="Tu análisis…"></textarea>
+            <textarea class="p5d-resp-input" id="chi3-p24-q1" rows="3" placeholder="Tu análisis…" oninput="chi3P24GuardarEstado()"></textarea>
           </div>
           <div class="chi3-preg-card">
             <p class="chi3-preg-num" style="color:var(--gold);">Pregunta N4 · Implicaciones</p>
             <p class="chi3-preg-text">Si fueras asesor de política educativa municipal, ¿qué acciones tomarías con base en estos resultados? ¿Qué información adicional pedirías antes de actuar?</p>
-            <textarea class="p5d-resp-input" id="chi3-p24-q2" rows="3" placeholder="Tu análisis…"></textarea>
+            <textarea class="p5d-resp-input" id="chi3-p24-q2" rows="3" placeholder="Tu análisis…" oninput="chi3P24GuardarEstado()"></textarea>
           </div>
           <button class="btn-verificar" style="background:var(--navy);margin-top:8px;" onclick="chi3P24EnviarAlTutor()">💬 Enviar todo al tutor</button>
           <div class="tutor-panel p5d-tutor-panel" id="chi3-p24-tutor" style="display:none;margin-top:12px;">
