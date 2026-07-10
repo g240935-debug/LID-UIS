@@ -442,15 +442,11 @@ function irAPagina(n) {
     setTimeout(() => p5dCargarSituacion(p5dSituacionActual), 300);
   }
 
-  // Cap II — Presentación (pág 6): exploración de datos libres antes del contenido formal
-  if (n === 6) {
-    setTimeout(p6RenderLibresGrid, 200);
-  }
-
   // Cap II — Tablas de contingencia
-  if (n === 7 && !chatCap2Iniciado) {
-    chatCap2Iniciado = true;
-    setTimeout(inicializarChatCap2, 400);
+  // Se difiere el arranque del tutor hasta que el estudiante complete la
+  // exploración inicial de datos libres (ver p7PrepararPagina / p7ExploracionContinuar2).
+  if (n === 7) {
+    setTimeout(p7PrepararPagina, 200);
   }
 
   // Cap II — Formulación (pág 12): re-renderizar tabla al entrar
@@ -5710,30 +5706,28 @@ function p3RenderLibresGrid() {
 }
 
 /* ════════════════════════════════════════════════
-   PÁGINA 6 — EXPLORACIÓN: por qué se necesita una tabla de contingencia
-   Situación libre (sexo × actividad extracurricular, N=40) antes de la
-   presentación formal. Mismo patrón genético que la página 3: datos crudos,
-   preguntas difíciles de responder así, reflexión, y luego la revelación.
+   PÁGINA 7 (cap2) — EXPLORACIÓN: por qué se necesita una tabla de contingencia
+   Situación libre (sexo × actividad extracurricular, N=40) antes de que el
+   tutor arranque la construcción guiada. Mismo patrón genético que la página 3.
 ════════════════════════════════════════════════ */
-let p6ExploracionCompleta = false;
 
 // Secuencia fija (no aleatoria en cada carga), respetando los conteos reales:
 // Hombres: Fútbol=10, Danza=2, Ajedrez=6, Música=2 (total 20)
 // Mujeres: Fútbol=3, Danza=9, Ajedrez=2, Música=6 (total 20)
-const P6_DATOS_LIBRES = [
+const P7_DATOS_LIBRES = [
   ['Hombre — Fútbol','Hombre — Fútbol','Hombre — Danza','Mujer — Música','Mujer — Danza','Mujer — Danza','Mujer — Danza','Hombre — Danza','Hombre — Fútbol','Mujer — Ajedrez'],
   ['Mujer — Fútbol','Mujer — Danza','Mujer — Danza','Hombre — Música','Hombre — Ajedrez','Mujer — Música','Mujer — Música','Mujer — Danza','Hombre — Ajedrez','Mujer — Fútbol'],
   ['Mujer — Fútbol','Mujer — Danza','Mujer — Música','Mujer — Danza','Hombre — Música','Hombre — Ajedrez','Mujer — Música','Mujer — Ajedrez','Hombre — Fútbol','Hombre — Fútbol'],
   ['Mujer — Música','Mujer — Danza','Hombre — Fútbol','Hombre — Fútbol','Hombre — Fútbol','Hombre — Ajedrez','Hombre — Ajedrez','Hombre — Ajedrez','Hombre — Fútbol','Hombre — Fútbol'],
 ];
 
-function p6RenderLibresGrid() {
-  const el = document.getElementById('p6-libres-grid');
+function p7RenderLibresGrid() {
+  const el = document.getElementById('p7-libres-grid');
   if (!el || el.dataset.init) return;
   el.dataset.init = '1';
   let html = '';
   let n = 1;
-  P6_DATOS_LIBRES.forEach(col => {
+  P7_DATOS_LIBRES.forEach(col => {
     html += '<div class="p3-libres-col">';
     col.forEach(val => {
       html += `<div class="p3-libres-item"><span class="p3-libres-num">${n}</span><span class="p3-libres-val">${val}</span></div>`;
@@ -5744,32 +5738,51 @@ function p6RenderLibresGrid() {
   el.innerHTML = html;
 }
 
-// Paso 1 → 2: tras responder la reflexión, revela el comentario de transición
-// que introduce la tabla de contingencia como solución.
-function p6ExploracionContinuar() {
-  const resp = document.getElementById('p6-exp-respuesta');
+// Prepara la página al entrar: si el estudiante ya inició el chat con el tutor
+// en una visita previa (chatCap2Iniciado === true), va directo a la actividad.
+// Si no, muestra primero la exploración de datos libres.
+function p7PrepararPagina() {
+  p7RenderLibresGrid();
+  const exploracion = document.getElementById('p7-exploracion');
+  const actividad    = document.getElementById('p7-activity-wrap');
+  if (chatCap2Iniciado) {
+    if (exploracion) exploracion.style.display = 'none';
+    if (actividad)   actividad.style.display = 'grid';
+  } else {
+    if (exploracion) exploracion.style.display = 'block';
+    if (actividad)   actividad.style.display = 'none';
+  }
+}
+
+// Paso 1 → 2: el estudiante debe escribir su reflexión antes de ver el comentario de transición
+function p7ExploracionContinuar1() {
+  const resp = document.getElementById('p7-exp-respuesta');
   if (!resp || !resp.value.trim()) {
     alert('Escribe tu reflexión antes de continuar — no hay respuesta correcta o incorrecta, es tu primera impresión sobre las dificultades de esta lista.');
     return;
   }
-  const btn = document.getElementById('p6-exp-btn1');
-  if (btn) { btn.style.display = 'none'; }
-  const comentario = document.getElementById('p6-exp-comentario');
+  const btn1 = document.getElementById('p7-exp-btn1');
+  if (btn1) { btn1.style.display = 'none'; }
+  const comentario = document.getElementById('p7-exp-comentario');
   if (comentario) {
     comentario.style.display = 'block';
     comentario.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }
 
-// Paso 2 → revela la presentación formal (antes oculta) y marca la exploración
-// como completa para el Soft Gate del botón "Situación →".
-function p6MostrarPresentacion() {
-  p6ExploracionCompleta = true;
-  const formal = document.getElementById('p6-presentacion-formal');
-  if (formal) {
-    formal.style.display = 'block';
-    formal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// Paso 2: oculta la exploración, revela la actividad y — solo la primera vez —
+// arranca el chat con el tutor (antes esto ocurría de inmediato al entrar a la
+// página; ahora se difiere hasta que el estudiante complete la exploración).
+function p7ExploracionContinuar2() {
+  const exploracion = document.getElementById('p7-exploracion');
+  const actividad    = document.getElementById('p7-activity-wrap');
+  if (exploracion) exploracion.style.display = 'none';
+  if (actividad)   actividad.style.display = 'grid';
+  if (!chatCap2Iniciado) {
+    chatCap2Iniciado = true;
+    setTimeout(inicializarChatCap2, 400);
   }
+  setTimeout(() => actividad?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
 }
 
 // Prepara la página 3 al entrar: si el estudiante ya completó la exploración
