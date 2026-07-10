@@ -391,6 +391,12 @@ function irAPagina(n) {
   const idxNueva = ORDEN_PAGINAS.indexOf(n);
   const avanza   = idxNueva > idxVieja;
 
+  // will-change SOLO en las dos páginas que realmente van a animar en este
+  // instante — aplicarlo a las ~30 páginas por igual (como antes) es
+  // contraproducente: fuerza al navegador a crear capas GPU de más.
+  pVieja.style.willChange = 'opacity, transform';
+  pNueva.style.willChange = 'opacity, transform';
+
   pNueva.style.transform = avanza ? 'translateX(48px)' : 'translateX(-48px)';
   pNueva.style.opacity   = '0';
 
@@ -411,6 +417,8 @@ function irAPagina(n) {
     pVieja.style.opacity    = '';
     pVieja.style.transition = '';
     pNueva.style.transition = '';
+    pVieja.style.willChange = '';
+    pNueva.style.willChange = '';
   }, 420);
 
   paginaActual = n;
@@ -1297,8 +1305,47 @@ function setStatusGen(elId, txt) {
 
 function setStatusFreq(elId, txt) { setStatusGen(elId, txt); }
 
+// Fuerza un reflow síncrono — el mismo efecto que abrir DevTools sin querer,
+// que es justo lo que "arregla" el bug cuando el estudiante lo hace manualmente.
+function forzarReflow() {
+  void document.body.offsetHeight;
+}
+
 function ocultarLoading() {
+  forzarReflow();
   document.getElementById('loadingOverlay')?.classList.add('hidden');
+  // Un segundo reflow tras revelar, para asentar el layout final de la página activa.
+  requestAnimationFrame(forzarReflow);
+}
+
+// Oculta la pantalla de carga solo cuando el contenido ya está realmente
+// estable (fuentes web cargadas) — evita el bug de "layout roto hasta que
+// abro F12", causado por revelar la página antes de que termine el cambio
+// de fuente (font-display:swap) y quede un repintado a medias.
+function ocultarLoadingCuandoListo() {
+  const MINIMO_MS = 400;   // evita parpadeo si todo carga muy rápido
+  const MAXIMO_MS = 3000;  // red de seguridad: nunca deja la pantalla pegada
+  const inicio = Date.now();
+
+  const esconder = () => {
+    const transcurrido = Date.now() - inicio;
+    setTimeout(ocultarLoading, Math.max(0, MINIMO_MS - transcurrido));
+  };
+
+  const timeoutSeguridad = setTimeout(ocultarLoading, MAXIMO_MS);
+
+  const listo = () => {
+    clearTimeout(timeoutSeguridad);
+    // Doble requestAnimationFrame: garantiza que el navegador ya completó
+    // un ciclo de pintado con el layout final antes de revelar la página.
+    requestAnimationFrame(() => requestAnimationFrame(esconder));
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(listo).catch(listo);
+  } else {
+    listo();
+  }
 }
 
 /* ════════════════════════════════
@@ -2983,7 +3030,7 @@ function ejfRenderizarGrafico() {
    INIT — DOMContentLoaded
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(ocultarLoading, 800);
+  ocultarLoadingCuandoListo();
   setTimeout(calcPosicionarBoton, 100);
 
   const repDot = document.getElementById('rep-dot');
