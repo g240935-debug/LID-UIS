@@ -1301,36 +1301,6 @@ function ocultarLoading() {
   document.getElementById('loadingOverlay')?.classList.add('hidden');
 }
 
-// Oculta la pantalla de carga solo cuando el contenido ya está realmente
-// estable (fuentes web cargadas) — evita el bug de "layout roto hasta que
-// abro F12", causado por revelar la página antes de que termine el cambio
-// de fuente (font-display:swap) y quede un repintado a medias.
-function ocultarLoadingCuandoListo() {
-  const MINIMO_MS = 400;   // evita parpadeo si todo carga muy rápido
-  const MAXIMO_MS = 3000;  // red de seguridad: nunca deja la pantalla pegada
-  const inicio = Date.now();
-
-  const esconder = () => {
-    const transcurrido = Date.now() - inicio;
-    setTimeout(ocultarLoading, Math.max(0, MINIMO_MS - transcurrido));
-  };
-
-  const timeoutSeguridad = setTimeout(ocultarLoading, MAXIMO_MS);
-
-  const listo = () => {
-    clearTimeout(timeoutSeguridad);
-    // Doble requestAnimationFrame: garantiza que el navegador ya completó
-    // un ciclo de pintado con el layout final antes de revelar la página.
-    requestAnimationFrame(() => requestAnimationFrame(esconder));
-  };
-
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(listo).catch(listo);
-  } else {
-    listo();
-  }
-}
-
 /* ════════════════════════════════
    RECUPERAR HISTORIAL
 ════════════════════════════════ */
@@ -2532,6 +2502,23 @@ const P3_DATA = [
 // Estado de columnas visibles en página 3
 let p3Columnas = { fi: true, hi: false, Fi: false, Hi: false };
 
+// Estado de formato (decimal vs porcentaje) para columnas de proporción,
+// independiente por tabla y por columna (fᵣ y Fᵣ se alternan por separado).
+let formatoP3  = { hi: false, Hi: false };
+let formatoEjf = { hi: false, Hi: false };
+let formatoP5c = { hi: false, Hi: false };
+
+// Formatea un valor de proporción según el modo activo (decimal 0.45 o 45%).
+function formatearProporcion(valor, modoPorcentaje) {
+  if (valor === undefined || valor === null || isNaN(valor)) return '—';
+  return modoPorcentaje ? `${Math.round(valor * 100)}%` : valor.toFixed(2);
+}
+
+// Genera el botoncito de alternancia para un encabezado de columna.
+function botonToggleFormato(onclickFn, activo) {
+  return `<button class="toggle-fmt-btn${activo ? ' activo' : ''}" onclick="event.stopPropagation(); ${onclickFn}" title="Cambiar entre decimal y porcentaje">${activo ? '%' : '.00'}</button>`;
+}
+
 function renderizarP3Tabla() {
   const inner = document.getElementById('p3-tabla-inner');
   if (!inner) return;
@@ -2539,32 +2526,37 @@ function renderizarP3Tabla() {
 
   let html = '<table><thead><tr><th>Bebida</th>';
   if (fi) html += '<th>fᵢ</th>';
-  if (hi) html += '<th class="col-nueva col-hi">fᵣ = fᵢ/N</th>';
+  if (hi) html += `<th class="col-nueva col-hi">fᵣ = fᵢ/N ${botonToggleFormato("toggleFormatoP3('hi')", formatoP3.hi)}</th>`;
   if (Fi) html += '<th class="col-nueva col-Fi">Fᵢ (acum.)</th>';
-  if (Hi) html += '<th class="col-nueva col-Hi">Fᵣ (acum.)</th>';
+  if (Hi) html += `<th class="col-nueva col-Hi">Fᵣ (acum.) ${botonToggleFormato("toggleFormatoP3('Hi')", formatoP3.Hi)}</th>`;
   html += '</tr></thead><tbody>';
 
   P3_DATA.forEach(row => {
     html += `<tr><td>${row.bebida}</td>`;
     if (fi) html += `<td>${row.fi}</td>`;
-    if (hi) html += `<td class="col-hi">${row.hi.toFixed(2)}</td>`;
+    if (hi) html += `<td class="col-hi">${formatearProporcion(row.hi, formatoP3.hi)}</td>`;
     if (Fi) html += `<td class="col-Fi">${row.Fi}</td>`;
-    if (Hi) html += `<td class="col-Hi">${row.Hi.toFixed(2)}</td>`;
+    if (Hi) html += `<td class="col-Hi">${formatearProporcion(row.Hi, formatoP3.Hi)}</td>`;
     html += '</tr>';
   });
 
   // Fila total
   html += '<tr class="freq-total-row"><td><strong>Total</strong></td>';
   if (fi) html += '<td><strong>40</strong></td>';
-  if (hi) html += '<td class="col-hi"><strong>1.00</strong></td>';
+  if (hi) html += `<td class="col-hi"><strong>${formatearProporcion(1, formatoP3.hi)}</strong></td>`;
   if (Fi) html += '<td class="col-Fi"><strong>40</strong></td>';
-  if (Hi) html += '<td class="col-Hi"><strong>1.00</strong></td>';
+  if (Hi) html += `<td class="col-Hi"><strong>${formatearProporcion(1, formatoP3.Hi)}</strong></td>`;
   html += '</tr></tbody></table>';
 
   inner.innerHTML = html;
 
   // Actualizar badges de progreso
   _p3ActualizarBadges();
+}
+
+function toggleFormatoP3(col) {
+  formatoP3[col] = !formatoP3[col];
+  renderizarP3Tabla();
 }
 
 function _p3ActualizarBadges() {
@@ -2819,17 +2811,17 @@ function ejfRenderizarTabla() {
 
   let html = `<table><thead><tr><th>${colEtiqueta}</th>`;
   if (cols.fi) html += '<th>fᵢ</th>';
-  if (cols.hi) html += '<th class="ejf-th-hi">fᵣ</th>';
+  if (cols.hi) html += `<th class="ejf-th-hi">fᵣ ${botonToggleFormato("toggleFormatoEjf('hi')", formatoEjf.hi)}</th>`;
   if (cols.Fi) html += '<th class="ejf-th-Fi">Fᵢ</th>';
-  if (cols.Hi) html += '<th class="ejf-th-Hi">Fᵣ</th>';
+  if (cols.Hi) html += `<th class="ejf-th-Hi">Fᵣ ${botonToggleFormato("toggleFormatoEjf('Hi')", formatoEjf.Hi)}</th>`;
   html += '</tr></thead><tbody>';
 
   filas.forEach(row => {
     html += `<tr><td>${row.bebida}</td>`;
     if (cols.fi) html += `<td>${row.fi}</td>`;
-    if (cols.hi) html += `<td class="ejf-td-hi">${row.hi.toFixed(2)}</td>`;
+    if (cols.hi) html += `<td class="ejf-td-hi">${formatearProporcion(row.hi, formatoEjf.hi)}</td>`;
     if (cols.Fi) html += `<td class="ejf-td-Fi">${row.Fi}</td>`;
-    if (cols.Hi) html += `<td class="ejf-td-Hi">${row.Hi.toFixed(2)}</td>`;
+    if (cols.Hi) html += `<td class="ejf-td-Hi">${formatearProporcion(row.Hi, formatoEjf.Hi)}</td>`;
     html += '</tr>';
   });
 
@@ -2838,9 +2830,9 @@ function ejfRenderizarTabla() {
   const totHi = filas.reduce((s, r) => s + r.hi, 0);
   html += '<tr class="ejf-total-row"><td><strong>Total</strong></td>';
   if (cols.fi) html += `<td><strong>${totFi}</strong></td>`;
-  if (cols.hi) html += `<td class="ejf-td-hi"><strong>${totHi.toFixed(2)}</strong></td>`;
+  if (cols.hi) html += `<td class="ejf-td-hi"><strong>${formatearProporcion(totHi, formatoEjf.hi)}</strong></td>`;
   if (cols.Fi) html += `<td class="ejf-td-Fi"><strong>${filas[filas.length-1]?.Fi ?? '—'}</strong></td>`;
-  if (cols.Hi) html += `<td class="ejf-td-Hi"><strong>${filas[filas.length-1]?.Hi?.toFixed(2) ?? '—'}</strong></td>`;
+  if (cols.Hi) html += `<td class="ejf-td-Hi"><strong>${filas.length ? formatearProporcion(filas[filas.length-1]?.Hi, formatoEjf.Hi) : '—'}</strong></td>`;
   html += '</tr></tbody></table>';
 
   wrapper.style.opacity = '0';
@@ -2854,6 +2846,11 @@ function ejfRenderizarTabla() {
     const info = document.getElementById('ejf-info-text');
     if (info) info.textContent = '⚠️ Selecciona al menos una columna para mostrar.';
   }
+}
+
+function toggleFormatoEjf(col) {
+  formatoEjf[col] = !formatoEjf[col];
+  ejfRenderizarTabla();
 }
 
 function ejfRenderizarGrafico() {
@@ -2986,7 +2983,7 @@ function ejfRenderizarGrafico() {
    INIT — DOMContentLoaded
 ════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  ocultarLoadingCuandoListo();
+  setTimeout(ocultarLoading, 800);
   setTimeout(calcPosicionarBoton, 100);
 
   const repDot = document.getElementById('rep-dot');
@@ -3112,6 +3109,11 @@ function p5cValoresCorrectos(prob) {
   return rows;
 }
 
+function toggleFormatoP5c(col) {
+  formatoP5c[col] = !formatoP5c[col];
+  p5cCargarProblema(p5cProblemaActual);
+}
+
 function p5cCargarProblema(idx) {
   p5cProblemaActual = idx;
   // Actualizar tabs
@@ -3135,7 +3137,10 @@ function p5cCargarProblema(idx) {
   const colEtiqueta = idx === 3 ? 'Intervalo (min)' : 'Categoría';
   let html = `<table class="p5c-tabla"><thead><tr>
     <th>${colEtiqueta}</th>
-    ${cols.map(c=>`<th>${c}</th>`).join('')}
+    <th>${cols[0]}</th>
+    <th>${cols[1]} ${botonToggleFormato("toggleFormatoP5c('hi')", formatoP5c.hi)}</th>
+    <th>${cols[2]}</th>
+    <th>${cols[3]} ${botonToggleFormato("toggleFormatoP5c('Hi')", formatoP5c.Hi)}</th>
   </tr></thead><tbody>`;
 
   prob.filas.forEach((f, r) => {
@@ -3147,7 +3152,8 @@ function p5cCargarProblema(idx) {
                    data-correct="${valores[r][k]}" data-row="${r}" data-col="${c}"
                    placeholder="?" oninput="p5cActualizarProgreso()"></td>`;
       } else {
-        const val = k === 'hi' || k === 'Hi' ? valores[r][k].toFixed(2) : valores[r][k];
+        const modo = k === 'hi' ? formatoP5c.hi : k === 'Hi' ? formatoP5c.Hi : null;
+        const val = (k === 'hi' || k === 'Hi') ? formatearProporcion(valores[r][k], modo) : valores[r][k];
         html += `<td class="p5c-given">${val}</td>`;
       }
     });
@@ -3158,9 +3164,9 @@ function p5cCargarProblema(idx) {
   html += `<tr class="p5c-total-row">
     <td><strong>Total</strong></td>
     <td class="p5c-given"><strong>${prob.N}</strong></td>
-    <td class="p5c-given"><strong>1.00</strong></td>
+    <td class="p5c-given"><strong>${formatearProporcion(1, formatoP5c.hi)}</strong></td>
     <td class="p5c-given"><strong>${prob.N}</strong></td>
-    <td class="p5c-given"><strong>1.00</strong></td>
+    <td class="p5c-given"><strong>${formatearProporcion(1, formatoP5c.Hi)}</strong></td>
   </tr></tbody></table>`;
 
   wrap.innerHTML = html;
