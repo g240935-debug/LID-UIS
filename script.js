@@ -442,6 +442,11 @@ function irAPagina(n) {
     setTimeout(() => p5dCargarSituacion(p5dSituacionActual), 300);
   }
 
+  // Cap II — Presentación (pág 6): exploración de datos libres antes del contenido formal
+  if (n === 6) {
+    setTimeout(p6RenderLibresGrid, 200);
+  }
+
   // Cap II — Tablas de contingencia
   if (n === 7 && !chatCap2Iniciado) {
     chatCap2Iniciado = true;
@@ -5702,6 +5707,69 @@ function p3RenderLibresGrid() {
     html += '</div>';
   });
   el.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════
+   PÁGINA 6 — EXPLORACIÓN: por qué se necesita una tabla de contingencia
+   Situación libre (sexo × actividad extracurricular, N=40) antes de la
+   presentación formal. Mismo patrón genético que la página 3: datos crudos,
+   preguntas difíciles de responder así, reflexión, y luego la revelación.
+════════════════════════════════════════════════ */
+let p6ExploracionCompleta = false;
+
+// Secuencia fija (no aleatoria en cada carga), respetando los conteos reales:
+// Hombres: Fútbol=10, Danza=2, Ajedrez=6, Música=2 (total 20)
+// Mujeres: Fútbol=3, Danza=9, Ajedrez=2, Música=6 (total 20)
+const P6_DATOS_LIBRES = [
+  ['Hombre — Fútbol','Hombre — Fútbol','Hombre — Danza','Mujer — Música','Mujer — Danza','Mujer — Danza','Mujer — Danza','Hombre — Danza','Hombre — Fútbol','Mujer — Ajedrez'],
+  ['Mujer — Fútbol','Mujer — Danza','Mujer — Danza','Hombre — Música','Hombre — Ajedrez','Mujer — Música','Mujer — Música','Mujer — Danza','Hombre — Ajedrez','Mujer — Fútbol'],
+  ['Mujer — Fútbol','Mujer — Danza','Mujer — Música','Mujer — Danza','Hombre — Música','Hombre — Ajedrez','Mujer — Música','Mujer — Ajedrez','Hombre — Fútbol','Hombre — Fútbol'],
+  ['Mujer — Música','Mujer — Danza','Hombre — Fútbol','Hombre — Fútbol','Hombre — Fútbol','Hombre — Ajedrez','Hombre — Ajedrez','Hombre — Ajedrez','Hombre — Fútbol','Hombre — Fútbol'],
+];
+
+function p6RenderLibresGrid() {
+  const el = document.getElementById('p6-libres-grid');
+  if (!el || el.dataset.init) return;
+  el.dataset.init = '1';
+  let html = '';
+  let n = 1;
+  P6_DATOS_LIBRES.forEach(col => {
+    html += '<div class="p3-libres-col">';
+    col.forEach(val => {
+      html += `<div class="p3-libres-item"><span class="p3-libres-num">${n}</span><span class="p3-libres-val">${val}</span></div>`;
+      n++;
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+// Paso 1 → 2: tras responder la reflexión, revela el comentario de transición
+// que introduce la tabla de contingencia como solución.
+function p6ExploracionContinuar() {
+  const resp = document.getElementById('p6-exp-respuesta');
+  if (!resp || !resp.value.trim()) {
+    alert('Escribe tu reflexión antes de continuar — no hay respuesta correcta o incorrecta, es tu primera impresión sobre las dificultades de esta lista.');
+    return;
+  }
+  const btn = document.getElementById('p6-exp-btn1');
+  if (btn) { btn.style.display = 'none'; }
+  const comentario = document.getElementById('p6-exp-comentario');
+  if (comentario) {
+    comentario.style.display = 'block';
+    comentario.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+// Paso 2 → revela la presentación formal (antes oculta) y marca la exploración
+// como completa para el Soft Gate del botón "Situación →".
+function p6MostrarPresentacion() {
+  p6ExploracionCompleta = true;
+  const formal = document.getElementById('p6-presentacion-formal');
+  if (formal) {
+    formal.style.display = 'block';
+    formal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // Prepara la página 3 al entrar: si el estudiante ya completó la exploración
