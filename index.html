@@ -581,50 +581,6 @@
           <span class="page-num">05</span>
         </div>
         <h2 class="page-title">Tablas de Contingencia</h2>
-
-        <!-- ══════════ EXPLORACIÓN: datos libres antes de la presentación formal ══════════ -->
-        <div class="p3-exploracion" id="p6-exploracion">
-
-          <div class="p3-exp-intro">
-            <span class="sit-badge">Situación</span>
-            <h3 class="sit-title">El coordinador de Bienestar Estudiantil necesita responder…</h3>
-            <p class="sit-desc">Se encuestó a 40 estudiantes sobre su <strong>sexo</strong> y su <strong>actividad extracurricular preferida</strong>. Estas son las respuestas <span class="p1-glosario" onclick="p1ToggleGlosario('libres', this, 'p6-glosario-panel')">libres</span> tal como se recolectaron, sin ningún procesamiento.</p>
-            <div class="p1-glosario-panel" id="p6-glosario-panel"></div>
-          </div>
-
-          <div class="p3-libres-grid" id="p6-libres-grid"></div>
-
-          <div class="chi3-preg-card chi3-inline-preg" style="margin-top:14px;">
-            <p class="chi3-preg-num" style="color:var(--sky);">Pregunta</p>
-            <p class="chi3-preg-text">El coordinador de Bienestar Estudiantil desea responder las siguientes preguntas:</p>
-            <ul class="p6-preg-lista">
-              <li>¿Qué actividad extracurricular prefieren los hombres?</li>
-              <li>¿Qué actividad prefieren las mujeres?</li>
-              <li>¿Cuántos estudiantes prefieren cada actividad?</li>
-              <li>¿Cuál es la actividad más popular en toda la institución?</li>
-              <li>¿Es posible comparar fácilmente las preferencias entre hombres y mujeres observando únicamente el listado?</li>
-            </ul>
-          </div>
-
-          <div class="chi3-preg-card chi3-inline-preg" style="margin-top:10px;">
-            <p class="chi3-preg-num" style="color:var(--gold);">Reflexiona</p>
-            <p class="chi3-preg-text">¿Qué dificultades encuentras para responder estas preguntas usando solo la lista de estudiantes? ¿Cómo podrías organizar la información para responderlas de manera más rápida y clara?</p>
-            <textarea class="p5d-resp-input" id="p6-exp-respuesta" rows="3" placeholder="Escribe las dificultades que encuentras y cómo organizarías la información…"></textarea>
-          </div>
-
-          <button class="btn-verificar" id="p6-exp-btn1" style="background:var(--navy);margin-top:10px;" onclick="p6ExploracionContinuar()">Continuar →</button>
-
-          <!-- Comentario de transición (oculto hasta responder) -->
-          <div class="note-card p3-exp-comentario" id="p6-exp-comentario" style="display:none;margin-top:16px;">
-            <div class="note-title">💭 Un momento para reflexionar</div>
-            <p class="note-text">Una forma eficiente de organizar simultáneamente dos variables es mediante una <strong>tabla de contingencia</strong>.</p>
-            <button class="btn-verificar" style="background:var(--gold);color:var(--ink);margin-top:10px;" onclick="p6MostrarPresentacion()">Ver cómo funciona →</button>
-          </div>
-
-        </div>
-
-        <!-- ══════════ Presentación formal (oculta hasta completar la exploración) ══════════ -->
-        <div id="p6-presentacion-formal" style="display:none;">
         <div class="intro-layout">
           <div class="intro-main">
             <p class="lead-text">Cuando se busca establecer si existe relación entre dos variables categóricas surge un recurso versátil y ampliamente utilizado: la <strong>Tabla de Contingencia</strong>. Su aplicación atraviesa prácticamente cualquier disciplina que trabaje con datos como por ejemplo: la epidemiología la usa para relacionar un tratamiento con su desenlace clínico, la investigación de mercados para vincular el perfil de un consumidor con su preferencia de producto, las ciencias sociales para estudiar cómo variables como el género o el nivel educativo se asocian con actitudes, comportamientos o condiciones de vida. A diferencia de la tabla de frecuencias que organiza una sola variable a la vez, esta representación de doble entrada permite estudiar la distribución conjunta de dos categorías simultáneamente, abriendo la puerta a un campo mucho más amplio del que este capítulo es apenas el punto de partida: el del análisis de asociación y más adelante de la validación estadística de esas relaciones.</p>
@@ -664,11 +620,9 @@
             </div>
           </div>
         </div>
-        </div>
-
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(5)">← Síntesis Cap. I</button>
-          <button class="btn-nav next" onclick="intentarAvanzarConGate(7, p6ExploracionCompleta, 'presentacion_contingencia', 'la exploración inicial sobre por qué se necesita una tabla de contingencia', MENSAJE_GATE_INTERACCION)">Situación →</button>
+          <button class="btn-nav next" onclick="irAPagina(7)">Situación →</button>
         </div>
       </div>
     </div>
@@ -684,7 +638,49 @@
           </span>
           <span class="page-num">06</span>
         </div>
-        <div class="activity-layout">
+
+        <!-- ══════════ EXPLORACIÓN: datos libres antes de la tabla ══════════ -->
+        <div class="p3-exploracion" id="p7-exploracion">
+
+          <div class="p3-exp-intro">
+            <span class="sit-badge">Situación</span>
+            <h3 class="sit-title">El coordinador de Bienestar Estudiantil necesita responder…</h3>
+            <p class="sit-desc">Se encuestó a 40 estudiantes sobre su <strong>sexo</strong> y su <strong>actividad extracurricular preferida</strong>. Estas son las respuestas <span class="p1-glosario" onclick="p1ToggleGlosario('libres', this, 'p7-glosario-panel')">libres</span> tal como se recolectaron, sin ningún procesamiento.</p>
+            <div class="p1-glosario-panel" id="p7-glosario-panel"></div>
+          </div>
+
+          <div class="p3-libres-grid" id="p7-libres-grid"></div>
+
+          <div class="chi3-preg-card chi3-inline-preg" style="margin-top:14px;">
+            <p class="chi3-preg-num" style="color:var(--sky);">Pregunta</p>
+            <p class="chi3-preg-text">El coordinador de Bienestar Estudiantil desea responder las siguientes preguntas:</p>
+            <ul class="p6-preg-lista">
+              <li>¿Qué actividad extracurricular prefieren los hombres?</li>
+              <li>¿Qué actividad prefieren las mujeres?</li>
+              <li>¿Cuántos estudiantes prefieren cada actividad?</li>
+              <li>¿Cuál es la actividad más popular en toda la institución?</li>
+              <li>¿Es posible comparar fácilmente las preferencias entre hombres y mujeres observando únicamente el listado?</li>
+            </ul>
+          </div>
+
+          <div class="chi3-preg-card chi3-inline-preg" style="margin-top:10px;">
+            <p class="chi3-preg-num" style="color:var(--gold);">Reflexiona</p>
+            <p class="chi3-preg-text">¿Qué dificultades encuentras para responder estas preguntas usando solo la lista de estudiantes? ¿Cómo podrías organizar la información para responderlas de manera más rápida y clara?</p>
+            <textarea class="p5d-resp-input" id="p7-exp-respuesta" rows="3" placeholder="Escribe las dificultades que encuentras y cómo organizarías la información…"></textarea>
+          </div>
+
+          <button class="btn-verificar" id="p7-exp-btn1" style="background:var(--navy);margin-top:10px;" onclick="p7ExploracionContinuar1()">Continuar →</button>
+
+          <!-- Comentario de transición (oculto hasta responder) -->
+          <div class="note-card p3-exp-comentario" id="p7-exp-comentario" style="display:none;margin-top:16px;">
+            <div class="note-title">💭 Un momento para reflexionar</div>
+            <p class="note-text">Una forma eficiente de organizar simultáneamente dos variables es mediante una <strong>tabla de contingencia</strong>.</p>
+            <button class="btn-verificar" style="background:var(--gold);color:var(--ink);margin-top:10px;" onclick="p7ExploracionContinuar2()">Comenzar la actividad →</button>
+          </div>
+
+        </div>
+
+        <div class="activity-layout" id="p7-activity-wrap" style="display:none;">
           <div class="vis-panel">
             <div class="situation-header">
               <span class="sit-badge">Situación</span>
