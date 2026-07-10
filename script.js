@@ -391,12 +391,6 @@ function irAPagina(n) {
   const idxNueva = ORDEN_PAGINAS.indexOf(n);
   const avanza   = idxNueva > idxVieja;
 
-  // will-change SOLO en las dos páginas que realmente van a animar en este
-  // instante — aplicarlo a las ~30 páginas por igual (como antes) es
-  // contraproducente: fuerza al navegador a crear capas GPU de más.
-  pVieja.style.willChange = 'opacity, transform';
-  pNueva.style.willChange = 'opacity, transform';
-
   pNueva.style.transform = avanza ? 'translateX(48px)' : 'translateX(-48px)';
   pNueva.style.opacity   = '0';
 
@@ -417,8 +411,6 @@ function irAPagina(n) {
     pVieja.style.opacity    = '';
     pVieja.style.transition = '';
     pNueva.style.transition = '';
-    pVieja.style.willChange = '';
-    pNueva.style.willChange = '';
   }, 420);
 
   paginaActual = n;
@@ -1305,17 +1297,8 @@ function setStatusGen(elId, txt) {
 
 function setStatusFreq(elId, txt) { setStatusGen(elId, txt); }
 
-// Fuerza un reflow síncrono — el mismo efecto que abrir DevTools sin querer,
-// que es justo lo que "arregla" el bug cuando el estudiante lo hace manualmente.
-function forzarReflow() {
-  void document.body.offsetHeight;
-}
-
 function ocultarLoading() {
-  forzarReflow();
   document.getElementById('loadingOverlay')?.classList.add('hidden');
-  // Un segundo reflow tras revelar, para asentar el layout final de la página activa.
-  requestAnimationFrame(forzarReflow);
 }
 
 // Oculta la pantalla de carga solo cuando el contenido ya está realmente
@@ -3157,7 +3140,27 @@ function p5cValoresCorrectos(prob) {
 }
 
 function toggleFormatoP5c(col) {
-  formatoP5c[col] = !formatoP5c[col];
+  const colIndex = col === 'hi' ? 1 : 3;
+  const activarPorcentaje = !formatoP5c[col]; // el modo AL QUE VAMOS, antes de aplicarlo
+
+  // Convertir lo que el estudiante ya escribió a la representación textual del
+  // nuevo modo — así el número sigue significando la misma proporción, no un
+  // valor distinto por accidente del cambio de formato.
+  const estado = p5cEstadoPorProblema[p5cProblemaActual] || (p5cEstadoPorProblema[p5cProblemaActual] = {});
+  if (!estado.valores) estado.valores = {};
+
+  document.querySelectorAll(`#p5c-tabla-wrap .p5c-cell[data-col="${colIndex}"]`).forEach(inp => {
+    if (inp.value === '') return;
+    const actual = parseFloat(inp.value);
+    if (isNaN(actual)) return;
+    const nuevoValor = activarPorcentaje
+      ? String(+(actual * 100).toFixed(2))
+      : String(+(actual / 100).toFixed(4));
+    inp.value = nuevoValor;
+    estado.valores[`${inp.dataset.row}-${inp.dataset.col}`] = nuevoValor;
+  });
+
+  formatoP5c[col] = activarPorcentaje;
   p5cCargarProblema(p5cProblemaActual);
 }
 
@@ -3195,9 +3198,12 @@ function p5cCargarProblema(idx) {
     keys.forEach((k, c) => {
       const key = `${r}-${c}`;
       if (vacias.has(key)) {
-        html += `<td><input type="number" step="0.0001" class="p5c-cell" id="p5c-${r}-${c}"
+        const modoActivo = k === 'hi' ? formatoP5c.hi : k === 'Hi' ? formatoP5c.Hi : null;
+        const placeholderTxt = modoActivo === true ? 'ej: 23' : modoActivo === false ? 'ej: 0.23' : '?';
+        const stepAttr = modoActivo === true ? '0.01' : '0.0001';
+        html += `<td><input type="number" step="${stepAttr}" class="p5c-cell" id="p5c-${r}-${c}"
                    data-correct="${valores[r][k]}" data-row="${r}" data-col="${c}"
-                   placeholder="?" oninput="p5cActualizarProgreso()"></td>`;
+                   placeholder="${placeholderTxt}" oninput="p5cActualizarProgreso()"></td>`;
       } else {
         const modo = k === 'hi' ? formatoP5c.hi : k === 'Hi' ? formatoP5c.Hi : null;
         const val = (k === 'hi' || k === 'Hi') ? formatearProporcion(valores[r][k], modo) : valores[r][k];
@@ -3267,12 +3273,24 @@ function p5cActualizarProgreso() {
   if (lbl) lbl.textContent = `${llenas} / ${total} celdas completadas`;
 }
 
+// Interpreta el valor escrito por el estudiante según el modo de formato activo
+// de esa columna (decimal o porcentaje) — necesario porque las columnas fᵣ/Fᵣ
+// pueden alternar entre ambas representaciones.
+function p5cValorEnDecimal(inp) {
+  const col = parseInt(inp.dataset.col, 10);
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) return NaN;
+  if (col === 1) return formatoP5c.hi ? val / 100 : val; // columna fᵣ
+  if (col === 3) return formatoP5c.Hi ? val / 100 : val; // columna Fᵣ
+  return val; // fᵢ, Fᵢ no son proporciones, no se ven afectadas
+}
+
 function p5cVerificar() {
   const inputs  = document.querySelectorAll('#p5c-tabla-wrap .p5c-cell');
   let correctas = 0, vacias = 0, incorrectas = 0;
   const estado = {};
   inputs.forEach(inp => {
-    const v = parseFloat(inp.value);
+    const v = p5cValorEnDecimal(inp);
     const c = parseFloat(inp.dataset.correct);
     estado[`${inp.dataset.row}-${inp.dataset.col}`] = inp.value;
     if (inp.value === '') { vacias++; return; }
