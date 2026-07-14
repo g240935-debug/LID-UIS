@@ -317,12 +317,16 @@ html, body {
   line-height: 1.7;
   color: var(--ink);
   margin-bottom: 14px;
+  text-align: justify;
+  hyphens: auto;
 }
 .body-text {
   font-size: .88rem;
   line-height: 1.7;
   color: #445;
   margin-bottom: 18px;
+  text-align: justify;
+  hyphens: auto;
 }
 
 .moment-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
