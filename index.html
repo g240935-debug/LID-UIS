@@ -803,7 +803,7 @@
     </div>
 
     <!-- ── Página 10: Actividad Cap III con IA (original page-5) ── -->
-    <div class="page" id="page-10">
+   <div class="page" id="page-10">
       <div class="page-inner page-activity">
         <div class="page-header">
           <span class="chapter-tag">Sección II · Actividad</span>
@@ -821,7 +821,7 @@
               <p class="sit-desc">Se clasificó a 400 estudiantes según su rasgo de personalidad (Introvertida / Extrovertida) y su color favorito (Rojo, Amarillo, Verde o Azul). Explora la tabla y responde antes de hablar con el tutor.</p>
             </div>
             <div class="fp-ref-table-wrapper">
-              <div class="fp-ref-label">Tabla de referencia — frecuencias absolutas (N = 400)</div>
+              <div class="fp-ref-label">Tabla de referencia — frecuencias absolutas (n = 400)</div>
               <div id="fp-ref-table"></div>
             </div>
 
@@ -844,12 +844,12 @@
               </div>
               <button class="btn-verificar" style="background:var(--navy);margin-top:10px;" onclick="cap3EnviarPreguntasIniciales()">Enviar al tutor →</button>
             </div>
+          </div>
 
-            <!-- Placeholder mientras no se han enviado las preguntas -->
-            <div class="p25-tutor-placeholder" id="cap3-tutor-placeholder" style="margin-top:14px;">
-              <div class="p25-ph-icon">🎓</div>
-              <div class="p25-ph-txt">El tutor aparecerá aquí cuando envíes tus tres respuestas.</div>
-            </div>
+          <!-- Placeholder mientras no se han enviado las preguntas — ocupa la columna derecha -->
+          <div class="p25-tutor-placeholder" id="cap3-tutor-placeholder">
+            <div class="p25-ph-icon">🎓</div>
+            <div class="p25-ph-txt">El tutor aparecerá aquí cuando envíes tus tres respuestas.</div>
           </div>
 
           <div class="tutor-panel" id="cap3-tutor-panel" style="display:none;">
@@ -874,6 +874,12 @@
             </div>
           </div>
         </div>
+        <div class="page-footer">
+          <button class="btn-nav prev" onclick="irAPagina(9)">← Formas parciales</button>
+          <button class="btn-nav next" onclick="intentarAvanzarConGate('10b', cap3Completado, 'cap3', 'las tres formas de leer una tabla de contingencia', MENSAJE_GATE_COMPLETITUD)">¿Están relacionadas? →</button>
+        </div>
+      </div>
+    </div>
         <div class="page-footer">
           <button class="btn-nav prev" onclick="irAPagina(9)">← Formas parciales</button>
           <button class="btn-nav next" onclick="intentarAvanzarConGate('10b', cap3Completado, 'cap3', 'las tres formas de leer una tabla de contingencia', MENSAJE_GATE_COMPLETITUD)">¿Están relacionadas? →</button>
